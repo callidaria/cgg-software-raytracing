@@ -4,20 +4,29 @@ public class Functions {
 
     static public final double EPSILON = 1e-5;
 
-    // Functions on doubles
+    /* Functions on doubles */
+
+    /** Returns true if v is between a and b. */
     public static boolean in(double a, double b, double v) {
         return a <= v && v <= b;
     }
 
+    /**
+     * Compares double values a and b. Returns true if the difference is less
+     * than EPSILON.
+     */
     public static boolean almostEqual(double a, double b) {
         return Math.abs(a - b) < EPSILON;
     }
 
     // Static Vec2 functions
+
+    /** Creates a new Vec2 object with coordinates x and y. */
     public static Vec2 vec2(double x, double y) {
         return new Vec2(x, y);
     }
 
+    /** Calculates the sum of two more vectors. */
     public static Vec2 add(Vec2 a, Vec2 b, Vec2... vs) {
         Vec2 r = vec2(a.x() + b.x(), a.y() + b.y());
         for (var v : vs)
@@ -25,6 +34,7 @@ public class Functions {
         return r;
     }
 
+    /** Calculates the difference of two more vectors. */
     public static Vec2 subtract(Vec2 a, Vec2 b, Vec2... vs) {
         Vec2 r = vec2(a.x() - b.x(), a.y() - b.y());
         for (var v : vs)
@@ -32,52 +42,70 @@ public class Functions {
         return r;
     }
 
-    // linear interpolation betweeen 2 points
+    /** Linear interpolation betweeen 2 vectors. */
     public static Vec2 interplolate(Vec2 a, Vec2 b, double t) {
         return add(multiply(a, 1 - t), multiply(b, t));
     }
 
-    // barycentric interpolation betweeen 3 points
+    /** Barycentric interpolation betweeen 3 points. */
     public static Vec2 interplolate(Vec2 a, Vec2 b, Vec2 c, Vec3 uvw) {
         return add(multiply(a, uvw.u()), multiply(b, uvw.v()), multiply(c, uvw.w()));
     }
 
+    /** Multiplies each coordinate of vector a with the scalar s. */
     public static Vec2 multiply(double s, Vec2 a) {
         return vec2(s * a.x(), s * a.y());
     }
 
+    /** Multiplies each coordinate of vector a with the scalar s. */
     public static Vec2 multiply(Vec2 a, double s) {
         return vec2(s * a.x(), s * a.y());
     }
 
+    /**
+     * Multiplies two vectors componentwise. This is NOT the dot product between
+     * two vectors. This is NOT the cross product between two vectors.
+     */
     public static Vec2 multiply(Vec2 a, Vec2 b) {
         return vec2(a.x() * b.x(), a.y() * b.y());
     }
 
+    /** Multiplies the coordinates of vector a with -1.0. */
     public static Vec2 negate(Vec2 a) {
         return vec2(-a.x(), -a.y());
     }
 
+    /** Divides each coordinate of vector a by the scalar s. */
     public static Vec2 divide(Vec2 a, double s) {
         return vec2(a.x() / s, a.y() / s);
     }
 
+    /** Calculates the dot product between vector a and b. */
     public static double dot(Vec2 a, Vec2 b) {
         return a.x() * b.x() + a.y() * b.y();
     }
 
+    /**
+     * Calculates the "perpendicular cross" product between 2D vectors a and b. This
+     * is the same as the regular 3D cross product where a.z and b.z are both zero.
+     * It returns just the magnitude of the resulting vector (which is the signed
+     * area of the parallelogram between the two vectors).
+     */
     public static double cross(Vec2 a, Vec2 b) {
         return a.x() * b.y() - a.y() * b.x();
     }
 
+    /** Returns the length of vector a. */
     public static double length(Vec2 a) {
         return (double) Math.sqrt(a.x() * a.x() + a.y() * a.y());
     }
 
+    /** Return the squared length of vector a. */
     public static double squaredLength(Vec2 a) {
         return a.x() * a.x() + a.y() * a.y();
     }
 
+    /** Normalizes vector a by dividing it by it's length. */
     public static Vec2 normalize(Vec2 a) {
         return divide(a, length(a));
     }

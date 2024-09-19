@@ -18,6 +18,23 @@ public class ReinhardGlobalTmo {
         this.white = white;
     }
 
+    public void toneMap(Image img) {
+        var average = averageLuminance(img);
+        var max = maxLuminance(img);
+        System.out.format("maximum luminance before: %02f", max);
+        if (white == null)
+            white = max;
+        for (int x = 0; x != img.width(); x++) {
+            for (int y = 0; y != img.height(); y++) {
+                var luminance = luminance(img.getPixel(x, y));
+                var scaled = (a / average) * luminance;
+                var display = (scaled * (1 + (scaled / (white * white)))) / (1 + scaled);
+                img.setPixel(x, y, changeLuminance(img.getPixel(x, y), display));
+            }
+        }
+        System.out.format("maximum luminance after : %02f", maxLuminance(img));
+    }
+
     private double luminance(Color c) {
         return dot(vec3(c), vec3(0.299, 0.587, 0.144));
     }
@@ -45,22 +62,5 @@ public class ReinhardGlobalTmo {
             }
         }
         return max;
-    }
-
-    public void toneMap(Image img) {
-        var average = averageLuminance(img);
-        var max = maxLuminance(img);
-        System.out.format("maximum luminance before: %02f", max);
-        if (white == null)
-            white = max;
-        for (int x = 0; x != img.width(); x++) {
-            for (int y = 0; y != img.height(); y++) {
-                var luminance = luminance(img.getPixel(x, y));
-                var scaled = (a / average) * luminance;
-                var display = (scaled * (1 + (scaled / (white * white)))) / (1 + scaled);
-                img.setPixel(x, y, changeLuminance(img.getPixel(x, y), display));
-            }
-        }
-        System.out.format("maximum luminance after : %02f", maxLuminance(img));
     }
 }
