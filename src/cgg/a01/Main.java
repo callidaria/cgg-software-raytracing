@@ -12,7 +12,7 @@ public class Main {
     int height = 400;
 
     // This class instance defines the contents of the image.
-    var constant = new ColorSampler(gray);
+    var constant = new ConstantColor(gray);
 
     // Creates an image and iterates over all pixel positions inside the image.
     var image = new Image(width, height);
