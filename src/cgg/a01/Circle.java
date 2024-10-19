@@ -21,6 +21,12 @@ public class Circle {
 		return sqCenterDistance(coordinate)<=sq_radius;
 	}
 
+	public double orientation(Vec2 target,Vec2 coordinate) {
+		Vec2 ori = target.sub(position);
+		Vec2 dir = coordinate.sub(position);
+		return Math.acos(ori.dot(dir)/(ori.distance()*dir.distance()));
+	}
+
 	public Color suncircleEmission(Vec2 coordinate) {
 		// TODO
 		return new Color(0,0,0);
@@ -31,6 +37,6 @@ public class Circle {
 	}
 
 	private double sqCenterDistance(Vec2 coordinate) {
-		return Math.pow(coordinate.x()-position.x(),2)+Math.pow(coordinate.y()-position.y(),2);
+		return coordinate.sub(position).sqDistance();
 	}
 }

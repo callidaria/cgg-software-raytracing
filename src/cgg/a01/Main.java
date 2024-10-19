@@ -27,25 +27,42 @@ public class Main {
 		}
 
 		// generate multicircles
-		Image image0 = new Image(width, height);
-		for (int x = 0; x != width; x++) {
-			for (int y = 0; y != height; y++) {
-				image0.setPixel(x,y,background);
+		Image image_multi = new Image(width,height);
+		Image image_disc = new Image(width,height);
+		for (int x=0;x<width;x++) {
+			for (int y=0;y<height;y++) {
+
+				// clear
+				image_multi.setPixel(x,y,background);
+				image_disc.setPixel(x,y,background);
+
+				// iterate entities
 				for (Circle circle : circles) {
-					boolean hits = circle.coversPoint(new Vec2(x,y));
-					if (circle.coversPoint(new Vec2(x,y))) image0.mixPixel(x,y,circle.colour());
+					if (!circle.coversPoint(new Vec2(x,y))) continue;
+
+					// multicircles
+					// barebones
+					image_multi.mixPixel(x,y,circle.colour());
+
+					// colourdiscs
+					double rot = circle.orientation(new Vec2(width/2,height/2),new Vec2(x,y));
+					image_disc.mixPixel(x,y,new Color(
+							Math.abs(Math.tan(rot)),Math.abs(Math.tan(rot)),Math.abs(Math.cos(rot)))
+						);
+					// FIXME: prettify colour spectrum
 				}
 			}
 		}
-		image0.writePng("a01-constant");
+		image_multi.writePng("a01-constant");
+		image_disc.writePng("a01-colourdisc");
 
 		// generate suncircle
-		Image image1 = new Image(width,height);
+		Image image_radiation = new Image(width,height);
 		for (int x=0;x<width;x++) {
 			for (int y=0;y!=height;y++) {
-				image1.setPixel(x,y,background);
+				image_radiation.setPixel(x,y,background);
 			}
 		}
-		image1.writePng("a01-suncircle");
+		image_radiation.writePng("a01-suncircle");
 	}
 }

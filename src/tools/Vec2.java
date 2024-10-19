@@ -19,6 +19,14 @@ public final record Vec2(double x, double y) {
     /** The negative unit vector along the y-axis (0, -1). */
     public static final Vec2 nyAxis = vec2(0, -1);
 
+	public Vec2 add(Vec2 val) { return new Vec2(x+val.x(),y+val.y()); }
+	public Vec2 sub(Vec2 val) { return new Vec2(x-val.x(),y-val.y()); }
+	public Vec2 mul(Vec2 val) { return new Vec2(x*val.x(),y*val.y()); }
+	public Vec2 div(Vec2 val) { return new Vec2(x/val.x(),y/val.y()); }
+	public double dot(Vec2 val) { return x*val.x()+y*val.y(); }
+	public double sqDistance() { return Math.pow(x,2)+Math.pow(y,2); }
+	public double distance() { return Math.sqrt(sqDistance()); }
+
     /**
      * Returns the x-coordinate of the vector.
      * This method is an alias for the x() method.
