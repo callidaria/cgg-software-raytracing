@@ -18,11 +18,19 @@ public class Circle {
 	}
 
 	public boolean coversPoint(Vec2 coordinate) {
-		double __SqVectorDistance = Math.pow(coordinate.x()-position.x(),2)+Math.pow(coordinate.y()-position.y(),2);
-		return __SqVectorDistance<=sq_radius;
+		return sqCenterDistance(coordinate)<=sq_radius;
+	}
+
+	public Color suncircleEmission(Vec2 coordinate) {
+		// TODO
+		return new Color(0,0,0);
 	}
 
 	public Color colour() {
 		return colour;
+	}
+
+	private double sqCenterDistance(Vec2 coordinate) {
+		return Math.pow(coordinate.x()-position.x(),2)+Math.pow(coordinate.y()-position.y(),2);
 	}
 }
