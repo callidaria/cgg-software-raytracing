@@ -1,53 +1,49 @@
-
 package cgg;
 
 import tools.*;
 
 public class Image implements tools.Image {
 
-    // ---8<--- missing-implementation
-    // TODO Provides storage for the image data. For each pixel in the image
-    // three double values are needed to store the pixel components.
+	private final int width;
+	private final int height;
+	private double[] data;
+
     public Image(int width, int height) {
+		this.width = width;
+		this.height = height;
+		this.data = new double[width*height*3];
     }
 
-    // TODO Stores the RGB color components for one particular pixel addressed
-    // by it's coordinates in the image.
     public void setPixel(int x, int y, Color color) {
+		int __PixelIndex = calculatePixelIndex(x,y);
+		data[__PixelIndex] = color.r();
+		data[__PixelIndex+1] = color.g();
+		data[__PixelIndex+2] = color.b();
     }
 
-    // TODO Retrieves the RGB color components for one particular pixel addressed
-    // by it's coordinates in the image.
     public Color getPixel(int x, int y) {
-        return Color.black;
+		int __PixelIndex = calculatePixelIndex(x,y);
+		return new Color(data[__PixelIndex],data[__PixelIndex+1],data[__PixelIndex+2]);
     }
-    // --->8---
 
     public void writePng(String name) {
-        // TODO This call also needs to be adjusted once Image() and setPixel()
-        // are implemented. Use
-        // ImageWriter.writePng(String name, double[] data, int width, int height) to
-        // write the image data to disk in PNG format.
+		ImageWriter.writePng(name,data,width,height);
     }
 
     public void writeHdr(String name) {
-        // TODO This call also needs to be adjusted once Image() and setPixel()
-        // are implemented. Use
-        // ImageWriter.writePng(String name, double[] data, int width, int height) to
-        // write the image data to disk in OpenEXR format.
+        // TODO: write the image data to disk in OpenEXR format.
+		//ImageWriter.writePng(name,data,width,height);
     }
 
     public int width() {
-        // TODO This is just a dummy value to make the compiler happy. This
-        // needs to be adjusted such that the actual width of the Image is
-        // returned.
-        return 0;
+        return width;
     }
 
     public int height() {
-        // TODO This is just a dummy value to make the compiler happy. This
-        // needs to be adjusted such that the actual height of the Image is
-        // returned.
-        return 0;
+        return height;
     }
+
+	private int calculatePixelIndex(int x,int y) {
+		return (y*width+x)*3;
+	}
 }
