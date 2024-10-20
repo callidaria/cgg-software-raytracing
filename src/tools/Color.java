@@ -27,8 +27,10 @@ public record Color(double r, double g, double b) {
     /** Yellow color (1, 1, 0). */
     public static final Color yellow = color(1, 1, 0);
 
+	public Color add(Color col) { return new Color(r+col.r(),g+col.g(),b+col.b()); }
 	public Color mul(double val) { return new Color(r*val,g*val,b*val); }
 	public Color mul(Color col) { return new Color(r*col.r(),g*col.g(),b*col.b()); }
+	public Color mix(Color col) { return new Color((r+col.r())/2,(g+col.g())/2,(b+col.b())/2); }
 
     /**
      * Returns a string representation of the color.

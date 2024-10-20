@@ -1,4 +1,3 @@
-
 package cgg.a01;
 
 import tools.*;
