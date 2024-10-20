@@ -21,15 +21,23 @@ public class Circle {
 		return sqCenterDistance(coordinate)<=sq_radius;
 	}
 
+	public double fadingInfluence(Vec2 coordinate) {
+		return Math.max((coordinate.sub(position).sqDistance()-sq_radius)*-1,.0)/sq_radius;
+	}
+
 	public double orientation(Vec2 target,Vec2 coordinate) {
 		Vec2 ori = target.sub(position);
 		Vec2 dir = coordinate.sub(position);
 		return Math.acos(ori.dot(dir)/(ori.distance()*dir.distance()));
 	}
 
-	public Color suncircleEmission(Vec2 coordinate) {
-		// TODO
-		return new Color(0,0,0);
+	public Color waveEmission(Vec2 coordinate) {
+		double range = Math.max(Math.sin(coordinate.sub(position).sqDistance()/sq_radius),.0);
+		return new Color(
+				range/.3,
+				Math.max(range-.3,.0)/.3,
+				Math.max(range-.6,.0)/.3
+			);
 	}
 
 	public Color colour() {

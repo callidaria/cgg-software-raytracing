@@ -28,6 +28,13 @@ public class Image implements tools.Image {
 		data[__PixelIndex+2] = (data[__PixelIndex+2]+colour.b())/2;
 	}
 
+	public void addPixelColour(int x,int y,Color colour) {
+		int __PixelIndex = calculatePixelIndex(x,y);
+		data[__PixelIndex] = (data[__PixelIndex]+colour.r());
+		data[__PixelIndex+1] = (data[__PixelIndex+1]+colour.g());
+		data[__PixelIndex+2] = (data[__PixelIndex+2]+colour.b());
+	}
+
     public Color getPixel(int x, int y) {
 		int __PixelIndex = calculatePixelIndex(x,y);
 		return new Color(data[__PixelIndex],data[__PixelIndex+1],data[__PixelIndex+2]);
