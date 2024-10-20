@@ -34,9 +34,9 @@ public class Circle {
 	public Color waveEmission(Vec2 coordinate) {
 		double range = Math.max(Math.sin(coordinate.sub(position).sqDistance()/sq_radius),.0);
 		return new Color(
-				range/.3,
-				Math.max(range-.3,.0)/.3,
-				Math.max(range-.6,.0)/.3
+				range*3,
+				Math.max(range-.3,.0)*3,
+				Math.max(range-.6,.0)*3
 			);
 	}
 

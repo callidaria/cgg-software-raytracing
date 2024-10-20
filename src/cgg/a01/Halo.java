@@ -12,9 +12,9 @@ public record Halo(ArrayList<Circle> circles,Vec2 center) implements Sampler {
 
 			double rot = circle.orientation(center,point);
 			double influence = Math.max(Math.cos(rot),.0);
-			result = result.add(circle.colour().mul(Math.cos(rot)));
+			double inner_cut = 1-Math.sqrt(circle.fadingInfluence(point));
+			result = result.add(circle.colour().mul(Math.max(Math.cos(rot),.0)*inner_cut));
 		}
 		return result;
 	}
 }
-// TODO protodistance + colour addition doesnt work for some reason
