@@ -18,7 +18,7 @@ public class Main {
 		// generate multicircles
 		Random rand = new Random();
 		ArrayList<Circle> circles = new ArrayList<Circle>();
-		for (int i=0;i<25;i++) {
+		for (int i=0;i<17;i++) {
 			circles.add(new Circle(
 					new Vec2(rand.nextInt(401),rand.nextInt(401)),
 					rand.nextInt(65)+10,

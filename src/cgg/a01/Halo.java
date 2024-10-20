@@ -12,7 +12,7 @@ public record Halo(ArrayList<Circle> circles,Vec2 center) implements Sampler {
 
 			double rot = circle.orientation(center,point);
 			double influence = Math.max(Math.cos(rot),.0);
-			double inner_cut = 1-Math.sqrt(circle.fadingInfluence(point));
+			double inner_cut = 1-Math.cos(circle.fadingInfluence(point)*Math.PI*2);
 			result = result.add(circle.colour().mul(Math.max(Math.cos(rot),.0)*inner_cut));
 		}
 		return result;
