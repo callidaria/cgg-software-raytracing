@@ -30,4 +30,6 @@ public class Camera
 		Vec3 ray_direction = normalize(vec3(coord.x()-hwidth,coord.y()-height*.5,-hwidth/tan(rad_fov*.5)));
 		return new Ray(position,ray_direction,near,far);
 	}
+
+	public Vec3 position() { return position; }
 }

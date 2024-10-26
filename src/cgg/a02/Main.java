@@ -13,11 +13,10 @@ public class Main
 		int height = 400;
 
 		// generate scene
-		Camera camera = new Camera(vec3(0,0,0),90,width,height);
-		Sphere sphere = new Sphere(vec3(0,0,-2),1,color(vec3(1,1,1)));
+		Scene scene = new Scene(width,height);
 
 		// samplers
-		Sampler sampler = new RayTracer(camera,sphere);
+		Sampler sampler = new RayTracer(scene);
 
 		// images
 		cgg.Image image = new cgg.Image(width,height);
