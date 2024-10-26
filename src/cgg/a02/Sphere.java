@@ -44,6 +44,5 @@ public class Sphere
 		Vec3 __Position = r.calculatePosition(t);
 		Vec3 __Normal = divide(subtract(__Position,center),radius);
 		return new Hit(t,__Position,__Normal,colour);
-		// TODO: normals
 	}
 }

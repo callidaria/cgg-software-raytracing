@@ -1,6 +1,7 @@
 package cgg.a02;
 
 import static java.lang.Math.*;
+import java.util.ArrayList;
 import tools.*;
 import static tools.Functions.*;
 
@@ -22,7 +23,7 @@ public class RayTracer implements Sampler
 		// process reflective hits
 		boolean __ReflectRay = false;
 		Hit __Proc = scene.reflector().intersect(__Ray);
-		if (__Hit==null||(__Proc!=null&&__Proc.param()<__Hit.param()))
+		if (recentSurfaceHit(__Hit,__Proc))
 		{
 			__Hit = __Proc;
 			__ReflectRay = true;
@@ -31,18 +32,55 @@ public class RayTracer implements Sampler
 		// combine
 		if (__Hit==null) return color(0,0,0);
 		if (__ReflectRay) return shadeReflective(__Hit);
+		return __Hit.colour();
+		/*
+		if (__Hit==null) return color(0,0,0);
+		if (__ReflectRay) return shadeReflective(__Hit);
 		return shade(__Hit);
+		*/
 	}
 
 	private Hit processScene(Ray ray)
 	{
+		// process bland spheres
+		Hit hit = iterateSpheres(scene.blands(),ray);
+
+		// process brick spheres
+		Hit __Hit = iterateSpheres(scene.bricks(),ray);
+		if (__Hit!=null&&recentSurfaceHit(hit,__Hit))
+		{
+			hit = __Hit;
+			hit.setType(1);
+		}
+
+		// surface processing
+		if (hit==null) return null;
+		switch (hit.type())
+		{
+			case 0: hit.overwriteColour(shade(hit));
+				break;
+			case 1: hit.overwriteColour(shadeBrick(hit));
+				break;
+			default:
+		}
+
+		return hit;
+	}
+
+	private Hit iterateSpheres(ArrayList<Sphere> spheres,Ray ray)
+	{
 		Hit hit = null;
-		for (Sphere sphere : scene.blands())
+		for (Sphere sphere : spheres)
 		{
 			Hit __Proc = sphere.intersect(ray);
-			hit = (hit==null||(__Proc!=null&&__Proc.param()<hit.param())) ? __Proc : hit;
+			hit = recentSurfaceHit(hit,__Proc) ? __Proc : hit;
 		}
 		return hit;
+	}
+
+	private boolean recentSurfaceHit(Hit h0,Hit h1)
+	{
+		return h0==null||(h1!=null&&h1.param()<h0.param());
 	}
 
 	private static Color shade(Hit hit)
@@ -51,6 +89,12 @@ public class RayTracer implements Sampler
 		Color ambient = multiply(.1,hit.colour());
 		Color diffuse = multiply(.9*max(0,dot(lightDir,hit.normal())),hit.colour());
 		return add(ambient,diffuse);
+	}
+
+	private static Color shadeBrick(Hit hit)
+	{
+		// TODO
+		return hit.colour();
 	}
 
 	private Color shadeReflective(Hit hit)
@@ -69,6 +113,6 @@ public class RayTracer implements Sampler
 	}
 
 	// TODO: ziegelsteinspheres
-	// TODO: semi-transparent volumetric gas spheres
+	// TODO: semi-transparent volumetric gas spheres or glassesque behaviour
 	// TODO: rough spheres
 }
