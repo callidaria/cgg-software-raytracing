@@ -12,7 +12,6 @@ public class Main {
 		// setup frame
 		int width = 400;
 		int height = 400;
-		Color background = new Color(.0f,.0f,.0f);
 		Vec2 center = new Vec2(width/2,height/2);
 
 		// generate multicircles
