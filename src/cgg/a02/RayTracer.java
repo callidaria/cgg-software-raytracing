@@ -15,16 +15,9 @@ public class RayTracer implements Sampler
 
 	public Color getColor(Vec2 coord)
 	{
-		// emit ray towards scene
+		// emit ray towards scene & process
 		Ray __Ray = scene.camera().generateRay(coord);
-
-		// process bland hits
-		Hit __Hit = null;
-		for (Sphere sphere : scene.blands())
-		{
-			Hit __Proc = sphere.intersect(__Ray);
-			__Hit = (__Hit==null||(__Proc!=null&&__Proc.param()<__Hit.param())) ? __Proc : __Hit;
-		}
+		Hit __Hit = processScene(__Ray);
 
 		// process reflective hits
 		boolean __ReflectRay = false;
@@ -39,6 +32,17 @@ public class RayTracer implements Sampler
 		if (__Hit==null) return color(0,0,0);
 		if (__ReflectRay) return shadeReflective(__Hit);
 		return shade(__Hit);
+	}
+
+	private Hit processScene(Ray ray)
+	{
+		Hit hit = null;
+		for (Sphere sphere : scene.blands())
+		{
+			Hit __Proc = sphere.intersect(ray);
+			hit = (hit==null||(__Proc!=null&&__Proc.param()<hit.param())) ? __Proc : hit;
+		}
+		return hit;
 	}
 
 	private static Color shade(Hit hit)
@@ -57,16 +61,10 @@ public class RayTracer implements Sampler
 		Ray __Ray = new Ray(hit.position(),__OutBounce,0,10000);
 
 		// receive colour source & combine
-		Hit __Hit = null;
-		for (Sphere sphere : scene.blands())
-		{
-			Hit __Proc = sphere.intersect(__Ray);
-			__Hit = (__Hit==null||(__Proc!=null&&__Proc.param()<__Hit.param())) ? __Proc : __Hit;
-		}
+		Hit __Hit = processScene(__Ray);
 		Color __Fin = color(.005,.005,.005);
 		if (__Hit!=null) __Fin = __Fin.mix(__Hit.colour());
 		return __Fin;
-		// TODO: dont reproduce code from scene iteration
 		// TODO: prettify combination
 	}
 
