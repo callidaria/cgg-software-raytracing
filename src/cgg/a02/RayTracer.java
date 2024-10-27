@@ -120,8 +120,12 @@ public class RayTracer implements Sampler
 	private Color shadeReflective(Hit hit)
 	{
 		// calculate reflective bouncing ray
+		double roughness = 15;
 		Vec3 vd = subtract(hit.position(),scene.camera().position());
 		Vec3 __OutBounce = add(vd,multiply(2*dot(multiply(vd,-1),hit.normal()),hit.normal()));
+		__OutBounce = multiplyPoint(Functions.rotate(vec3(1,0,0),Functions.random()*roughness),__OutBounce);
+		__OutBounce = multiplyPoint(Functions.rotate(vec3(0,1,0),Functions.random()*roughness),__OutBounce);
+		__OutBounce = multiplyPoint(Functions.rotate(vec3(0,0,1),Functions.random()*roughness),__OutBounce);
 		Ray __Ray = new Ray(hit.position(),__OutBounce,0,10000);
 
 		// receive colour source & combine
@@ -130,6 +134,7 @@ public class RayTracer implements Sampler
 		if (__Hit!=null) __Fin = __Fin.mix(__Hit.colour(),.9);
 		return __Fin;
 	}
+	// TODO: random rotation adjustment on surface bounce
 
 	private Color shadeGlass(Hit hit)
 	{
