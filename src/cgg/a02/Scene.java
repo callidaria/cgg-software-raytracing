@@ -33,6 +33,27 @@ public class Scene
 		glass = new ArrayList<Sphere>();
 		glass.add(new Sphere(vec3(-.5,.35,-1.5),.5,color(vec3(.3,.1,.6))));
 		glass.add(new Sphere(vec3(2.5,-2.5,-4),.5,color(vec3(.5,.1,0))));
+		glass.add(new Sphere(vec3(-.5,3,-4),.4,color(vec3(0,0,.5))));
+
+		// generate additional background spheres
+		Color colour[] = {
+			color(vec3(.5,0,0)),
+			color(vec3(.5,.5,0)),
+			color(vec3(.5,0,.5)),
+			color(vec3(0,.5,0)),
+			color(vec3(0,.5,.5)),
+			color(vec3(0,0,.5)),
+			color(vec3(.5,.2,.2)),
+			color(vec3(.2,.5,.2)),
+			color(vec3(.2,.2,.5)),
+			color(vec3(.5,.5,.5))
+		};
+		for (int i=0;i<10;i++)
+		{
+			Vec3 position = vec3(-10+20*random(),-10+20*random(),-10-7*random());
+			double radius = .5+random();
+			blands.add(new Sphere(position,radius,colour[i]));
+		}
 
 		// reflector setup
 		reflector = new Sphere(vec3(0,0,-4),1,color(vec3(.5,.1,0)));

@@ -144,7 +144,6 @@ public class RayTracer implements Sampler
 		if (__Hit!=null) __Fin = __Fin.mix(__Hit.colour(),.9);
 		return __Fin;
 	}
-	// TODO: random rotation adjustment on surface bounce
 
 	private Color shadeGlass(Ray ray,Hit hit)
 	{
@@ -163,6 +162,4 @@ public class RayTracer implements Sampler
 		__MatColour = (__HitBounce!=null) ? __MatColour.mix(__HitBounce.colour(),.1) : __MatColour;
 		return __MatColour;
 	}
-
-	// TODO: semi-transparent volumetric gas spheres in background
 }
