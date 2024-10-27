@@ -30,5 +30,6 @@ public class Hit
 	public Color colour() { return colour; }
 	public int type() { return type; }
 	public void setType(int type) { this.type = type; }
+	public void overwriteNormal(Vec3 normal) { this.normal = normal; }
 	public void overwriteColour(Color colour) { this.colour = colour; }
 }

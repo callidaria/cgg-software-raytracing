@@ -33,11 +33,6 @@ public class RayTracer implements Sampler
 		if (__Hit==null) return color(0,0,0);
 		if (__ReflectRay) return shadeReflective(__Hit);
 		return __Hit.colour();
-		/*
-		if (__Hit==null) return color(0,0,0);
-		if (__ReflectRay) return shadeReflective(__Hit);
-		return shade(__Hit);
-		*/
 	}
 
 	private Hit processScene(Ray ray)
@@ -93,9 +88,24 @@ public class RayTracer implements Sampler
 
 	private static Color shadeBrick(Hit hit)
 	{
-		// TODO
-		return hit.colour();
+		// horizontal brick splitting
+		double h_bricks = abs(mod(hit.position(),vec3(.1,.1,.1)).y());
+		boolean h_koof = h_bricks<.015;
+
+		// vertical
+		Vec3 normal2D = vec3(hit.normal().x(),0,hit.normal().z());
+		double v_bricks = abs(toDegrees(cos(dot(normal2D,vec3(0,0,1))/length(normal2D))))%7;
+		boolean v_koof = v_bricks<.8;
+
+		// calculate colour & normals
+		Color __Colour = (h_koof||v_koof) ? color(.7,.7,.7) : hit.colour();
+		if (h_koof) hit.overwriteNormal(interplolate(vec3(0,1,0),vec3(0,-1,0),h_bricks/.015));
+		else if (h_koof) hit.overwriteNormal(multiplyPoint(rotate(vec3(0,1,0),(v_bricks-.4)/.4),hit.normal()));
+		hit.overwriteColour((h_koof||v_koof) ? color(.7,.7,.7) : hit.colour());
+		return shade(hit);
 	}
+	// FIXME: naming issues?!?? interPLOlate?
+	// TODO: make equidistant and rotate on each layer
 
 	private Color shadeReflective(Hit hit)
 	{
@@ -112,7 +122,8 @@ public class RayTracer implements Sampler
 		// TODO: prettify combination
 	}
 
-	// TODO: ziegelsteinspheres
-	// TODO: semi-transparent volumetric gas spheres or glassesque behaviour
+	// TODO: brickspheres
+	// TODO: semi-transparent volumetric gas spheres in background
+	// TODO: concaving glass balls
 	// TODO: rough spheres
 }
