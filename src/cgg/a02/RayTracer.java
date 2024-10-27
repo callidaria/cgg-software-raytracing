@@ -41,7 +41,7 @@ public class RayTracer implements Sampler
 		// combine
 		if (__Hit==null) return color(0,0,0);
 		if (__GlassRay) return shadeGlass(__Ray,__Hit);
-		if (__ReflectRay) return shadeReflective(__Hit);
+		if (__ReflectRay) return shadeReflective(__Ray,__Hit);
 		return __Hit.colour();
 	}
 
@@ -119,11 +119,10 @@ public class RayTracer implements Sampler
 	}
 	// FIXME: naming issues?!?? interPLOlate?
 
-	private Color shadeReflective(Hit hit)
+	private Color shadeReflective(Ray ray,Hit hit)
 	{
 		// calculate reflective bouncing ray
-		Vec3 vd = subtract(hit.position(),scene.camera().position());
-		Vec3 __OutBounce = add(vd,multiply(2*dot(multiply(vd,-1),hit.normal()),hit.normal()));
+		Vec3 __OutBounce = bounce(ray.direction(),hit.normal());
 		__OutBounce = randomRoughness(__OutBounce,10);
 		Ray __Ray = new Ray(hit.position(),__OutBounce,0,10000);
 
@@ -138,13 +137,19 @@ public class RayTracer implements Sampler
 	private Color shadeGlass(Ray ray,Hit hit)
 	{
 		// calculate glass ray deformation
-		Ray __Ray = new Ray(hit.position(),multiply(hit.normal(),-1),0,10000);
+		Ray __RayThrough = new Ray(hit.position(),multiply(hit.normal(),-1),0,10000);
+		Ray __RayBounce = new Ray(hit.position(),randomRoughness(bounce(ray.direction(),hit.normal()),2),0,10000);
 
-		// receive colour source & combine
-		Hit __Hit = processScene(__Ray);
+		// assemble material colour
 		double fresnel_mod = pow(angle(ray.direction(),hit.normal())/(Math.PI*.5),4);
 		Color __MatColour = multiply(hit.colour(),.1*fresnel_mod);
-		return (__Hit!=null) ? __Hit.colour().mix(__MatColour) : __MatColour;
+
+		// receive colour source & combine
+		Hit __HitThrough = processScene(__RayThrough);
+		Hit __HitBounce = processScene(__RayBounce);
+		__MatColour = (__HitThrough!=null) ? __MatColour.mix(__HitThrough.colour()) : __MatColour;
+		__MatColour = (__HitBounce!=null) ? __MatColour.mix(__HitBounce.colour(),.1) : __MatColour;
+		return __MatColour;
 	}
 
 	// TODO: semi-transparent volumetric gas spheres in background

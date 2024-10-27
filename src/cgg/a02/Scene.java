@@ -32,7 +32,7 @@ public class Scene
 		// glass setup
 		glass = new ArrayList<Sphere>();
 		glass.add(new Sphere(vec3(-.5,.35,-1.5),.5,color(vec3(.3,.1,.6))));
-		glass.add(new Sphere(vec3(2.5,-2.5,-4),.8,color(vec3(.5,.1,0))));
+		glass.add(new Sphere(vec3(2.5,-2.5,-4),.5,color(vec3(.5,.1,0))));
 
 		// reflector setup
 		reflector = new Sphere(vec3(0,0,-4),1,color(vec3(.5,.1,0)));

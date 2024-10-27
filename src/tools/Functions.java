@@ -1168,6 +1168,11 @@ public class Functions {
 		return Math.cos(dot(v0,v1)/(length(v0)*length(v1)));
 	}
 
+	public static Vec3 bounce(Vec3 dir,Vec3 normal)
+	{
+		return add(dir,multiply(2*dot(multiply(dir,-1),normal),normal));
+	}
+
     /**
      * Helper method for HSV to RGB conversion.
      * Calculates the RGB color for a given hue value.
