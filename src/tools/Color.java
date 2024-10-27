@@ -31,6 +31,13 @@ public record Color(double r, double g, double b) {
 	public Color mul(double val) { return new Color(r*val,g*val,b*val); }
 	public Color mul(Color col) { return new Color(r*col.r(),g*col.g(),b*col.b()); }
 	public Color mix(Color col) { return new Color((r+col.r())/2,(g+col.g())/2,(b+col.b())/2); }
+	public Color mix(Color col,double i)
+	{
+		double pref = 1-i;
+		Color c0 = color(r*pref,g*pref,b*pref);
+		Color c1 = multiply(col,i);
+		return c0.mix(c1);
+	}
 
     /**
      * Returns a string representation of the color.

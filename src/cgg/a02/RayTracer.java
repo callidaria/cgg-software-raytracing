@@ -29,8 +29,18 @@ public class RayTracer implements Sampler
 			__ReflectRay = true;
 		}
 
+		// process glass spheres
+		boolean __GlassRay = false;
+		__Proc = iterateSpheres(scene.glass(),__Ray);
+		if (recentSurfaceHit(__Hit,__Proc))
+		{
+			__Hit = __Proc;
+			__GlassRay = true;
+		}
+
 		// combine
 		if (__Hit==null) return color(0,0,0);
+		if (__GlassRay) return shadeGlass(__Hit);
 		if (__ReflectRay) return shadeReflective(__Hit);
 		return __Hit.colour();
 	}
@@ -81,7 +91,7 @@ public class RayTracer implements Sampler
 	private static Color shade(Hit hit)
 	{
 		Vec3 lightDir = normalize(vec3(1,1,.7));
-		Color ambient = multiply(.1,hit.colour());
+		Color ambient = multiply(.05,hit.colour());
 		Color diffuse = multiply(.9*max(0,dot(lightDir,hit.normal())),hit.colour());
 		return add(ambient,diffuse);
 	}
@@ -116,10 +126,23 @@ public class RayTracer implements Sampler
 
 		// receive colour source & combine
 		Hit __Hit = processScene(__Ray);
-		Color __Fin = color(.005,.005,.005);
-		if (__Hit!=null) __Fin = __Fin.mix(__Hit.colour());
+		Color __Fin = shade(hit);
+		if (__Hit!=null) __Fin = __Fin.mix(__Hit.colour(),.9);
 		return __Fin;
-		// TODO: prettify combination
+	}
+
+	private Color shadeGlass(Hit hit)
+	{
+		// calculate glass ray deformation
+		/*
+		Ray __Ray = new Ray();
+
+		// receive colour source & combine
+		/*
+		Hit __Hit = processScene(__Ray);
+		return (__Hit!=null) ? __Hit.colour().mix(multiply(hit.colour(),.1)) : color(.005,.005,.005);
+		*/
+		return shade(hit);
 	}
 
 	// TODO: brickspheres
