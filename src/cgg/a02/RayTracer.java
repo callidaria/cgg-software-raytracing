@@ -72,6 +72,18 @@ public class RayTracer implements Sampler
 		return hit;
 	}
 
+	private Hit processOpaqueScene(Ray ray)
+	{
+		Hit __Hit = processScene(ray);
+		Hit __Proc = scene.reflector().intersect(ray);
+		if (__Proc!=null&&recentSurfaceHit(__Hit,__Proc))
+		{
+			__Proc.overwriteColour(shadeReflective(ray,__Proc));
+			return __Proc;
+		}
+		return __Hit;
+	}
+
 	private Hit iterateSpheres(ArrayList<Sphere> spheres,Ray ray)
 	{
 		Hit hit = null;
@@ -123,7 +135,7 @@ public class RayTracer implements Sampler
 	{
 		// calculate reflective bouncing ray
 		Vec3 __OutBounce = bounce(ray.direction(),hit.normal());
-		__OutBounce = randomRoughness(__OutBounce,10);
+		__OutBounce = randomRoughness(__OutBounce,7);
 		Ray __Ray = new Ray(hit.position(),__OutBounce,0,10000);
 
 		// receive colour source & combine
@@ -145,14 +157,12 @@ public class RayTracer implements Sampler
 		Color __MatColour = multiply(hit.colour(),.1*fresnel_mod);
 
 		// receive colour source & combine
-		Hit __HitThrough = processScene(__RayThrough);
-		Hit __HitBounce = processScene(__RayBounce);
+		Hit __HitThrough = processOpaqueScene(__RayThrough);
+		Hit __HitBounce = processOpaqueScene(__RayBounce);
 		__MatColour = (__HitThrough!=null) ? __MatColour.mix(__HitThrough.colour()) : __MatColour;
 		__MatColour = (__HitBounce!=null) ? __MatColour.mix(__HitBounce.colour(),.1) : __MatColour;
 		return __MatColour;
 	}
 
 	// TODO: semi-transparent volumetric gas spheres in background
-	// TODO: concaving glass balls
-	// TODO: rough spheres
 }
