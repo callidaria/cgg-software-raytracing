@@ -1153,6 +1153,14 @@ public class Functions {
         Random.seed(s);
     }
 
+	public static Vec3 randomRoughness(Vec3 val,double roughness)
+	{
+		Vec3 out = multiplyPoint(rotate(vec3(1,0,0),Functions.random()*roughness),val);
+		out = multiplyPoint(rotate(vec3(0,1,0),Functions.random()*roughness),out);
+		out = multiplyPoint(rotate(vec3(0,0,1),Functions.random()*roughness),out);
+		return out;
+	}
+
     /**
      * Helper method for HSV to RGB conversion.
      * Calculates the RGB color for a given hue value.

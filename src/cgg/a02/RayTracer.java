@@ -90,6 +90,8 @@ public class RayTracer implements Sampler
 
 	private static Color shade(Hit hit)
 	{
+		hit.overwriteNormal(randomRoughness(hit.normal(),5));
+		// TODO: find out if shade with roughness is hotter or notter
 		Vec3 lightDir = normalize(vec3(1,1,.7));
 		Color ambient = multiply(.05,hit.colour());
 		Color diffuse = multiply(.9*max(0,dot(lightDir,hit.normal())),hit.colour());
@@ -120,12 +122,9 @@ public class RayTracer implements Sampler
 	private Color shadeReflective(Hit hit)
 	{
 		// calculate reflective bouncing ray
-		double roughness = 15;
 		Vec3 vd = subtract(hit.position(),scene.camera().position());
 		Vec3 __OutBounce = add(vd,multiply(2*dot(multiply(vd,-1),hit.normal()),hit.normal()));
-		__OutBounce = multiplyPoint(Functions.rotate(vec3(1,0,0),Functions.random()*roughness),__OutBounce);
-		__OutBounce = multiplyPoint(Functions.rotate(vec3(0,1,0),Functions.random()*roughness),__OutBounce);
-		__OutBounce = multiplyPoint(Functions.rotate(vec3(0,0,1),Functions.random()*roughness),__OutBounce);
+		__OutBounce = randomRoughness(__OutBounce,10);
 		Ray __Ray = new Ray(hit.position(),__OutBounce,0,10000);
 
 		// receive colour source & combine
@@ -139,8 +138,8 @@ public class RayTracer implements Sampler
 	private Color shadeGlass(Hit hit)
 	{
 		// calculate glass ray deformation
-		/*
-		Ray __Ray = new Ray();
+
+//		Ray __Ray = new Ray();
 
 		// receive colour source & combine
 		/*
@@ -150,7 +149,6 @@ public class RayTracer implements Sampler
 		return shade(hit);
 	}
 
-	// TODO: brickspheres
 	// TODO: semi-transparent volumetric gas spheres in background
 	// TODO: concaving glass balls
 	// TODO: rough spheres
