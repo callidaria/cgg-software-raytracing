@@ -89,23 +89,23 @@ public class RayTracer implements Sampler
 	private static Color shadeBrick(Hit hit)
 	{
 		// horizontal brick splitting
-		double h_bricks = abs(mod(hit.position(),vec3(.1,.1,.1)).y());
+		double h_bricks = abs(hit.position().y())%.1;
 		boolean h_koof = h_bricks<.015;
 
 		// vertical
-		Vec3 normal2D = vec3(hit.normal().x(),0,hit.normal().z());
-		double v_bricks = abs(toDegrees(cos(dot(normal2D,vec3(0,0,1))/length(normal2D))))%9;
-		boolean v_koof = v_bricks<.8;
+		int tilt = (int)(hit.position().y()/.1);
+		Vec3 normal2D = multiplyPoint(rotate(vec3(0,1,0),tilt*12),vec3(hit.normal().x(),0,hit.normal().z()));
+		double deg_tilt = cos(dot(normal2D,vec3(0,0,1))/length(normal2D));
+		double v_bricks = abs(deg_tilt)%.1;
+		boolean v_koof = v_bricks<.015;
 
 		// calculate colour & normals
-		Color __Colour = (h_koof||v_koof) ? color(.7,.7,.7) : hit.colour();
 		if (h_koof) hit.overwriteNormal(interplolate(vec3(0,1,0),vec3(0,-1,0),h_bricks/.015));
-		else if (v_koof) hit.overwriteNormal(multiplyPoint(rotate(vec3(0,1,0),(v_bricks-.4)/.4*70),hit.normal()));
+		else if (v_koof) hit.overwriteNormal(multiplyPoint(rotate(vec3(0,1,0),(v_bricks-.0075)/.0075*-70),hit.normal()));
 		hit.overwriteColour((h_koof||v_koof) ? color(.7,.7,.7) : hit.colour());
 		return shade(hit);
 	}
 	// FIXME: naming issues?!?? interPLOlate?
-	// TODO: make equidistant and rotate on each layer
 
 	private Color shadeReflective(Hit hit)
 	{
