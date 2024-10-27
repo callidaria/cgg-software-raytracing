@@ -1,5 +1,7 @@
 package tools;
 
+import java.lang.Math;
+
 /**
  * Utility class providing various mathematical and vector operations.
  */
@@ -1159,6 +1161,11 @@ public class Functions {
 		out = multiplyPoint(rotate(vec3(0,1,0),Functions.random()*roughness),out);
 		out = multiplyPoint(rotate(vec3(0,0,1),Functions.random()*roughness),out);
 		return out;
+	}
+
+	public static double angle(Vec3 v0,Vec3 v1)
+	{
+		return Math.cos(dot(v0,v1)/(length(v0)*length(v1)));
 	}
 
     /**

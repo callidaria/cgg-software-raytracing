@@ -40,7 +40,7 @@ public class RayTracer implements Sampler
 
 		// combine
 		if (__Hit==null) return color(0,0,0);
-		if (__GlassRay) return shadeGlass(__Hit);
+		if (__GlassRay) return shadeGlass(__Ray,__Hit);
 		if (__ReflectRay) return shadeReflective(__Hit);
 		return __Hit.colour();
 	}
@@ -90,7 +90,7 @@ public class RayTracer implements Sampler
 
 	private static Color shade(Hit hit)
 	{
-		hit.overwriteNormal(randomRoughness(hit.normal(),5));
+		hit.overwriteNormal(randomRoughness(hit.normal(),7));
 		// TODO: find out if shade with roughness is hotter or notter
 		Vec3 lightDir = normalize(vec3(1,1,.7));
 		Color ambient = multiply(.05,hit.colour());
@@ -135,18 +135,16 @@ public class RayTracer implements Sampler
 	}
 	// TODO: random rotation adjustment on surface bounce
 
-	private Color shadeGlass(Hit hit)
+	private Color shadeGlass(Ray ray,Hit hit)
 	{
 		// calculate glass ray deformation
-
-//		Ray __Ray = new Ray();
+		Ray __Ray = new Ray(hit.position(),multiply(hit.normal(),-1),0,10000);
 
 		// receive colour source & combine
-		/*
 		Hit __Hit = processScene(__Ray);
-		return (__Hit!=null) ? __Hit.colour().mix(multiply(hit.colour(),.1)) : color(.005,.005,.005);
-		*/
-		return shade(hit);
+		double fresnel_mod = pow(angle(ray.direction(),hit.normal())/(Math.PI*.5),4);
+		Color __MatColour = multiply(hit.colour(),.1*fresnel_mod);
+		return (__Hit!=null) ? __Hit.colour().mix(__MatColour) : __MatColour;
 	}
 
 	// TODO: semi-transparent volumetric gas spheres in background
