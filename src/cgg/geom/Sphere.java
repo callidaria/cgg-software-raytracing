@@ -36,17 +36,26 @@ public class Sphere implements Geometry
 		if (sq_comp<0) return new ArrayList<HitTuple>();
 
 		// calculate param
-		double t0 = (-b+sqrt(sq_comp))/(2*a);
-		double t1 = (-b-sqrt(sq_comp))/(2*a);
-		double t;
-		if (r.paramInRange(t0)&&r.paramInRange(t1)) t = (t0<t1) ? t0 : t1;
-		else t = (r.paramInRange(t0)) ? t0 : t1;
-		// FIXME: unelegant, my eyes bleed. i'm too tired to think about this now. lets move on...
+		double t0 = (-b+sqrt(sq_comp))/(2*a), t1 = (-b-sqrt(sq_comp))/(2*a);
+		double ts0 = min(t0,t1), ts1 = max(t0,t1);
 
-		// assemble hit if param in range
-		Vec3 __Position = r.calculatePosition(t);
-		Vec3 __Normal = divide(subtract(__Position,center),radius);
-		return primitive_hit(new HitTuple(new Hit(t,__Position,__Normal,colour),null));
-		// TODO: back intersection
+		// assemble hits & combine
+		Hit __Front = assembleHit(r,ts0,1);
+		Hit __Back = assembleHit(r,ts1,-1);
+
+		// combine hits as primitive geometry output
+		return primitive_hit(new HitTuple(__Front,__Back));
+	}
+	// TODO: test this with camera being inside the sphere
+
+	private Hit assembleHit(Ray r,double t,int nmod)
+	{
+		if (r.paramInRange(t))
+		{
+			Vec3 __Position = r.calculatePosition(t);
+			Vec3 __Normal = multiply(divide(subtract(__Position,center),radius),nmod);
+			return new Hit(t,__Position,__Normal,colour);
+		}
+		return null;
 	}
 }
