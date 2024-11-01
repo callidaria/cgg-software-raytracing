@@ -36,7 +36,46 @@ public class Complex implements Geometry
 	private Queue<HitTuple> _union(Queue<HitTuple> h0,Queue<HitTuple> h1)
 	{
 		Queue<HitTuple> __Final = new LinkedList<>();
-		return h0;
+		HitTuple __Hit = h0.poll();
+		HitTuple __Inter = h1.poll();
+
+		// iterate target geometry and combine in union
+		while (__Hit!=null||__Inter!=null)
+		{
+			if (__Hit==null)
+			{
+				__Final.add(__Inter);
+				__Inter = h1.poll();
+				continue;
+			}
+			if (__Inter==null)
+			{
+				__Final.add(__Hit);
+				__Hit = h0.poll();
+				continue;
+			}
+
+			// check for intersection
+			if (secondHitRecent(__Inter.front(),__Hit.back()))
+			{
+				__Final.add(__Hit);
+				__Hit = h0.poll();
+				continue;
+			}
+			if (secondHitRecent(__Hit.front(),__Inter.back()))
+			{
+				__Final.add(__Inter);
+				__Inter = h1.poll();
+				continue;
+			}
+
+			// unify intersecting geometry
+			Hit __Front = closestHit(__Hit.front(),__Inter.front());
+			Hit __Back = farthestHit(__Hit.back(),__Inter.back());
+			__Hit = new HitTuple(__Front,__Back);
+			__Inter = h1.poll();
+		}
+		return __Final;
 	}
 
 	private Queue<HitTuple> _intersect(Queue<HitTuple> h0,Queue<HitTuple> h1)
