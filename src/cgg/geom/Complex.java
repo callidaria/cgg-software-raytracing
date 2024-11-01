@@ -27,7 +27,7 @@ public class Complex implements Geometry
 		switch(jop)
 		{
 			case UNION: return _union(__Hits0,__Hits1);
-			case INTERSECT: return _intersect(__Hits0,__Hits1);
+			case INTERSECTION: return _intersect(__Hits0,__Hits1);
 			case DIFFERENCE: return _difference(__Hits0,__Hits1);
 		}
 		return null;
@@ -42,8 +42,36 @@ public class Complex implements Geometry
 	private Queue<HitTuple> _intersect(Queue<HitTuple> h0,Queue<HitTuple> h1)
 	{
 		Queue<HitTuple> __Final = new LinkedList<>();
-		return h0;
-		// TODO
+		HitTuple __Hit = h0.poll();
+		HitTuple __Inter = h1.poll();
+
+		// iterate target geometry and reduce to intersection
+		while (__Hit!=null)
+		{
+			if (__Inter==null) return __Final;
+
+			// check for intersection
+			if (secondHitRecent(__Inter.front(),__Hit.back()))
+			{
+				__Hit = h0.poll();
+				continue;
+			}
+			if (secondHitRecent(__Hit.front(),__Inter.back()))
+			{
+				__Inter = h1.poll();
+				continue;
+			}
+
+			// assemble intersection
+			Hit __Front = farthestHit(__Hit.front(),__Inter.front());
+			Hit __Back = closestHit(__Hit.back(),__Inter.back());
+			__Final.add(new HitTuple(__Front,__Back));
+
+			// iterate geometry
+			__Hit = secondHitRecent(__Hit.back(),__Back) ? new HitTuple(__Back,__Hit.back()) : h0.poll();
+			__Inter = secondHitRecent(__Inter.back(),__Back) ? new HitTuple(__Back,__Inter.back()) : h1.poll();
+		}
+		return __Final;
 	}
 
 	private Queue<HitTuple> _difference(Queue<HitTuple> h0,Queue<HitTuple> h1)

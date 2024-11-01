@@ -4,6 +4,6 @@ package cgg.geom;
 public enum JoinOperation
 {
 	UNION,
-	INTERSECT,
+	INTERSECTION,
 	DIFFERENCE
 }

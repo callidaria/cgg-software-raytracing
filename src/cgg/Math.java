@@ -19,4 +19,14 @@ public class Math
 	{
 		return h0==null||(h1!=null&&h1.param()<h0.param());
 	}
+
+	public static Hit closestHit(Hit h0,Hit h1)
+	{
+		return secondHitRecent(h0,h1) ? h1 : h0;
+	}
+
+	public static Hit farthestHit(Hit h0,Hit h1)
+	{
+		return secondHitRecent(h0,h1) ? h0 : h1;
+	}
 }
