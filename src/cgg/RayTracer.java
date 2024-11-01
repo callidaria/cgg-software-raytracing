@@ -1,7 +1,7 @@
 package cgg;
 
 import static java.lang.Math.*;
-import java.util.ArrayList;
+import java.util.Queue;
 import static tools.Functions.*;
 import tools.*;
 import cgg.geom.*;
@@ -23,11 +23,11 @@ public class RayTracer implements Sampler
 	public Color getColor(Vec2 coord)
 	{
 		Ray __Ray = scene.camera.generateRay(coord);
-		ArrayList<HitTuple> __Hits = scene.complex.intersect(__Ray);
-		return (__Hits.size()>0) ? shade(__Hits.get(0).front()) : background;
+		Queue<HitTuple> __Hits = scene.complex.intersect(__Ray);
+		return (__Hits.size()>0) ? _shade(__Hits.peek().front()) : background;
 	}
 
-	public Color shade(Hit hit)
+	public Color _shade(Hit hit)
 	{
 		Vec3 lightDir = normalize(vec3(1,1,.7));
 		Color ambient = multiply(.05,hit.colour());

@@ -1,7 +1,8 @@
 package cgg.geom;
 
 import static java.lang.Math.*;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import static tools.Functions.*;
 import static cgg.Math.*;
 import tools.*;
@@ -23,7 +24,7 @@ public class Sphere implements Geometry
 		this.colour = colour;
 	}
 
-	public ArrayList<HitTuple> intersect(Ray r)
+	public Queue<HitTuple> intersect(Ray r)
 	{
 		// component precalculation
 		Vec3 __Center = subtract(r.origin(),center);
@@ -33,22 +34,22 @@ public class Sphere implements Geometry
 
 		// discriminant & early exit
 		double sq_comp = pow(b,2)-4*a*c;
-		if (sq_comp<0) return new ArrayList<HitTuple>();
+		if (sq_comp<0) return new LinkedList<HitTuple>();
 
 		// calculate param
 		double t0 = (-b+sqrt(sq_comp))/(2*a), t1 = (-b-sqrt(sq_comp))/(2*a);
 		double ts0 = min(t0,t1), ts1 = max(t0,t1);
 
 		// assemble hits & combine
-		Hit __Front = assembleHit(r,ts0,1);
-		Hit __Back = assembleHit(r,ts1,-1);
+		Hit __Front = _assembleHit(r,ts0,1);
+		Hit __Back = _assembleHit(r,ts1,-1);
 
 		// combine hits as primitive geometry output
 		return primitive_hit(new HitTuple(__Front,__Back));
 	}
 	// TODO: test this with camera being inside the sphere
 
-	private Hit assembleHit(Ray r,double t,int nmod)
+	private Hit _assembleHit(Ray r,double t,int nmod)
 	{
 		if (r.paramInRange(t))
 		{

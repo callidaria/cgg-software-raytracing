@@ -1,10 +1,11 @@
 package cgg.geom;
 
-import java.util.ArrayList;
+import java.util.Queue;
 import cgg.a02.Ray;
 import cgg.a02.Hit;
 
+
 public interface Geometry
 {
-	public ArrayList<HitTuple> intersect(Ray ray);
+	public Queue<HitTuple> intersect(Ray ray);
 }

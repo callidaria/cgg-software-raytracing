@@ -1,14 +1,16 @@
 package cgg;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import cgg.a02.Hit;
 import cgg.geom.HitTuple;
 
+
 public class Math
 {
-	public static ArrayList<HitTuple> primitive_hit(HitTuple tuple)
+	public static Queue<HitTuple> primitive_hit(HitTuple tuple)
 	{
-		ArrayList<HitTuple> out = new ArrayList<HitTuple>();
+		Queue<HitTuple> out = new LinkedList<>();
 		out.add(tuple);
 		return out;
 	}
