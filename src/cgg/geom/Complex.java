@@ -22,6 +22,7 @@ public class Complex implements Geometry
 
 	public Queue<HitTuple> intersect(Ray ray)
 	{
+		if (g1==null) return g0.intersect(ray);
 		Queue<HitTuple> __Hits0 = g0.intersect(ray);
 		Queue<HitTuple> __Hits1 = g1.intersect(ray);
 		switch(jop)

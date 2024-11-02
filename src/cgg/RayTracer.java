@@ -24,15 +24,14 @@ public class RayTracer implements Sampler
 	{
 		Ray __Ray = scene.camera.generateRay(coord);
 		Queue<HitTuple> __Hits = scene.complex.intersect(__Ray);
-		return (__Hits.size()>0) ? _shade(__Hits.peek().front(),__Hits.size()) : background;
+		return (__Hits.size()>0) ? _shade(__Hits.peek().front()) : background;
 	}
 
-	public Color _shade(Hit hit,int size)
+	public Color _shade(Hit hit)
 	{
-		Color ncolour = hit.colour().mix(color(0,(size>1)?1:0,0));
 		Vec3 lightDir = normalize(vec3(1,1,.7));
-		Color ambient = multiply(.05,ncolour);
-		Color diffuse = multiply(.9*max(0,dot(lightDir,hit.normal())),ncolour);
+		Color ambient = multiply(.05,hit.colour());
+		Color diffuse = multiply(.9*max(0,dot(lightDir,hit.normal())),hit.colour());
 		return add(ambient,diffuse);
 	}
 }
