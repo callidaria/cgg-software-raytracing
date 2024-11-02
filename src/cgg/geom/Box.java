@@ -22,27 +22,32 @@ class TValueTuple
 	}
 }
 
-// FIXME: this is not a cube but a quad. fix due to marketing issues
-public class Cube implements Geometry
+public class Box implements Geometry
 {
+	private Vec3 position;
 	private Vec3 bmin;
 	private Vec3 bmax;
 	private Color colour;
 
-	public Cube(Vec3 position,double width,double height,double depth,Color colour)
+	public Box(Vec3 position,double width,double height,double depth,Color colour)
 	{
-		Vec3 __HDim = vec3(width*.5,height*.5,depth*.5);
+		Vec3 __HDim = multiply(vec3(width,height,depth),.5);
+		this.position = position;
 		this.bmin = subtract(position,__HDim);
 		this.bmax = add(position,__HDim);
 		this.colour = colour;
 	}
 
-	public Cube(Vec3 bmin,Vec3 bmax,Color colour)
+	/*
+	public Box(Vec3 bmin,Vec3 bmax,Color colour)
 	{
+		this.position =
 		this.bmin = bmin;
 		this.bmax = bmax;
 		this.colour = colour;
 	}
+	*/
+	// TODO
 
 	public Queue<HitTuple> intersect(Ray r)
 	{
@@ -75,7 +80,10 @@ public class Cube implements Geometry
 		if (r.paramInRange(t))
 		{
 			Vec3 __Position = r.calculatePosition(t);
-			Vec3 __Normal = vec3(1,0,0);  // TODO
+			Vec3 lp = normalize(subtract(__Position,position));
+			boolean hx = (abs(lp.x())>abs(lp.y()))&&(abs(lp.x())>abs(lp.z()));
+			boolean hy = !hx&&(abs(lp.y())>abs(lp.z()));
+			Vec3 __Normal = normalize(vec3(hx?lp.x():0,hy?lp.y():0,!(hx||hy)?lp.z():0));
 			return new Hit(t,__Position,__Normal,colour);
 		}
 		return null;

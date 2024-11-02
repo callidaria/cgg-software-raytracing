@@ -34,4 +34,9 @@ public class RayTracer implements Sampler
 		Color diffuse = multiply(.9*max(0,dot(lightDir,hit.normal())),hit.colour());
 		return add(ambient,diffuse);
 	}
+
+	public Color _shadeNormals(Hit hit)
+	{
+		return color(hit.normal());
+	}
 }

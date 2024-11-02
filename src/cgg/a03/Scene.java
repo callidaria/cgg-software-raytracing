@@ -19,7 +19,7 @@ public class Scene
 
 	private void _die()
 	{
-		Cube cube = new Cube(vec3(-.75,.75,-2),1,1,1,color(.5,0,0));
+		Box cube = new Box(vec3(-.75,.75,-2),1,1,1,color(.5,0,0));
 		complex = new Complex(cube,null,JoinOperation.UNION);
 	}
 
