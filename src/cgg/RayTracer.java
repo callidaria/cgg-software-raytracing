@@ -1,9 +1,11 @@
 package cgg;
 
 import static java.lang.Math.*;
+import java.util.LinkedList;
 import java.util.Queue;
 import static tools.Functions.*;
 import tools.*;
+import static cgg.Math.*;
 import cgg.geom.*;
 import cgg.a02.Ray;
 import cgg.a02.Hit;
@@ -23,7 +25,12 @@ public class RayTracer implements Sampler
 	public Color getColor(Vec2 coord)
 	{
 		Ray __Ray = scene.camera.generateRay(coord);
-		Queue<HitTuple> __Hits = scene.complex.intersect(__Ray);
+		Queue<HitTuple> __Hits = new LinkedList<>();
+		for (Geometry g : scene.objects)
+		{
+			Queue<HitTuple> __Proc = g.intersect(__Ray);
+			__Hits = recentGeometry(__Hits,__Proc);
+		}
 		return (__Hits.size()>0) ? _shade(__Hits.peek().front()) : background;
 	}
 

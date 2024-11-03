@@ -38,17 +38,6 @@ public class Box implements Geometry
 		this.colour = colour;
 	}
 
-	/*
-	public Box(Vec3 bmin,Vec3 bmax,Color colour)
-	{
-		this.position =
-		this.bmin = bmin;
-		this.bmax = bmax;
-		this.colour = colour;
-	}
-	*/
-	// TODO
-
 	public Queue<HitTuple> intersect(Ray r)
 	{
 		// calculating quad intersections
