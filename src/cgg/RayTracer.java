@@ -7,6 +7,7 @@ import static tools.Functions.*;
 import tools.*;
 import static cgg.Math.*;
 import cgg.geom.*;
+import cgg.lght.*;
 import cgg.a02.Ray;
 import cgg.a02.Hit;
 import cgg.a03.Scene;
@@ -31,10 +32,10 @@ public class RayTracer implements Sampler
 			Queue<HitTuple> __Proc = g.intersect(__Ray);
 			__Hits = recentGeometry(__Hits,__Proc);
 		}
-		return (__Hits.size()>0) ? _shade(__Hits.peek().front()) : background;
+		return (__Hits.size()>0) ? _shadePhong(__Hits.peek().front()) : background;
 	}
 
-	public Color _shade(Hit hit)
+	private Color _shade(Hit hit)
 	{
 		Vec3 lightDir = normalize(vec3(1,1,.7));
 		Color ambient = multiply(.05,hit.colour());
@@ -42,7 +43,39 @@ public class RayTracer implements Sampler
 		return add(ambient,diffuse);
 	}
 
-	public Color _shadeNormals(Hit hit)
+	private Color _shadePhong(Hit hit)
+	{
+		Color __Result = color(0,0,0);
+		for (PhongIllumination light : scene.phong_lights)
+		{
+			// precalculations
+			Vec3 __LightDirection = light.direction(hit.position());
+			Color __LightIntensity = light.intensity(hit.position());
+			Color __Albedo = multiply(__LightIntensity,.4);
+
+			// ambient component
+			Color __Ambient = multiply(hit.colour(),__Albedo);
+
+			// diffuse component
+			double __Attitude = dot(hit.normal(),__LightDirection);
+			Color __Diffuse = multiply(hit.colour(),multiply(__Albedo,__Attitude));
+			__Result = add(__Result,__Ambient,__Diffuse);
+
+			// specular component
+			if (__Attitude>0)
+			{
+				Vec3 r = subtract(multiply(hit.normal(),2*dot(__LightDirection,hit.normal())),__LightDirection);
+				r = normalize(r);
+				Vec3 v = normalize(subtract(scene.camera.position(),hit.position()));
+				Color __IntensitySpecular = multiply(__LightIntensity,pow(max(dot(r,v),0),50));
+				Color __Specular = multiply(hit.colour(),__IntensitySpecular);
+				__Result = add(__Result,__Specular);
+			}
+		}
+		return clamp(__Result);
+	}
+
+	private Color _shadeNormals(Hit hit)
 	{
 		return color(hit.normal());
 	}

@@ -5,20 +5,30 @@ import static tools.Functions.*;
 import tools.*;
 import cgg.*;
 import cgg.geom.*;
+import cgg.lght.*;
 import cgg.a02.Camera;
 
 public class Scene
 {
 	public Camera camera;
 	public ArrayList<Geometry> objects;
+	public ArrayList<PhongIllumination> phong_lights;
 
 	public Scene(int width,int height)
 	{
+		// projection
 		camera = new Camera(vec3(0,0,0),60.,width,height);
+
+		// geometry
 		objects = new ArrayList<>();
 		_childsplay();
 		_die();
 		_yummy();
+		_deathstar();
+
+		// lighting
+		phong_lights = new ArrayList<>();
+		phong_lights.add(new DirectionalLight(vec3(1,1,.7),color(1,1,1),1));
 	}
 
 	private void _childsplay()
@@ -69,8 +79,9 @@ public class Scene
 
 	private void _deathstar()
 	{
-		Sphere sphere0 = new Sphere(vec3(-.5,0,-2),1.,color(.5,0,0));
-		Sphere sphere1 = new Sphere(vec3(0,0,-1.5),.5,color(0,0,.5));
+		Vec3 __Position = vec3(0,-2,-7);
+		Sphere sphere0 = new Sphere(__Position,1.,color(.5,0,0));
+		Sphere sphere1 = new Sphere(add(__Position,vec3(.5,0,.5)),.5,color(0,0,.5));
 		Complex complex = new Complex(sphere0,sphere1,JoinOperation.DIFFERENCE);
 		objects.add(complex);
 	}
