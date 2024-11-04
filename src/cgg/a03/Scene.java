@@ -28,7 +28,8 @@ public class Scene
 
 		// lighting
 		phong_lights = new ArrayList<>();
-		phong_lights.add(new DirectionalLight(vec3(1,1,.7),color(1,1,1),1));
+		//phong_lights.add(new DirectionalLight(vec3(1,1,.7),color(1,1,1),1));
+		phong_lights.add(new PointLight(vec3(-1.25,1,-4),color(1,1,1),1));
 	}
 
 	private void _childsplay()
