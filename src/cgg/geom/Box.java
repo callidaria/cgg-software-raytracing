@@ -48,7 +48,7 @@ public class Box implements Geometry
 		_clipAxis(t,bmin.z(),bmax.z(),r.origin().z(),r.direction().z());
 
 		// ee in case of no intersection & assemble
-		if (t.near>t.far) return new LinkedList<HitTuple>();
+		if (t.near>t.far||(!r.paramInRange(t.near)&&!r.paramInRange(t.far))) return new LinkedList<HitTuple>();
 		Hit __Front = _assembleHit(r,t.near);
 		Hit __Back = _assembleHit(r,t.far);
 

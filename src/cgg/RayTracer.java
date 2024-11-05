@@ -49,17 +49,31 @@ public class RayTracer implements Sampler
 		for (PhongIllumination light : scene.phong_lights)
 		{
 			// precalculations
-			Vec3 __LightDirection = light.direction(hit.position());
 			Color __LightIntensity = light.intensity(hit.position());
-			Color __Albedo = multiply(__LightIntensity,.4);
+			Color __Albedo = multiply(__LightIntensity,.7);
 
 			// ambient component
-			Color __Ambient = multiply(hit.colour(),__Albedo);
+			Color __Ambient = multiply(hit.colour(),multiply(__LightIntensity,.1));
+			__Result = add(__Result,__Ambient);
+
+			// shadow calculation
+			Vec3 __LightDirection = light.direction(hit.position());
+			Ray __ShadowRay = new Ray(hit.position(),__LightDirection,.0001,light.distance(hit.position()));
+			boolean __InShadow = false;
+			for (Geometry g : scene.objects)
+			{
+				if (g.intersect(__ShadowRay).size()>0)
+				{
+					__InShadow = true;
+					break;
+				}
+			}
+			if (__InShadow) continue;
 
 			// diffuse component
 			double __Attitude = dot(hit.normal(),__LightDirection);
 			Color __Diffuse = multiply(hit.colour(),multiply(__Albedo,max(0,__Attitude)));
-			__Result = add(__Result,__Ambient,__Diffuse);
+			__Result = add(__Result,__Diffuse);
 
 			// specular component
 			if (__Attitude>0)
@@ -67,8 +81,7 @@ public class RayTracer implements Sampler
 				Vec3 r = subtract(multiply(hit.normal(),2*dot(__LightDirection,hit.normal())),__LightDirection);
 				r = normalize(r);
 				Vec3 v = normalize(subtract(scene.camera.position(),hit.position()));
-				Color __IntensitySpecular = multiply(__LightIntensity,pow(max(dot(r,v),0),50));
-				Color __Specular = multiply(hit.colour(),__IntensitySpecular);
+				Color __Specular = multiply(.2,multiply(__LightIntensity,pow(max(dot(r,v),0),50)));
 				__Result = add(__Result,__Specular);
 			}
 		}

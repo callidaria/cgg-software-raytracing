@@ -29,7 +29,7 @@ public class Scene
 
 		// lighting
 		phong_lights = new ArrayList<>();
-		//phong_lights.add(new DirectionalLight(vec3(1,1,.7),color(1,1,1),1));
+		//phong_lights.add(new DirectionalLight(vec3(1,-1,.4),color(1,1,1),1));
 		phong_lights.add(new PointLight(vec3(-1.25,0,-4),color(1,1,1),1));
 		phong_lights.add(new PointLight(vec3(1.25,-1,-4),color(1,.5,0),.4));
 	}
@@ -87,6 +87,11 @@ public class Scene
 		Sphere sphere1 = new Sphere(add(__Position,vec3(.5,0,.5)),.5,color(0,0,.5));
 		Complex complex = new Complex(sphere0,sphere1,JoinOperation.DIFFERENCE);
 		objects.add(complex);
+	}
+
+	private void _sphere()
+	{
+		objects.add(new Sphere(vec3(-1.25,1,-4),.5,color(.5,0,0)));
 	}
 
 	private void _flooring()

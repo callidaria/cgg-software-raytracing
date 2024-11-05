@@ -41,6 +41,7 @@ public class Sphere implements Geometry
 		double ts0 = min(t0,t1), ts1 = max(t0,t1);
 
 		// assemble hits & combine
+		if (!r.paramInRange(ts0)&&!r.paramInRange(ts1)) return new LinkedList<HitTuple>();
 		Hit __Front = _assembleHit(r,ts0,1);
 		Hit __Back = _assembleHit(r,ts1,-1);
 

@@ -8,13 +8,11 @@ public class DirectionalLight implements PhongIllumination
 {
 	private Vec3 direction;
 	private Color colour;
-	private double intensity;
 
 	public DirectionalLight(Vec3 direction,Color colour,double intensity)
 	{
 		this.direction = normalize(direction);
-		this.colour = colour;
-		this.intensity = intensity;
+		this.colour = multiply(colour,intensity);
 	}
 
 	public Vec3 direction(Vec3 position)
@@ -22,8 +20,13 @@ public class DirectionalLight implements PhongIllumination
 		return direction;
 	}
 
+	public double distance(Vec3 position)
+	{
+		return 10000;
+	}
+
 	public Color intensity(Vec3 position)
 	{
-		return multiply(colour,intensity);
+		return colour;
 	}
 }
