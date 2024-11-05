@@ -21,6 +21,7 @@ public class Scene
 
 		// geometry
 		objects = new ArrayList<>();
+		_flooring();
 		_childsplay();
 		_die();
 		_yummy();
@@ -30,7 +31,7 @@ public class Scene
 		phong_lights = new ArrayList<>();
 		//phong_lights.add(new DirectionalLight(vec3(1,1,.7),color(1,1,1),1));
 		phong_lights.add(new PointLight(vec3(-1.25,0,-4),color(1,1,1),1));
-		phong_lights.add(new PointLight(vec3(1.25,0,-4),color(0,0,1),.4));
+		phong_lights.add(new PointLight(vec3(1.25,-1,-4),color(1,.5,0),.4));
 	}
 
 	private void _childsplay()
@@ -86,5 +87,11 @@ public class Scene
 		Sphere sphere1 = new Sphere(add(__Position,vec3(.5,0,.5)),.5,color(0,0,.5));
 		Complex complex = new Complex(sphere0,sphere1,JoinOperation.DIFFERENCE);
 		objects.add(complex);
+	}
+
+	private void _flooring()
+	{
+		Vec3 __Position = vec3(0,2,-4);
+		objects.add(new Box(__Position,10,1,10,color(.7,.7,.7)));
 	}
 }

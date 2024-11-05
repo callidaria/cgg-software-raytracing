@@ -25,16 +25,17 @@ class TValueTuple
 public class Box implements Geometry
 {
 	private Vec3 position;
+	private Vec3 hdim;
 	private Vec3 bmin;
 	private Vec3 bmax;
 	private Color colour;
 
 	public Box(Vec3 position,double width,double height,double depth,Color colour)
 	{
-		Vec3 __HDim = multiply(vec3(width,height,depth),.5);
 		this.position = position;
-		this.bmin = subtract(position,__HDim);
-		this.bmax = add(position,__HDim);
+		this.hdim = multiply(vec3(width,height,depth),.5);
+		this.bmin = subtract(position,hdim);
+		this.bmax = add(position,hdim);
 		this.colour = colour;
 	}
 
@@ -69,7 +70,7 @@ public class Box implements Geometry
 		if (r.paramInRange(t))
 		{
 			Vec3 __Position = r.calculatePosition(t);
-			Vec3 lp = normalize(subtract(__Position,position));
+			Vec3 lp = normalize(divide(subtract(__Position,position),hdim));
 			boolean hx = (abs(lp.x())>abs(lp.y()))&&(abs(lp.x())>abs(lp.z()));
 			boolean hy = !hx&&(abs(lp.y())>abs(lp.z()));
 			Vec3 __Normal = normalize(vec3(hx?lp.x():0,hy?lp.y():0,!(hx||hy)?lp.z():0));

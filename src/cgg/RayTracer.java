@@ -58,7 +58,7 @@ public class RayTracer implements Sampler
 
 			// diffuse component
 			double __Attitude = dot(hit.normal(),__LightDirection);
-			Color __Diffuse = multiply(hit.colour(),multiply(__Albedo,__Attitude));
+			Color __Diffuse = multiply(hit.colour(),multiply(__Albedo,max(0,__Attitude)));
 			__Result = add(__Result,__Ambient,__Diffuse);
 
 			// specular component

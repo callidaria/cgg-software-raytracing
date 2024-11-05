@@ -402,6 +402,11 @@ public class Functions {
         return vec3(a.x() / s, a.y() / s, a.z() / s);
     }
 
+	public static Vec3 divide(Vec3 a,Vec3 b)
+	{
+		return vec3(a.x()/b.x(),a.y()/b.y(),a.z()/b.z());
+	}
+
     /**
      * Calculates the dot product of two Vec3 objects.
      *
