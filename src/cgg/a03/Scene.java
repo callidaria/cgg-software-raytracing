@@ -16,11 +16,13 @@ public class Scene
 
 	public Scene(int width,int height)
 	{
+		objects = new ArrayList<>();
+		phong_lights = new ArrayList<>();
+
 		// projection
 		camera = new Camera(vec3(0,0,0),60.,width,height);
 
 		// geometry
-		objects = new ArrayList<>();
 		_flooring();
 		_childsplay();
 		_die();
@@ -28,10 +30,10 @@ public class Scene
 		_deathstar();
 
 		// lighting
-		phong_lights = new ArrayList<>();
 		//phong_lights.add(new DirectionalLight(vec3(1,-1,.4),color(1,1,1),1));
 		phong_lights.add(new PointLight(vec3(-1.25,0,-4),color(1,1,1),1));
 		phong_lights.add(new PointLight(vec3(1.25,-1,-4),color(1,.5,0),.4));
+		phong_lights.add(new PointLight(vec3(1.25,-1.5,-2),color(0,.5,1),.7));
 	}
 
 	private void _childsplay()
@@ -87,6 +89,7 @@ public class Scene
 		Sphere sphere1 = new Sphere(add(__Position,vec3(.5,0,.5)),.5,color(0,0,.5));
 		Complex complex = new Complex(sphere0,sphere1,JoinOperation.DIFFERENCE);
 		objects.add(complex);
+		//_craeveTheVorbiddenLaemp(add(__Position,vec3(1,-.25,0)),color(1,1,1),.2);
 	}
 
 	private void _sphere()
@@ -99,4 +102,11 @@ public class Scene
 		Vec3 __Position = vec3(0,2,-4);
 		objects.add(new Box(__Position,10,1,10,color(.7,.7,.7)));
 	}
+
+	private void _craeveTheVorbiddenLaemp(Vec3 position,Color colour,double intensity)
+	{
+		objects.add(new Sphere(position,.25,colour));
+		phong_lights.add(new PointLight(position,colour,intensity));
+	}
+	// TODO: define geometry exempt from shadow testing
 }

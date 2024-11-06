@@ -48,7 +48,6 @@ public class Sphere implements Geometry
 		// combine hits as primitive geometry output
 		return primitive_hit(new HitTuple(__Front,__Back));
 	}
-	// TODO: test this with camera being inside the sphere
 
 	private Hit _assembleHit(Ray r,double t,int nmod)
 	{

@@ -17,12 +17,12 @@ public class Math
 
 	public static Queue<HitTuple> recentGeometry(Queue<HitTuple> h0,Queue<HitTuple> h1)
 	{
-		return (h0.size()==0)||(h1.size()>0&&h1.peek().front().param()<h0.peek().front().param()) ? h1 : h0;
+		return (h0.size()==0)||(h1.size()>0&&h1.peek().relevantHit().param()<h0.peek().relevantHit().param()) ? h1 : h0;
 	}
 
 	public static boolean secondHitRecent(Hit h0,Hit h1)
 	{
-		return h0==null||(h1!=null&&h1.param()<h0.param());
+		return h1==null||(h0!=null&&h1.param()<h0.param());
 	}
 
 	public static Hit closestHit(Hit h0,Hit h1)
