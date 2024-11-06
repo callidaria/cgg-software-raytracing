@@ -27,6 +27,15 @@ public class RayTracer implements Sampler
 	{
 		Ray __Ray = scene.camera.generateRay(coord);
 		Queue<HitTuple> __Hits = new LinkedList<>();
+
+		// emitter
+		for (Geometry g : scene.emitter)
+		{
+			Queue<HitTuple> __Proc = g.intersect(__Ray);
+			__Hits = recentGeometry(__Hits,__Proc);
+		}
+
+		// opaque geometry
 		for (Geometry g : scene.objects)
 		{
 			Queue<HitTuple> __Proc = g.intersect(__Ray);
