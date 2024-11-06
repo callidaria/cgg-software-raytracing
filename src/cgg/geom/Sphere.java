@@ -46,6 +46,7 @@ public class Sphere implements Geometry
 		Hit __Back = _assembleHit(r,ts1,-1);
 
 		// combine hits as primitive geometry output
+		__Front = (__Front==null&&__Back!=null) ? new Hit(0,r.origin(),vec3(0,0,0),colour) : __Front;
 		return primitive_hit(new HitTuple(__Front,__Back));
 	}
 

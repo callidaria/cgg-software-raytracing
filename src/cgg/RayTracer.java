@@ -32,7 +32,7 @@ public class RayTracer implements Sampler
 			Queue<HitTuple> __Proc = g.intersect(__Ray);
 			__Hits = recentGeometry(__Hits,__Proc);
 		}
-		return (__Hits.size()>0) ? _shadePhong(__Hits.peek().relevantHit()) : background;
+		return (__Hits.size()>0) ? _shadePhong(__Hits.peek().front()) : background;
 	}
 
 	private Color _shade(Hit hit)

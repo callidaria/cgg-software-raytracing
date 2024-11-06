@@ -31,7 +31,7 @@ public class Scene
 
 		// lighting
 		//phong_lights.add(new DirectionalLight(vec3(1,-1,.4),color(1,1,1),1));
-		phong_lights.add(new PointLight(vec3(-1.25,0,-4),color(1,1,1),1));
+		phong_lights.add(new PointLight(vec3(-1.25,0,-4),color(.7,.7,.7),1));
 		phong_lights.add(new PointLight(vec3(1.25,-1,-4),color(1,.5,0),.4));
 		phong_lights.add(new PointLight(vec3(1.25,-1.5,-2),color(0,.5,1),.7));
 	}
@@ -41,11 +41,14 @@ public class Scene
 		Vec3 __Position = vec3(-1.25,1,-4);
 		Box cube = new Box(__Position,1,1,1,color(.5,0,0));
 		Sphere sphere0 = new Sphere(__Position,.65,color(0,0,.5));
+		Complex complex = new Complex(cube,sphere0,JoinOperation.DIFFERENCE);
+		/*
 		Sphere sphere1 = new Sphere(__Position,.75,color(0,.5,0));
 		Box inlay = new Box(__Position,.85,.85,.85,color(1,.5,0));
 		Complex complex = new Complex(cube,sphere0,JoinOperation.DIFFERENCE);
 		complex = new Complex(complex,sphere1,JoinOperation.INTERSECTION);
 		complex = new Complex(complex,inlay,JoinOperation.DIFFERENCE);
+		*/
 		objects.add(complex);
 	}
 
