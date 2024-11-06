@@ -1,0 +1,12 @@
+math:
+- panorama camera
+- preview panorama camera
+
+geometry:
+- cylinders
+- transparent geometry
+
+lighting:
+- phong to pbs
+- volumetrics
+- caustics

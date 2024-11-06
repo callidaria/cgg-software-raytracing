@@ -13,10 +13,13 @@ import cgg.a02.Hit;
 import cgg.a03.Scene;
 
 
+enum ObjectType { ERROR,OBJECT,LAEMP }
+
 public class RayTracer implements Sampler
 {
 	private Scene scene;
 	private final Color background = color(0,0,0);
+	private final Color error = color(0,.9,1);
 
 	public RayTracer(Scene scene)
 	{
@@ -27,21 +30,40 @@ public class RayTracer implements Sampler
 	{
 		Ray __Ray = scene.camera.generateRay(coord);
 		Queue<HitTuple> __Hits = new LinkedList<>();
+		ObjectType type = ObjectType.ERROR;
 
 		// emitter
 		for (Geometry g : scene.emitter)
 		{
 			Queue<HitTuple> __Proc = g.intersect(__Ray);
-			__Hits = recentGeometry(__Hits,__Proc);
+			if (recentGeometry(__Hits,__Proc))
+			{
+				__Hits = __Proc;
+				type = ObjectType.LAEMP;
+			}
 		}
 
 		// opaque geometry
 		for (Geometry g : scene.objects)
 		{
 			Queue<HitTuple> __Proc = g.intersect(__Ray);
-			__Hits = recentGeometry(__Hits,__Proc);
+			if (recentGeometry(__Hits,__Proc))
+			{
+				__Hits = __Proc;
+				type = ObjectType.OBJECT;
+			}
 		}
-		return (__Hits.size()>0) ? _shadePhong(__Hits.peek().front()) : background;
+
+		// switch shading
+		if (__Hits.size()==0) return background;
+		Hit __Recent = __Hits.peek().front();
+		switch (type)
+		{
+			case ObjectType.OBJECT: return _shadePhong(__Recent);
+			case ObjectType.LAEMP: return _shadeLaemp(__Recent);
+		}
+		return error;
+		//return (__Hits.size()>0) ? _shadePhong(__Hits.peek().front()) : background;
 	}
 
 	private Color _shade(Hit hit)
@@ -54,20 +76,24 @@ public class RayTracer implements Sampler
 
 	private Color _shadePhong(Hit hit)
 	{
+		Color __Ambient = color(0,0,0);
+		for (PhongIllumination p_Light : scene.phong_lights)
+		{
+			Color __LightIntensity = p_Light.intensity(hit.position());
+			__Ambient = multiply(hit.colour(),multiply(__LightIntensity,.7));
+		}
+		__Ambient = divide(__Ambient,scene.phong_lights.size());
+
 		Color __Result = color(0,0,0);
-		for (PhongIllumination light : scene.phong_lights)
+		for (PhongIllumination p_Light : scene.phong_lights)
 		{
 			// precalculations
-			Color __LightIntensity = light.intensity(hit.position());
+			Color __LightIntensity = p_Light.intensity(hit.position());
 			Color __Albedo = multiply(__LightIntensity,.7);
 
-			// ambient component
-			Color __Ambient = multiply(hit.colour(),multiply(__LightIntensity,.1));
-			__Result = add(__Result,__Ambient);
-
 			// shadow calculation
-			Vec3 __LightDirection = light.direction(hit.position());
-			Ray __ShadowRay = new Ray(hit.position(),__LightDirection,.0001,light.distance(hit.position()));
+			Vec3 __LightDirection = p_Light.direction(hit.position());
+			Ray __ShadowRay = new Ray(hit.position(),__LightDirection,.0001,p_Light.distance(hit.position()));
 			boolean __InShadow = false;
 			for (Geometry g : scene.objects)
 			{
@@ -95,6 +121,11 @@ public class RayTracer implements Sampler
 			}
 		}
 		return clamp(__Result);
+	}
+
+	private Color _shadeLaemp(Hit hit)
+	{
+		return multiply(hit.colour(),.7);
 	}
 
 	private Color _shadeNormals(Hit hit)

@@ -15,9 +15,9 @@ public class Math
 		return out;
 	}
 
-	public static Queue<HitTuple> recentGeometry(Queue<HitTuple> h0,Queue<HitTuple> h1)
+	public static boolean recentGeometry(Queue<HitTuple> h0,Queue<HitTuple> h1)
 	{
-		return (h0.size()==0)||(h1.size()>0&&h1.peek().front().param()<h0.peek().front().param()) ? h1 : h0;
+		return (h0.size()==0)||(h1.size()>0&&h1.peek().front().param()<h0.peek().front().param());
 	}
 
 	public static boolean secondHitRecent(Hit h0,Hit h1)

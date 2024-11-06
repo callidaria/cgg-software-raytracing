@@ -32,10 +32,10 @@ public class Scene
 		_deathstar();
 
 		// lighting
-		_craeveTheVorbiddenLaemp(vec3(1.25,-1,-4),color(1,.5,0),.4);
-		_craeveTheVorbiddenLaemp(vec3(1.25,-1.5,-2),color(0,.5,1),.7);
-		_craeveTheVorbiddenLaemp(vec3(1.5,.75,-1),color(.7,.7,.7),.2);
-		_craeveTheVorbiddenLaemp(vec3(1,.75,-5.5),color(.7,.7,.7),.2);
+		_craeveTheVorbiddenLaemp(vec3(1.25,-1,-4),color(1,.5,0),.7);
+		_craeveTheVorbiddenLaemp(vec3(1.25,-1.5,-2),color(0,.5,1),1);
+		_craeveTheVorbiddenLaemp(vec3(1.5,.75,-1),color(.7,.7,.7),.4);
+		_craeveTheVorbiddenLaemp(vec3(1,.75,-5.4),color(.7,.7,.7),.4);
 	}
 
 	private void _childsplay()
