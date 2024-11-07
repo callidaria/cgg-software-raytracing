@@ -30,7 +30,7 @@ public class RayTracer implements Sampler
 	{
 		Ray __Ray = scene.camera.generateRay(coord);
 		Queue<HitTuple> __Hits = new LinkedList<>();
-		ObjectType type = ObjectType.ERROR;
+		ObjectType __Type = ObjectType.ERROR;
 
 		// emitter
 		for (Geometry g : scene.emitter)
@@ -39,7 +39,7 @@ public class RayTracer implements Sampler
 			if (recentGeometry(__Hits,__Proc))
 			{
 				__Hits = __Proc;
-				type = ObjectType.LAEMP;
+				__Type = ObjectType.LAEMP;
 			}
 		}
 
@@ -50,20 +50,19 @@ public class RayTracer implements Sampler
 			if (recentGeometry(__Hits,__Proc))
 			{
 				__Hits = __Proc;
-				type = ObjectType.OBJECT;
+				__Type = ObjectType.OBJECT;
 			}
 		}
 
 		// switch shading
 		if (__Hits.size()==0) return background;
 		Hit __Recent = __Hits.peek().front();
-		switch (type)
+		switch (__Type)
 		{
-			case ObjectType.OBJECT: return _shadePhong(__Recent);
-			case ObjectType.LAEMP: return _shadeLaemp(__Recent);
+			case OBJECT: return _shadePhong(__Recent);
+			case LAEMP: return _shadeLaemp(__Recent);
 		}
 		return error;
-		//return (__Hits.size()>0) ? _shadePhong(__Hits.peek().front()) : background;
 	}
 
 	private Color _shade(Hit hit)
@@ -76,6 +75,7 @@ public class RayTracer implements Sampler
 
 	private Color _shadePhong(Hit hit)
 	{
+		// ambient component
 		Color __Ambient = color(0,0,0);
 		for (PhongIllumination p_Light : scene.phong_lights)
 		{

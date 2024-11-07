@@ -1,12 +1,22 @@
-math:
+math.
 - panorama camera
 - preview panorama camera
 
-geometry:
+geometry.
 - cylinders
 - transparent geometry
 
-lighting:
+lighting.
 - phong to pbs
 - volumetrics
 - caustics
+- pbb
+- subsurface scattering
+
+dictate.
+- super sampling (desired technique)
+- global illumination (already handled in a functioning pbs)
+- reflections (already handled in a functioning pbs)
+- fixing glass deformation
+- texturing
+- surface materials
