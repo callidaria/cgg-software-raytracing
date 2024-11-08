@@ -59,7 +59,7 @@ public class RayTracer implements Sampler
 		Hit __Recent = __Hits.peek().front();
 		switch (__Type)
 		{
-			case OBJECT: return _shadePhong(__Recent);
+		case OBJECT: return _shadePhong(__Recent);
 			case LAEMP: return _shadeLaemp(__Recent);
 		}
 		return error;
@@ -67,7 +67,7 @@ public class RayTracer implements Sampler
 
 	private Color _shade(Hit hit)
 	{
-		Vec3 lightDir = normalize(vec3(1,1,.7));
+		Vec3 lightDir = normalize(vec3(1,-1,.7));
 		Color ambient = multiply(.05,hit.colour());
 		Color diffuse = multiply(.9*max(0,dot(lightDir,hit.normal())),hit.colour());
 		return add(ambient,diffuse);
@@ -126,6 +126,11 @@ public class RayTracer implements Sampler
 	private Color _shadeLaemp(Hit hit)
 	{
 		return multiply(hit.colour(),.7);
+	}
+
+	private Color _shadePosition(Hit hit,double intent)
+	{
+		return color(multiply(hit.position(),intent));
 	}
 
 	private Color _shadeNormals(Hit hit)

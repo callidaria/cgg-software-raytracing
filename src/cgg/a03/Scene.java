@@ -33,10 +33,12 @@ public class Scene
 		_cylinder();
 
 		// lighting
+		//phong_lights.add(new DirectionalLight(vec3(1,-.7,-.7),color(.7,.7,.7),1));
 		_craeveTheVorbiddenLaemp(vec3(1.25,-1,-4),color(1,.5,0),.7);
 		_craeveTheVorbiddenLaemp(vec3(1.25,-1.5,-2),color(0,.5,1),1);
 		_craeveTheVorbiddenLaemp(vec3(1.5,.75,-1),color(.7,.7,.7),.4);
 		_craeveTheVorbiddenLaemp(vec3(1,.75,-5.4),color(.7,.7,.7),.4);
+		_craeveTheVorbiddenLaemp(vec3(-1.7,-2.15,-7),color(1,1,1),.2);
 	}
 
 	private void _childsplay()
@@ -92,7 +94,6 @@ public class Scene
 		Sphere sphere1 = new Sphere(add(__Position,vec3(.5,0,.5)),.5,color(0,0,.5));
 		Complex complex = new Complex(sphere0,sphere1,JoinOperation.DIFFERENCE);
 		objects.add(complex);
-		_craeveTheVorbiddenLaemp(add(__Position,vec3(-1.7,-.15,0)),color(1,1,1),.2);
 	}
 
 	private void _flooring()
@@ -103,7 +104,10 @@ public class Scene
 
 	private void _cylinder()
 	{
-		objects.add(new Cylinder(vec3(0,1,-4),.5,.25,color(.5,0,0)));
+		Vec3 __Position = vec3(0,1.5,-3.5);
+		Cylinder outer = new Cylinder(__Position,.25,.5,color(.5,0,0));
+		Cylinder inner = new Cylinder(__Position,.25,.4,color(.5,0,0));
+		objects.add(new Complex(outer,inner,JoinOperation.DIFFERENCE));
 	}
 
 	private void _craeveTheVorbiddenLaemp(Vec3 position,Color colour,double intensity)
