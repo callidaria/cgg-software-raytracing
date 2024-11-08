@@ -30,6 +30,7 @@ public class Scene
 		_die();
 		_yummy();
 		_deathstar();
+		_cylinder();
 
 		// lighting
 		_craeveTheVorbiddenLaemp(vec3(1.25,-1,-4),color(1,.5,0),.7);
@@ -94,15 +95,15 @@ public class Scene
 		_craeveTheVorbiddenLaemp(add(__Position,vec3(-1.7,-.15,0)),color(1,1,1),.2);
 	}
 
-	private void _sphere()
-	{
-		objects.add(new Sphere(vec3(-1.25,1,-4),.5,color(.5,0,0)));
-	}
-
 	private void _flooring()
 	{
 		Vec3 __Position = vec3(0,2,-4);
 		objects.add(new Box(__Position,10,1,10,color(.7,.7,.7)));
+	}
+
+	private void _cylinder()
+	{
+		objects.add(new Cylinder(vec3(0,1,-4),.5,.25,color(.5,0,0)));
 	}
 
 	private void _craeveTheVorbiddenLaemp(Vec3 position,Color colour,double intensity)

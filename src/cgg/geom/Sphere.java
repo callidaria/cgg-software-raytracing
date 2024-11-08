@@ -40,7 +40,7 @@ public class Sphere implements Geometry
 		double t0 = (-b+sqrt(sq_comp))/(2*a), t1 = (-b-sqrt(sq_comp))/(2*a);
 		double ts0 = min(t0,t1), ts1 = max(t0,t1);
 
-		// assemble hits & combine
+		// assemble hits
 		if (!r.paramInRange(ts0)&&!r.paramInRange(ts1)) return new LinkedList<HitTuple>();
 		Hit __Front = _assembleHit(r,ts0,1);
 		Hit __Back = _assembleHit(r,ts1,-1);
@@ -52,12 +52,9 @@ public class Sphere implements Geometry
 
 	private Hit _assembleHit(Ray r,double t,int nmod)
 	{
-		if (r.paramInRange(t))
-		{
-			Vec3 __Position = r.calculatePosition(t);
-			Vec3 __Normal = multiply(divide(subtract(__Position,center),radius),nmod);
-			return new Hit(t,__Position,__Normal,colour);
-		}
-		return null;
+		if (!r.paramInRange(t)) return null;
+		Vec3 __Position = r.calculatePosition(t);
+		Vec3 __Normal = multiply(divide(subtract(__Position,center),radius),nmod);
+		return new Hit(t,__Position,__Normal,colour);
 	}
 }

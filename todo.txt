@@ -4,6 +4,7 @@ math.
 
 geometry.
 - cylinders
+- cones
 - transparent geometry
 
 lighting.
