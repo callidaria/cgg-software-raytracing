@@ -30,7 +30,9 @@ public class Scene
 		_die();
 		_yummy();
 		_deathstar();
-		_cylinder();
+		// cylinders shall not be used until basic geometry transform is implemented
+		// and also the inside-geometry extras are to be fixed
+		//_cylinder();
 
 		// lighting
 		//phong_lights.add(new DirectionalLight(vec3(1,-.7,-.7),color(.7,.7,.7),1));
@@ -104,10 +106,13 @@ public class Scene
 
 	private void _cylinder()
 	{
-		Vec3 __Position = vec3(0,1.5,-3.5);
+		Vec3 __Position = vec3(0,1.5,-3);
+		objects.add(new Cylinder(__Position,.25,.5,color(.5,0,0)));
+		/*
 		Cylinder outer = new Cylinder(__Position,.25,.5,color(.5,0,0));
 		Cylinder inner = new Cylinder(__Position,.25,.4,color(.5,0,0));
 		objects.add(new Complex(outer,inner,JoinOperation.DIFFERENCE));
+		*/
 	}
 
 	private void _craeveTheVorbiddenLaemp(Vec3 position,Color colour,double intensity)

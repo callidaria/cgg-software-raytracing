@@ -60,7 +60,7 @@ public class RayTracer implements Sampler
 		switch (__Type)
 		{
 		case OBJECT: return _shadePhong(__Recent);
-			case LAEMP: return _shadeLaemp(__Recent);
+		case LAEMP: return _shadeLaemp(__Recent);
 		}
 		return error;
 	}

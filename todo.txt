@@ -3,12 +3,12 @@ math.
 - preview panorama camera
 
 geometry.
-- cylinders
-- cones
+- cylinders (after transformations)
+- cones (after transformations)
 - transparent geometry
 
 lighting.
-- phong to pbs
+- phong to pbs (after surface materials)
 - volumetrics
 - caustics
 - pbb
@@ -21,3 +21,4 @@ dictate.
 - fixing glass deformation
 - texturing
 - surface materials
+- transformations

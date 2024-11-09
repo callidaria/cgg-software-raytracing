@@ -51,6 +51,10 @@ public class Cylinder implements Geometry
 		if ((ip0<0&&ip1<0)||(ip0>0&&ip1>0)) return new LinkedList<HitTuple>();
 		Hit __Front = (!p0) ? _assembleCaps(r,ts0,1) : _assembleSpherical(r,ts0,1);
 		Hit __Back = (!p1) ? _assembleCaps(r,ts1,-1) : _assembleSpherical(r,ts1,-1);
+		// FIXME: we found the issue! rays within cylinder range react inappropriately when e.g. shadow tracing
+		// this type of checking if the ray escapes does not work for rays inside the cylindrical geometry
+		// will fix this after transformation has been implemented (and also until the others implement them)
+		// cylinders are useless for my usecase until they can be rotated, which is not the case as of rn
 
 		// combine hits as primitive geometry output
 		if (__Front==null&&__Back==null) return new LinkedList<HitTuple>();
@@ -81,7 +85,7 @@ public class Cylinder implements Geometry
 		Vec3 __Position = r.calculatePosition(t);
 		double y = (__Attitude) ? position.y()-height : position.y();
 		double s = (y-__Position.y())/r.direction().y();
-		__Position = add(__Position,multiply(r.direction(),-s));
+		__Position = add(__Position,multiply(r.direction(),s));
 
 		// calculate normal
 		Vec3 __Normal = multiply((__Attitude) ? vec3(0,-1,0) : vec3(0,1,0),nmod);
