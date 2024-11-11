@@ -17,23 +17,23 @@ enum ObjectType { ERROR,OBJECT,LAEMP }
 
 public class RayTracer implements Sampler
 {
-	private Scene scene;
+	private Stage scene;
 	private final Color background = color(0,0,0);
 	private final Color error = color(0,.9,1);
 
-	public RayTracer(Scene scene)
+	public RayTracer(Stage scene)
 	{
 		this.scene = scene;
 	}
 
 	public Color getColor(Vec2 coord)
 	{
-		Ray __Ray = scene.camera.generateRay(coord);
+		Ray __Ray = scene.camera().generateRay(coord);
 		Queue<HitTuple> __Hits = new LinkedList<>();
 		ObjectType __Type = ObjectType.ERROR;
 
 		// emitter
-		for (Geometry g : scene.emitter)
+		for (Geometry g : scene.emitter())
 		{
 			Queue<HitTuple> __Proc = g.intersect(__Ray);
 			if (recentGeometry(__Hits,__Proc))
@@ -44,7 +44,7 @@ public class RayTracer implements Sampler
 		}
 
 		// opaque geometry
-		for (Geometry g : scene.objects)
+		for (Geometry g : scene.objects())
 		{
 			Queue<HitTuple> __Proc = g.intersect(__Ray);
 			if (recentGeometry(__Hits,__Proc))
@@ -77,15 +77,15 @@ public class RayTracer implements Sampler
 	{
 		// ambient component
 		Color __Ambient = color(0,0,0);
-		for (PhongIllumination p_Light : scene.phong_lights)
+		for (PhongIllumination p_Light : scene.phong_lights())
 		{
 			Color __LightIntensity = p_Light.intensity(hit.position());
 			__Ambient = multiply(hit.colour(),multiply(__LightIntensity,.7));
 		}
-		__Ambient = divide(__Ambient,scene.phong_lights.size());
+		__Ambient = divide(__Ambient,scene.phong_lights().size());
 
 		Color __Result = color(0,0,0);
-		for (PhongIllumination p_Light : scene.phong_lights)
+		for (PhongIllumination p_Light : scene.phong_lights())
 		{
 			// precalculations
 			Color __LightIntensity = p_Light.intensity(hit.position());
@@ -95,7 +95,7 @@ public class RayTracer implements Sampler
 			Vec3 __LightDirection = p_Light.direction(hit.position());
 			Ray __ShadowRay = new Ray(hit.position(),__LightDirection,.0001,p_Light.distance(hit.position()));
 			boolean __InShadow = false;
-			for (Geometry g : scene.objects)
+			for (Geometry g : scene.objects())
 			{
 				if (g.intersect(__ShadowRay).size()>0)
 				{
@@ -115,7 +115,7 @@ public class RayTracer implements Sampler
 			{
 				Vec3 r = subtract(multiply(hit.normal(),2*dot(__LightDirection,hit.normal())),__LightDirection);
 				r = normalize(r);
-				Vec3 v = normalize(subtract(scene.camera.position(),hit.position()));
+				Vec3 v = normalize(subtract(scene.camera().position(),hit.position()));
 				Color __Specular = multiply(.2,multiply(__LightIntensity,pow(max(dot(r,v),0),50)));
 				__Result = add(__Result,__Specular);
 			}

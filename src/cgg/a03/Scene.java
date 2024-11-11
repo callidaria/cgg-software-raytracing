@@ -8,12 +8,12 @@ import cgg.geom.*;
 import cgg.lght.*;
 import cgg.a02.Camera;
 
-public class Scene
+public class Scene implements Stage
 {
-	public Camera camera;
-	public ArrayList<Geometry> objects;
-	public ArrayList<Geometry> emitter;
-	public ArrayList<PhongIllumination> phong_lights;
+	private Camera camera;
+	private ArrayList<Geometry> objects;
+	private ArrayList<Geometry> emitter;
+	private ArrayList<PhongIllumination> phong_lights;
 
 	public Scene(int width,int height)
 	{
@@ -120,4 +120,9 @@ public class Scene
 		emitter.add(new Sphere(position,.25,colour));
 		phong_lights.add(new PointLight(position,colour,intensity));
 	}
+
+	public Camera camera() { return camera; }
+	public ArrayList<Geometry> objects() { return objects; }
+	public ArrayList<Geometry> emitter() { return emitter; }
+	public ArrayList<PhongIllumination> phong_lights() { return phong_lights; }
 }
