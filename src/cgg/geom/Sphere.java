@@ -6,6 +6,7 @@ import java.util.Queue;
 import static tools.Functions.*;
 import static cgg.Math.*;
 import tools.*;
+import cgg.mtrl.*;
 import cgg.a02.Ray;
 import cgg.a02.Hit;
 
@@ -15,14 +16,22 @@ public class Sphere implements Geometry
 	private Vec3 center;
 	private double radius;
 	private double sq_radius;
-	private Color colour;
+	private Material material;
 
 	public Sphere(Vec3 center,double radius,Color colour)
 	{
 		this.center = center;
 		this.radius = radius;
 		this.sq_radius = pow(radius,2);
-		this.colour = colour;
+		this.material = new SurfaceMaterial(colour);
+	}
+
+	public Sphere(Vec3 center,double radius,Material material)
+	{
+		this.center = center;
+		this.radius = radius;
+		this.sq_radius = pow(radius,2);
+		this.material = material;
 	}
 
 	public Queue<HitTuple> intersect(Ray r)
@@ -47,7 +56,7 @@ public class Sphere implements Geometry
 		Hit __Back = _assembleHit(r,ts1,-1);
 
 		// combine hits as primitive geometry output
-		__Front = (__Front==null&&__Back!=null) ? hit_pointblank(r.origin(),colour) : __Front;
+		__Front = (__Front==null&&__Back!=null) ? hit_pointblank(r.origin(),material) : __Front;
 		return primitive_hit(new HitTuple(__Front,__Back));
 	}
 
@@ -58,6 +67,6 @@ public class Sphere implements Geometry
 		Vec3 __Origin = subtract(__Position,center);
 		Vec2 __UV = vec2((atan2(__Origin.z(),__Origin.x())+PI)/(2*PI),(PI-acos(__Origin.y()/radius))/PI);
 		Vec3 __Normal = multiply(divide(__Origin,radius),nmod);
-		return new Hit(t,__Position,__UV,__Normal,colour);
+		return new Hit(t,__Position,__UV,__Normal,material);
 	}
 }

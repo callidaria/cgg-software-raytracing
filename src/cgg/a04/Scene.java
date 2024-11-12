@@ -6,6 +6,7 @@ import tools.*;
 import cgg.*;
 import cgg.geom.*;
 import cgg.lght.*;
+import cgg.mtrl.*;
 import cgg.a02.Camera;
 
 
@@ -38,7 +39,7 @@ public class Scene implements Stage
 	private void _testing()
 	{
 		Vec3 __Position = vec3(0,1,-4);
-		objects.add(new Sphere(add(__Position,vec3(-1,0,0)),.5,color(.5,0,0)));
+		objects.add(new Sphere(add(__Position,vec3(-1,0,0)),.5,new SurfaceMaterial("./res/checker.png")));
 		objects.add(new Box(add(__Position,vec3(1,0,0)),1,1,1,color(0,0,.5)));
 	}
 
@@ -50,7 +51,7 @@ public class Scene implements Stage
 
 	private void _craeveTheVorbiddenLaemp(Vec3 position,Color colour,double intensity)
 	{
-		emitter.add(new Sphere(position,.25,colour));
+		emitter.add(new Sphere(position,.25,new SurfaceColour(colour)));
 		phong_lights.add(new PointLight(position,colour,intensity));
 	}
 

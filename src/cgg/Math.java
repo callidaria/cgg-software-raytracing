@@ -4,15 +4,16 @@ import java.util.LinkedList;
 import java.util.Queue;
 import static tools.Functions.*;
 import tools.*;
+import cgg.mtrl.*;
 import cgg.a02.Hit;
 import cgg.geom.HitTuple;
 
 
 public class Math
 {
-	public static Hit hit_pointblank(Vec3 position,Color colour)
+	public static Hit hit_pointblank(Vec3 position,Material material)
 	{
-		return new Hit(0,position,vec2(0,0),vec3(0,0,0),colour);
+		return new Hit(0,position,vec2(0,0),vec3(0,0,0),material);
 	}
 
 	public static Queue<HitTuple> primitive_hit(HitTuple tuple)

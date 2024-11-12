@@ -6,6 +6,7 @@ import java.util.Queue;
 import static tools.Functions.*;
 import static cgg.Math.*;
 import tools.*;
+import cgg.mtrl.*;
 import cgg.a02.Ray;
 import cgg.a02.Hit;
 
@@ -28,7 +29,7 @@ public class Box implements Geometry
 	private Vec3 hdim;
 	private Vec3 bmin;
 	private Vec3 bmax;
-	private Color colour;
+	private SurfaceMaterial colour;
 
 	public Box(Vec3 position,double width,double height,double depth,Color colour)
 	{
@@ -36,7 +37,7 @@ public class Box implements Geometry
 		this.hdim = multiply(vec3(width,height,depth),.5);
 		this.bmin = subtract(position,hdim);
 		this.bmax = add(position,hdim);
-		this.colour = colour;
+		this.colour = new SurfaceMaterial(colour);
 	}
 
 	public Queue<HitTuple> intersect(Ray r)

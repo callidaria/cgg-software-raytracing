@@ -49,18 +49,19 @@ public class RayTracer implements Sampler
 	{
 		// process bland spheres
 		Hit hit = iterateSpheres(scene.blands(),ray);
+		int __Type = 0;
 
 		// process brick spheres
 		Hit __Hit = iterateSpheres(scene.bricks(),ray);
 		if (__Hit!=null&&recentSurfaceHit(hit,__Hit))
 		{
 			hit = __Hit;
-			hit.setType(1);
+			__Type = 1;
 		}
 
 		// surface processing
 		if (hit==null) return null;
-		switch (hit.type())
+		switch (__Type)
 		{
 			case 0: hit.overwriteColour(shade(hit));
 				break;

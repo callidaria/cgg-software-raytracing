@@ -8,12 +8,11 @@ import tools.*;
 import static cgg.Math.*;
 import cgg.geom.*;
 import cgg.lght.*;
+import cgg.mtrl.*;
 import cgg.a02.Ray;
 import cgg.a02.Hit;
 import cgg.a03.Scene;
 
-
-enum ObjectType { ERROR,OBJECT,LAEMP }
 
 public class RayTracer implements Sampler
 {
@@ -30,7 +29,6 @@ public class RayTracer implements Sampler
 	{
 		Ray __Ray = scene.camera().generateRay(coord);
 		Queue<HitTuple> __Hits = new LinkedList<>();
-		ObjectType __Type = ObjectType.ERROR;
 
 		// emitter
 		for (Geometry g : scene.emitter())
@@ -39,7 +37,6 @@ public class RayTracer implements Sampler
 			if (recentGeometry(__Hits,__Proc))
 			{
 				__Hits = __Proc;
-				__Type = ObjectType.LAEMP;
 			}
 		}
 
@@ -50,19 +47,18 @@ public class RayTracer implements Sampler
 			if (recentGeometry(__Hits,__Proc))
 			{
 				__Hits = __Proc;
-				__Type = ObjectType.OBJECT;
 			}
 		}
 
 		// switch shading
 		if (__Hits.size()==0) return background;
 		Hit __Recent = __Hits.peek().front();
-		switch (__Type)
+		return switch (__Recent.material())
 		{
-		case OBJECT: return _shadeTexture(__Recent);
-		case LAEMP: return _shadeLaemp(__Recent);
-		}
-		return error;
+		case SurfaceMaterial c -> _shadePhong(__Recent);
+		case SurfaceColour c -> _shadeLaemp(__Recent);
+		default -> error;
+		};
 	}
 
 	private Color _shade(Hit hit)
@@ -75,12 +71,15 @@ public class RayTracer implements Sampler
 
 	private Color _shadePhong(Hit hit)
 	{
+		// extract colour
+		Color p_Colour = hit.material().getComponent(MaterialComponent.COLOUR,hit);
+
 		// ambient component
 		Color __Ambient = color(0,0,0);
 		for (PhongIllumination p_Light : scene.phong_lights())
 		{
 			Color __LightIntensity = p_Light.intensity(hit.position());
-			__Ambient = multiply(hit.colour(),multiply(__LightIntensity,.7));
+			__Ambient = multiply(p_Colour,multiply(__LightIntensity,.7));
 		}
 		__Ambient = divide(__Ambient,scene.phong_lights().size());
 
@@ -107,7 +106,7 @@ public class RayTracer implements Sampler
 
 			// diffuse component
 			double __Attitude = dot(hit.normal(),__LightDirection);
-			Color __Diffuse = multiply(hit.colour(),multiply(__Albedo,max(0,__Attitude)));
+			Color __Diffuse = multiply(p_Colour,multiply(__Albedo,max(0,__Attitude)));
 			__Result = add(__Result,__Diffuse);
 
 			// specular component
@@ -125,7 +124,7 @@ public class RayTracer implements Sampler
 
 	private Color _shadeLaemp(Hit hit)
 	{
-		return multiply(hit.colour(),.7);
+		return multiply(hit.material().getComponent(MaterialComponent.COLOUR,hit),.7);
 	}
 
 	private Color _shadePosition(Hit hit,double intent)

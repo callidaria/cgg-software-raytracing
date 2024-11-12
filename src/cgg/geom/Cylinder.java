@@ -6,6 +6,7 @@ import java.util.Queue;
 import static tools.Functions.*;
 import static cgg.Math.*;
 import tools.*;
+import cgg.mtrl.*;
 import cgg.a02.Ray;
 import cgg.a02.Hit;
 
@@ -16,7 +17,7 @@ public class Cylinder implements Geometry
 	private double height;
 	private double radius;
 	private double sq_radius;
-	private Color colour;
+	private SurfaceMaterial colour;
 
 	public Cylinder(Vec3 position,double height,double radius,Color colour)
 	{
@@ -24,7 +25,7 @@ public class Cylinder implements Geometry
 		this.height = height;
 		this.radius = radius;
 		this.sq_radius = pow(radius,2);
-		this.colour = colour;
+		this.colour = new SurfaceMaterial(colour);
 	}
 
 	public Queue<HitTuple> intersect(Ray r)

@@ -3,20 +3,21 @@ package cgg.a02;
 import static java.lang.Math.*;
 import static tools.Functions.*;
 import tools.*;
+import cgg.mtrl.*;
 
 public class Sphere
 {
 	private Vec3 center;
 	private double radius;
 	private double sq_radius;
-	private Color colour;
+	private SurfaceMaterial colour;
 
 	public Sphere(Vec3 center,double radius,Color colour)
 	{
 		this.center = center;
 		this.radius = radius;
 		this.sq_radius = pow(radius,2);
-		this.colour = colour;
+		this.colour = new SurfaceMaterial(colour);
 	}
 
 	public Hit intersect(Ray r)
