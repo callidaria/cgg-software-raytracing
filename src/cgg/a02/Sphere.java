@@ -43,6 +43,6 @@ public class Sphere
 		// assemble hit if param in range
 		Vec3 __Position = r.calculatePosition(t);
 		Vec3 __Normal = divide(subtract(__Position,center),radius);
-		return new Hit(t,__Position,__Normal,colour);
+		return new Hit(t,__Position,vec2(0,0),__Normal,colour);
 	}
 }

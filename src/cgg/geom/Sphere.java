@@ -9,6 +9,7 @@ import tools.*;
 import cgg.a02.Ray;
 import cgg.a02.Hit;
 
+
 public class Sphere implements Geometry
 {
 	private Vec3 center;
@@ -46,7 +47,7 @@ public class Sphere implements Geometry
 		Hit __Back = _assembleHit(r,ts1,-1);
 
 		// combine hits as primitive geometry output
-		__Front = (__Front==null&&__Back!=null) ? new Hit(0,r.origin(),vec3(0,0,0),colour) : __Front;
+		__Front = (__Front==null&&__Back!=null) ? hit_pointblank(r.origin(),colour) : __Front;
 		return primitive_hit(new HitTuple(__Front,__Back));
 	}
 
@@ -54,7 +55,9 @@ public class Sphere implements Geometry
 	{
 		if (!r.paramInRange(t)) return null;
 		Vec3 __Position = r.calculatePosition(t);
-		Vec3 __Normal = multiply(divide(subtract(__Position,center),radius),nmod);
-		return new Hit(t,__Position,__Normal,colour);
+		Vec3 __Origin = subtract(__Position,center);
+		Vec2 __UV = vec2((atan2(__Origin.z(),__Origin.x())+PI)/(2*PI),(PI-acos(__Origin.y()/radius))/PI);
+		Vec3 __Normal = multiply(divide(__Origin,radius),nmod);
+		return new Hit(t,__Position,__UV,__Normal,colour);
 	}
 }

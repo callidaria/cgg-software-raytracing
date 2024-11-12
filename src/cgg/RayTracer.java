@@ -59,7 +59,7 @@ public class RayTracer implements Sampler
 		Hit __Recent = __Hits.peek().front();
 		switch (__Type)
 		{
-		case OBJECT: return _shadePhong(__Recent);
+		case OBJECT: return _shadeTexture(__Recent);
 		case LAEMP: return _shadeLaemp(__Recent);
 		}
 		return error;
@@ -131,6 +131,11 @@ public class RayTracer implements Sampler
 	private Color _shadePosition(Hit hit,double intent)
 	{
 		return color(multiply(hit.position(),intent));
+	}
+
+	private Color _shadeTexture(Hit hit)
+	{
+		return color(hit.uv().x(),hit.uv().y(),0);
 	}
 
 	private Color _shadeNormals(Hit hit)

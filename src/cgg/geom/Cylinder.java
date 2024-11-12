@@ -58,7 +58,7 @@ public class Cylinder implements Geometry
 
 		// combine hits as primitive geometry output
 		if (__Front==null&&__Back==null) return new LinkedList<HitTuple>();
-		__Front = (__Front==null&&__Back!=null) ? new Hit(0,r.origin(),vec3(0,0,0),colour) : __Front;
+		__Front = (__Front==null&&__Back!=null) ? hit_pointblank(r.origin(),colour) : __Front;
 		return primitive_hit(new HitTuple(__Front,__Back));
 	}
 
@@ -73,7 +73,9 @@ public class Cylinder implements Geometry
 		if (!r.paramInRange(t)) return null;
 		Vec3 __Position = r.calculatePosition(t);
 		Vec3 __Normal = normalize(vec3(__Position.x()-position.x(),0,__Position.z()-position.z()));
-		return new Hit(t,__Position,__Normal,colour);
+		Vec2 __UV = vec2(0,0);
+		// TODO
+		return new Hit(t,__Position,__UV,__Normal,colour);
 	}
 
 	private Hit _assembleCaps(Ray r,double t,int nmod)
@@ -89,6 +91,11 @@ public class Cylinder implements Geometry
 
 		// calculate normal
 		Vec3 __Normal = multiply((__Attitude) ? vec3(0,-1,0) : vec3(0,1,0),nmod);
-		return new Hit(t,__Position,__Normal,colour);
+
+		// texture coordinates
+		Vec2 __UV = vec2(0,0);
+		// TODO
+
+		return new Hit(t,__Position,__UV,__Normal,colour);
 	}
 }

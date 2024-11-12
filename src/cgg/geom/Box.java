@@ -53,7 +53,7 @@ public class Box implements Geometry
 		Hit __Back = _assembleHit(r,t.far);
 
 		// combine
-		__Front = (__Back!=null&&__Front==null) ? new Hit(0,r.origin(),vec3(0,0,0),colour) : __Front;
+		__Front = (__Back!=null&&__Front==null) ? hit_pointblank(r.origin(),colour) : __Front;
 		return primitive_hit(new HitTuple(__Front,__Back));
 	}
 
@@ -68,15 +68,20 @@ public class Box implements Geometry
 
 	private Hit _assembleHit(Ray r,double t)
 	{
-		if (r.paramInRange(t))
-		{
-			Vec3 __Position = r.calculatePosition(t);
-			Vec3 lp = normalize(divide(subtract(__Position,position),hdim));
-			boolean hx = (abs(lp.x())>abs(lp.y()))&&(abs(lp.x())>abs(lp.z()));
-			boolean hy = !hx&&(abs(lp.y())>abs(lp.z()));
-			Vec3 __Normal = normalize(vec3(hx?lp.x():0,hy?lp.y():0,!(hx||hy)?lp.z():0));
-			return new Hit(t,__Position,__Normal,colour);
-		}
-		return null;
+		if (!r.paramInRange(t)) return null;
+		Vec3 __Position = r.calculatePosition(t);
+
+		// texture coordinates
+		Vec2 __UV = vec2(0,0);
+		// TODO
+
+		// normals
+		Vec3 lp = normalize(divide(subtract(__Position,position),hdim));
+		boolean hx = (abs(lp.x())>abs(lp.y()))&&(abs(lp.x())>abs(lp.z()));
+		boolean hy = !hx&&(abs(lp.y())>abs(lp.z()));
+		Vec3 __Normal = normalize(vec3(hx?lp.x():0,hy?lp.y():0,!(hx||hy)?lp.z():0));
+
+		// finalize
+		return new Hit(t,__Position,__UV,__Normal,colour);
 	}
 }
