@@ -20,18 +20,7 @@ public class Main
 
 		// images
 		cgg.Image image = new cgg.Image(width,height);
-
-		// draw
-		for (int x=0;x<width;x++)
-		{
-			for (int y=0;y<height;y++)
-			{
-				Vec2 coord = vec2(x,y);
-				image.setPixel(x,y,rt.getColor(coord));
-			}
-		}
-
-		// write
+		image.sample(rt);
 		image.writePng("a04-image");
 	}
 }

@@ -1,6 +1,8 @@
 package cgg;
 
+import static tools.Functions.*;
 import tools.*;
+
 
 public class Image implements tools.Image {
 
@@ -13,6 +15,15 @@ public class Image implements tools.Image {
 		this.height = height;
 		this.data = new double[width*height*3];
     }
+
+	public void sample(Sampler sampler)
+	{
+		for (int x=0;x<width;x++)
+		{
+			for (int y=0;y<height;y++)
+				setPixel(x,y,sampler.getColor(vec2(x,y)));
+		}
+	}
 
     public void setPixel(int x, int y, Color color) {
 		int __PixelIndex = calculatePixelIndex(x,y);

@@ -30,12 +30,9 @@ public class Scene implements Stage
 		_testing();
 
 		// lighting
-		//phong_lights.add(new DirectionalLight(vec3(1,-.7,-.7),color(.7,.7,.7),1));
-		_craeveTheVorbiddenLaemp(vec3(1.25,-1,-4),color(1,.5,0),.7);
-		_craeveTheVorbiddenLaemp(vec3(1.25,-1.5,-2),color(0,.5,1),1);
-		_craeveTheVorbiddenLaemp(vec3(1.5,.75,-1),color(.7,.7,.7),.4);
-		_craeveTheVorbiddenLaemp(vec3(1,.75,-5.4),color(.7,.7,.7),.4);
-		_craeveTheVorbiddenLaemp(vec3(-1.7,-2.15,-7),color(1,1,1),.2);
+		_craeveTheVorbiddenLaemp(vec3(-1,0,-1),color(1,1,1),.7);
+		_craeveTheVorbiddenLaemp(vec3(1,-1,-4),color(1,.5,0),.7);
+		_craeveTheVorbiddenLaemp(vec3(-1.25,-2,-5),color(0,0,.5),.4);
 	}
 
 	private void _testing()
