@@ -1,6 +1,10 @@
 #include "frame.h"
 
 
+/**
+ *		FRAME UTILITY
+ */
+
 Frame* frame_open(const char* title,int width,int height)
 {
 	// data definition
@@ -28,7 +32,10 @@ Frame* frame_open(const char* title,int width,int height)
 	glFrontFace(GL_CCW);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	glViewport(0,0,width,height);
+
+	// set standard values and out
 	glClearColor(0,0,0,0);
+	out->running = 1;
 	return out;
 }
 
@@ -37,14 +44,30 @@ void frame_clear()
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 }
 
-void frame_swap(Frame* frame)
+void frame_swap(Frame* f)
 {
-	SDL_GL_SwapWindow(frame->frame);
+	SDL_GL_SwapWindow(f->frame);
 }
 
-void frame_close(Frame* frame)
+void frame_close(Frame* f)
 {
-	SDL_GL_DeleteContext(frame->context);
+	SDL_GL_DeleteContext(f->context);
 	SDL_Quit();
-	free(frame);
+	free(f);
+}
+
+
+/**
+ *		INPUT UTILITY
+ */
+
+void input_read(Frame* f)
+{
+	while (SDL_PollEvent(&f->event))
+	{
+		switch (f->event.type)
+		{
+		case SDL_QUIT: f->running = 0;
+		}
+	}
 }
