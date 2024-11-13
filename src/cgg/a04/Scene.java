@@ -40,13 +40,13 @@ public class Scene implements Stage
 	{
 		Vec3 __Position = vec3(0,1,-4);
 		objects.add(new Sphere(add(__Position,vec3(-1,0,0)),.5,new SurfaceMaterial("./res/checker.png")));
-		objects.add(new Box(add(__Position,vec3(1,0,0)),1,1,1,color(0,0,.5)));
+		objects.add(new Box(add(__Position,vec3(1,0,0)),1,1,1,new SurfaceMaterial(color(0,0,.5))));
 	}
 
 	private void _flooring()
 	{
 		Vec3 __Position = vec3(0,2,-4);
-		objects.add(new Box(__Position,10,1,10,color(.7,.7,.7)));
+		objects.add(new Box(__Position,10,1,10,new SurfaceMaterial(color(.7,.7,.7))));
 	}
 
 	private void _craeveTheVorbiddenLaemp(Vec3 position,Color colour,double intensity)

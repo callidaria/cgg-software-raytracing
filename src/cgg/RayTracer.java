@@ -34,20 +34,14 @@ public class RayTracer implements Sampler
 		for (Geometry g : scene.emitter())
 		{
 			Queue<HitTuple> __Proc = g.intersect(__Ray);
-			if (recentGeometry(__Hits,__Proc))
-			{
-				__Hits = __Proc;
-			}
+			if (recentGeometry(__Hits,__Proc)) __Hits = __Proc;
 		}
 
 		// opaque geometry
 		for (Geometry g : scene.objects())
 		{
 			Queue<HitTuple> __Proc = g.intersect(__Ray);
-			if (recentGeometry(__Hits,__Proc))
-			{
-				__Hits = __Proc;
-			}
+			if (recentGeometry(__Hits,__Proc)) __Hits = __Proc;
 		}
 
 		// switch shading

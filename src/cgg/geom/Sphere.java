@@ -18,14 +18,6 @@ public class Sphere implements Geometry
 	private double sq_radius;
 	private Material material;
 
-	public Sphere(Vec3 center,double radius,Color colour)
-	{
-		this.center = center;
-		this.radius = radius;
-		this.sq_radius = pow(radius,2);
-		this.material = new SurfaceMaterial(colour);
-	}
-
 	public Sphere(Vec3 center,double radius,Material material)
 	{
 		this.center = center;

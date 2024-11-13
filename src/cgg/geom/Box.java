@@ -29,15 +29,15 @@ public class Box implements Geometry
 	private Vec3 hdim;
 	private Vec3 bmin;
 	private Vec3 bmax;
-	private SurfaceMaterial colour;
+	private Material material;
 
-	public Box(Vec3 position,double width,double height,double depth,Color colour)
+	public Box(Vec3 position,double width,double height,double depth,Material material)
 	{
 		this.position = position;
 		this.hdim = multiply(vec3(width,height,depth),.5);
 		this.bmin = subtract(position,hdim);
 		this.bmax = add(position,hdim);
-		this.colour = new SurfaceMaterial(colour);
+		this.material = material;
 	}
 
 	public Queue<HitTuple> intersect(Ray r)
@@ -54,7 +54,7 @@ public class Box implements Geometry
 		Hit __Back = _assembleHit(r,t.far);
 
 		// combine
-		__Front = (__Back!=null&&__Front==null) ? hit_pointblank(r.origin(),colour) : __Front;
+		__Front = (__Back!=null&&__Front==null) ? hit_pointblank(r.origin(),material) : __Front;
 		return primitive_hit(new HitTuple(__Front,__Back));
 	}
 
@@ -71,18 +71,18 @@ public class Box implements Geometry
 	{
 		if (!r.paramInRange(t)) return null;
 		Vec3 __Position = r.calculatePosition(t);
-
-		// texture coordinates
-		Vec2 __UV = vec2(0,0);
-		// TODO
+		Vec3 __Origin = subtract(__Position,position);
 
 		// normals
-		Vec3 lp = normalize(divide(subtract(__Position,position),hdim));
+		Vec3 lp = normalize(divide(__Origin,hdim));
 		boolean hx = (abs(lp.x())>abs(lp.y()))&&(abs(lp.x())>abs(lp.z()));
 		boolean hy = !hx&&(abs(lp.y())>abs(lp.z()));
 		Vec3 __Normal = normalize(vec3(hx?lp.x():0,hy?lp.y():0,!(hx||hy)?lp.z():0));
 
+		// texture coordinates
+		Vec2 __UV = vec2(0,__Origin.y()/hdim.y()-__Normal.y()*.5);
+
 		// finalize
-		return new Hit(t,__Position,__UV,__Normal,colour);
+		return new Hit(t,__Position,__UV,__Normal,material);
 	}
 }
