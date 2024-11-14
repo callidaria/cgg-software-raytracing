@@ -49,8 +49,8 @@ public class RayTracer implements Sampler
 		Hit __Recent = __Hits.peek().front();
 		return switch (__Recent.material())
 		{
-		case SurfaceMaterial c -> _shadePhong(__Recent);
-		case SurfaceColour c -> _shadeLaemp(__Recent);
+		case SurfaceMaterial _ -> _shadePhong(__Recent);
+		case SurfaceColour _ -> _shadeLaemp(__Recent);
 		default -> error;
 		};
 	}

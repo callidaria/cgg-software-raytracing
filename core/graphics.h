@@ -4,18 +4,22 @@
 #include "base.h"
 
 
-// graphics data
 typedef struct Buffer_
 {
 	unsigned int vao,vbo;
+	// yes yes, static allocation please. there is no usecase for dynamic additions
+	// all components can be adequatly instanced, there is no need for additions while running
+	float* vertices;
+	size_t vsize,rlen;
 } Buffer;
 
 
-// graphics utility
+// buffer utility
 Buffer* buffer_generate();
 void buffer_bind(Buffer* b);
 void buffer_unbind();
-void buffer_upload_vertices(Buffer* b,float* vertices,size_t range);
+void buffer_upload_vertices(Buffer* b);
+void buffer_destroy(Buffer* b);
 
 
 // shader utility
@@ -30,7 +34,11 @@ void shader_define(unsigned int sp,const char* varname,
 
 
 // generative utility
-// TODO
+void generate_gpu_data(Buffer* qb,Buffer* pb,Buffer* lvb);
+
+
+// render utility
+void render(unsigned int sp,Buffer* b);
 
 
 #endif
