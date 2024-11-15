@@ -8,7 +8,8 @@ int main(char** argc,int argv)
 
 	// geometry definition
 	Buffer* buffer_quad = buffer_generate();
-	generate_gpu_data(buffer_quad,NULL,NULL);
+	ElementBuffer* elbuffer_quad = elbuffer_generate();
+	generate_gpu_data(buffer_quad,elbuffer_quad,NULL,NULL);
 
 	// shader pipelines
 	buffer_bind(buffer_quad);
@@ -19,6 +20,9 @@ int main(char** argc,int argv)
 		);
 	shader_enable(pipeline_quad);
 	shader_define(pipeline_quad,"position",2,0,2);
+	elbuffer_bind(elbuffer_quad);
+	shader_define_element(pipeline_quad,"offset",2,0,4);
+	shader_define_element(pipeline_quad,"scale",2,2,4);
 
 	// render
 	while (frame->running)
@@ -27,12 +31,13 @@ int main(char** argc,int argv)
 
 		// START DRAW
 		frame_clear();
-		render(pipeline_quad,buffer_quad);
+		render_windows(pipeline_quad,buffer_quad,elbuffer_quad);
 		frame_swap(frame);
 		// END DRAW
 	}
 
 	// close window
+	elbuffer_destroy(elbuffer_quad);
 	buffer_destroy(buffer_quad);
 	frame_close(frame);
 }

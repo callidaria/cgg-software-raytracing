@@ -21,7 +21,7 @@
 
 // command definition
 #define COMM_CLS printf("%s\n",LOG_CLEAR);
-#define COMM_MSG(c,...) printf("%s",col),printf(__VA_ARGS__),COMM_CLS;
+#define COMM_MSG(c,...) printf("%s",c),printf(__VA_ARGS__),COMM_CLS;
 #define COMM_LOG(...) COMM_MSG(LOG_CLEAR,__VA_ARGS__);
 #define COMM_ERR(...) printf("%serror: ",LOG_RED),printf(__VA_ARGS__),COMM_CLS;
 #define COMM_SCC(...) COMM_MSG(LOG_GREEN,__VA_ARGS__);
