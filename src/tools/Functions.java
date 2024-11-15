@@ -308,6 +308,11 @@ public class Functions {
         return r;
     }
 
+	public static Vec3 add(Vec3 a,double b)
+	{
+		return vec3(a.x()+b,a.y()+b,a.z()+b);
+	}
+
     /**
      * Calculates the difference between two or more Vec3 objects.
      *
@@ -322,6 +327,11 @@ public class Functions {
             r = vec3(r.x() - v.x(), r.y() - v.y(), r.z() - v.z());
         return r;
     }
+
+	public static Vec3 subtract(Vec3 a,double b)
+	{
+		return vec3(a.x()-b,a.y()-b,a.z()-b);
+	}
 
     /**
      * Multiplies a Vec3 by a scalar value.
@@ -1176,6 +1186,16 @@ public class Functions {
 	public static Vec3 bounce(Vec3 dir,Vec3 normal)
 	{
 		return add(dir,multiply(2*dot(multiply(dir,-1),normal),normal));
+	}
+
+	public static Vec3 mix(Vec3 v0,Vec3 v1,double t)
+	{
+		return add(multiply(v0,1.-t),multiply(v1,t));
+	}
+
+	public static Color mix(Color c0,Color c1,double t)
+	{
+		return add(multiply(c0,1.-t),multiply(c1,t));
 	}
 
     /**

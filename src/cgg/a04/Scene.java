@@ -31,15 +31,20 @@ public class Scene implements Stage
 		_testing();
 
 		// lighting
+		phong_lights.add(new DirectionalLight(vec3(1,-1,1),color(.7,.7,.7),1.));
+		/*
 		_craeveTheVorbiddenLaemp(vec3(-1,0,-1),color(1,1,1),.7);
 		_craeveTheVorbiddenLaemp(vec3(1,-1,-4),color(1,.5,0),.7);
 		_craeveTheVorbiddenLaemp(vec3(-1.25,-2,-5),color(0,0,.5),.4);
+		*/
 	}
 
 	private void _testing()
 	{
 		Vec3 __Position = vec3(0,1,-4);
-		objects.add(new Sphere(add(__Position,vec3(-1,0,0)),.5,new SurfaceMaterial("./res/checker.png")));
+		//objects.add(new Sphere(add(__Position,vec3(-1,0,0)),.5,new SurfaceMaterial("./res/checker.png")));
+		objects.add(new Sphere(add(__Position,vec3(-1,0,0)),.5,
+							   new PhysicalMaterial("./res/marble/colour.png","./res/marble/material.png")));
 		objects.add(new Box(add(__Position,vec3(1,0,0)),1,1,1,new SurfaceMaterial(color(0,0,.5))));
 	}
 

@@ -49,8 +49,9 @@ public class RayTracer implements Sampler
 		Hit __Recent = __Hits.peek().front();
 		return switch (__Recent.material())
 		{
-		case SurfaceMaterial _ -> _shadePhong(__Recent);
-		case SurfaceColour _ -> _shadeLaemp(__Recent);
+		case PhysicalMaterial c -> _shadePhysical(__Recent);
+		case SurfaceMaterial c -> _shadePhong(__Recent);
+		case SurfaceColour c -> _shadeLaemp(__Recent);
 		default -> error;
 		};
 	}
@@ -61,6 +62,65 @@ public class RayTracer implements Sampler
 		Color ambient = multiply(.05,hit.colour());
 		Color diffuse = multiply(.9*max(0,dot(lightDir,hit.normal())),hit.colour());
 		return add(ambient,diffuse);
+	}
+
+	private Color _shadePhysical(Hit hit)
+	{
+		// extract colour information
+		Color p_Colour = hit.material().getComponent(MaterialComponent.COLOUR,hit);
+		Color p_Material = hit.material().getComponent(MaterialComponent.MATERIAL,hit);
+
+		// translate colour to surface info
+		double __Metallic = p_Material.r();
+		double __Roughness = p_Material.g();
+		double __Occlusion = p_Material.b();
+
+		// precalculations
+		Vec3 __CameraDir = normalize(subtract(scene.camera().position(),hit.position()));
+		Vec3 __Fresnel0 = mix(vec3(.04,.04,.04),vec3(p_Colour),__Metallic);
+		double __dtLightOut = max(dot(hit.normal(),__CameraDir),.0);
+		double __SchlickOut = _schlickBeckmannApprox(__dtLightOut,__Roughness);
+
+		// processing lights
+		Vec3 __Result = vec3(0,0,0);
+		for (PhongIllumination p_Light : scene.phong_lights())
+		{
+			Vec3 __LightDir = p_Light.direction(hit.position());
+			Vec3 __Halfway = normalize(add(__CameraDir,__LightDir));
+
+			// distribution component
+			double aSq = pow(__Roughness,4.);
+			double __TBR = aSq/(PI*pow(pow(max(dot(hit.normal(),__Halfway),.0),2.)*(aSq-1.)+1.,2.));
+
+			// fresnel component as through approximation
+			Vec3 __Fresnel = add(
+					__Fresnel0,
+					multiply(
+						subtract(vec3(1.),__Fresnel0),
+						vec3(pow(clamp(1.-max(dot(__Halfway,__CameraDir),.0),.0,1.),5.))
+					)
+				);
+
+			// geometry component
+			double __dtLightIn = max(dot(hit.normal(),__LightDir),.0);
+			double __Smith = _schlickBeckmannApprox(__dtLightIn,__Roughness)*__SchlickOut;
+
+			// specular brdf
+			Vec3 __CT = divide(multiply(multiply(__TBR,__Fresnel),__Smith),4.*__dtLightIn*__dtLightOut+.0001);
+			Vec3 lR = divide(multiply(multiply(subtract(vec3(1.),__Fresnel),(1.-__Metallic)),vec3(p_Colour)),
+							 add(__CT,PI));
+			lR = multiply(lR,multiply(vec3(p_Light.intensity(hit.position())),__dtLightIn));
+			__Result = add(__Result,lR);
+		}
+		// TODO: pointlight attenuation upgrade
+
+		return clamp(color(__Result));
+	}
+
+	private double _schlickBeckmannApprox(double l,double r)
+	{
+		double __Direct = pow(r+1.,2)/8.;
+		return l/(l*(1.-__Direct)+__Direct);
 	}
 
 	private Color _shadePhong(Hit hit)
