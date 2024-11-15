@@ -1198,6 +1198,16 @@ public class Functions {
 		return add(multiply(c0,1.-t),multiply(c1,t));
 	}
 
+	public static Color pow(Color a,double b)
+	{
+		return color(Math.pow(a.r(),b),Math.pow(a.g(),b),Math.pow(a.b(),b));
+	}
+
+	public static Color exp(Color a)
+	{
+		return color(Math.exp(a.r()),Math.exp(a.g()),Math.exp(a.b()));
+	}
+
     /**
      * Helper method for HSV to RGB conversion.
      * Calculates the RGB color for a given hue value.

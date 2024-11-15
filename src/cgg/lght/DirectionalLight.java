@@ -29,4 +29,9 @@ public class DirectionalLight implements PhongIllumination
 	{
 		return colour;
 	}
+
+	public Color physicalInfluence(Vec3 position)
+	{
+		return colour;
+	}
 }

@@ -24,19 +24,17 @@ public class Scene implements Stage
 		phong_lights = new ArrayList<>();
 
 		// projection
-		camera = new Camera(vec3(0,0,0),60.,width,height);
+		camera = new Camera(vec3(0,0,0),60.,width,height,1.);
 
 		// geometry
 		_flooring();
 		_testing();
 
 		// lighting
-		phong_lights.add(new DirectionalLight(vec3(1,-1,1),color(.7,.7,.7),1.));
-		/*
+		//phong_lights.add(new DirectionalLight(vec3(1,-1,1),color(.7,.7,.7),1.));
 		_craeveTheVorbiddenLaemp(vec3(-1,0,-1),color(1,1,1),.7);
 		_craeveTheVorbiddenLaemp(vec3(1,-1,-4),color(1,.5,0),.7);
 		_craeveTheVorbiddenLaemp(vec3(-1.25,-2,-5),color(0,0,.5),.4);
-		*/
 	}
 
 	private void _testing()
@@ -44,8 +42,12 @@ public class Scene implements Stage
 		Vec3 __Position = vec3(0,1,-4);
 		//objects.add(new Sphere(add(__Position,vec3(-1,0,0)),.5,new SurfaceMaterial("./res/checker.png")));
 		objects.add(new Sphere(add(__Position,vec3(-1,0,0)),.5,
+							   new PhysicalMaterial("./res/plastic/orange.png","./res/plastic/material.png")));
+		objects.add(new Sphere(add(__Position,vec3(0,0,-1)),.5,
+							   new PhysicalMaterial("./res/gold/colour.png","./res/gold/material.png")));
+		objects.add(new Sphere(add(__Position,vec3(1,0,0)),.5,
 							   new PhysicalMaterial("./res/marble/colour.png","./res/marble/material.png")));
-		objects.add(new Box(add(__Position,vec3(1,0,0)),1,1,1,new SurfaceMaterial(color(0,0,.5))));
+		//objects.add(new Box(add(__Position,vec3(1,0,0)),1,1,1,new SurfaceMaterial(color(0,0,.5))));
 	}
 
 	private void _flooring()
@@ -57,7 +59,7 @@ public class Scene implements Stage
 	private void _craeveTheVorbiddenLaemp(Vec3 position,Color colour,double intensity)
 	{
 		emitter.add(new Sphere(position,.25,new SurfaceColour(colour)));
-		phong_lights.add(new PointLight(position,colour,intensity));
+		phong_lights.add(new PointLight(position,colour,intensity,1.,.7,1.8));
 	}
 
 	public Camera camera() { return camera; }

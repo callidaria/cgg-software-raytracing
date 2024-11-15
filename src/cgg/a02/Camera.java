@@ -13,10 +13,11 @@ public class Camera
 	private double hwidth;
 	private double height;
 	private double hheight;
+	private double exposure;
 	private final double near = 0;
 	private final double far = 1000;
 
-	public Camera(Vec3 position,double fov,double width,double height)
+	public Camera(Vec3 position,double fov,double width,double height,double exposure)
 	{
 		this.position = position;
 		this.deg_fov = fov;
@@ -25,6 +26,7 @@ public class Camera
 		this.hwidth = width*.5;
 		this.height = height;
 		this.hheight = height*.5;
+		this.exposure = exposure;
 	}
 
 	public Ray generateRay(Vec2 coord)
@@ -34,4 +36,5 @@ public class Camera
 	}
 
 	public Vec3 position() { return position; }
+	public double exposure() { return exposure; }
 }

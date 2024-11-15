@@ -15,7 +15,7 @@ public class Scene
 	public Scene(int width,int height)
 	{
 		// camera setup
-		this.camera = new Camera(vec3(0,0,0),90,width,height);
+		this.camera = new Camera(vec3(0,0,0),90,width,height,1.);
 
 		// bland sphere setup
 		blands = new ArrayList<Sphere>();

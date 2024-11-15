@@ -9,11 +9,26 @@ public class PointLight implements PhongIllumination
 {
 	private Vec3 position;
 	private Color colour;
+	private double constant;
+	private double linear;
+	private double quadratic;
 
 	public PointLight(Vec3 position,Color colour,double intensity)
 	{
 		this.position = position;
 		this.colour = multiply(colour,intensity);
+		this.constant = 1.;
+		this.linear = .045;
+		this.quadratic = .0075;
+	}
+
+	public PointLight(Vec3 position,Color colour,double intensity,double constant,double linear,double quadratic)
+	{
+		this.position = position;
+		this.colour = multiply(colour,intensity);
+		this.constant = constant;
+		this.linear = linear;
+		this.quadratic = quadratic;
 	}
 
 	public Vec3 direction(Vec3 position)
@@ -28,6 +43,13 @@ public class PointLight implements PhongIllumination
 
 	public Color intensity(Vec3 position)
 	{
-		return divide(colour,pow(length(subtract(this.position,position)),2));
+		return divide(colour,pow(distance(position),2));
+	}
+
+	public Color physicalInfluence(Vec3 position)
+	{
+		double d = distance(position);
+		double __Attenuation = 1/(constant+linear*d+quadratic*pow(d,2.));
+		return multiply(colour,__Attenuation);
 	}
 }

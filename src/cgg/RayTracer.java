@@ -47,13 +47,17 @@ public class RayTracer implements Sampler
 		// switch shading
 		if (__Hits.size()==0) return background;
 		Hit __Recent = __Hits.peek().front();
-		return switch (__Recent.material())
+		Color __Result = switch (__Recent.material())
 		{
 		case PhysicalMaterial c -> _shadePhysical(__Recent);
 		case SurfaceMaterial c -> _shadePhong(__Recent);
 		case SurfaceColour c -> _shadeLaemp(__Recent);
 		default -> error;
 		};
+
+		// colour correction
+		__Result = subtract(color(1.),exp(multiply(__Result,-scene.camera().exposure())));
+		return pow(__Result,1./2.2);
 	}
 
 	private Color _shade(Hit hit)
@@ -74,6 +78,11 @@ public class RayTracer implements Sampler
 		double __Metallic = p_Material.r();
 		double __Roughness = p_Material.g();
 		double __Occlusion = p_Material.b();
+		/*
+		p_Colour = color(.75,0,0);
+		__Metallic = .0;
+		__Roughness = .2;
+		*/
 
 		// precalculations
 		Vec3 __CameraDir = normalize(subtract(scene.camera().position(),hit.position()));
@@ -85,10 +94,13 @@ public class RayTracer implements Sampler
 		Vec3 __Result = vec3(0,0,0);
 		for (PhongIllumination p_Light : scene.phong_lights())
 		{
+			// shadow checking
 			Vec3 __LightDir = p_Light.direction(hit.position());
-			Vec3 __Halfway = normalize(add(__CameraDir,__LightDir));
+			if (_shadowCast(hit,__LightDir,p_Light.distance(hit.position()))) continue;
+			// TODO: test this in a complex environment
 
 			// distribution component
+			Vec3 __Halfway = normalize(add(__CameraDir,__LightDir));
 			double aSq = pow(__Roughness,4.);
 			double __TBR = aSq/(PI*pow(pow(max(dot(hit.normal(),__Halfway),.0),2.)*(aSq-1.)+1.,2.));
 
@@ -109,10 +121,10 @@ public class RayTracer implements Sampler
 			Vec3 __CT = divide(multiply(multiply(__TBR,__Fresnel),__Smith),4.*__dtLightIn*__dtLightOut+.0001);
 			Vec3 lR = divide(multiply(multiply(subtract(vec3(1.),__Fresnel),(1.-__Metallic)),vec3(p_Colour)),
 							 add(__CT,PI));
-			lR = multiply(lR,multiply(vec3(p_Light.intensity(hit.position())),__dtLightIn));
+			lR = multiply(lR,multiply(vec3(p_Light.physicalInfluence(hit.position())),__dtLightIn));
 			__Result = add(__Result,lR);
 		}
-		// TODO: pointlight attenuation upgrade
+		// FIXME: no specular highlights on geometry, component specific debug necessary
 
 		return clamp(color(__Result));
 	}
@@ -146,17 +158,7 @@ public class RayTracer implements Sampler
 
 			// shadow calculation
 			Vec3 __LightDirection = p_Light.direction(hit.position());
-			Ray __ShadowRay = new Ray(hit.position(),__LightDirection,.0001,p_Light.distance(hit.position()));
-			boolean __InShadow = false;
-			for (Geometry g : scene.objects())
-			{
-				if (g.intersect(__ShadowRay).size()>0)
-				{
-					__InShadow = true;
-					break;
-				}
-			}
-			if (__InShadow) continue;
+			if (_shadowCast(hit,__LightDirection,p_Light.distance(hit.position()))) continue;
 
 			// diffuse component
 			double __Attitude = dot(hit.normal(),__LightDirection);
@@ -174,6 +176,16 @@ public class RayTracer implements Sampler
 			}
 		}
 		return clamp(__Result);
+	}
+
+	private boolean _shadowCast(Hit hit,Vec3 ldir,double ldist)
+	{
+		Ray __ShadowRay = new Ray(hit.position(),ldir,.0001,ldist);
+		for (Geometry g : scene.objects())
+		{
+			if (g.intersect(__ShadowRay).size()>0) return true;
+		}
+		return false;
 	}
 
 	private Color _shadeLaemp(Hit hit)
