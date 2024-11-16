@@ -74,13 +74,13 @@ public class Box implements Geometry
 		Vec3 __Origin = subtract(__Position,position);
 
 		// normals
-		Vec3 lp = normalize(divide(__Origin,hdim));
+		Vec3 lp = divide(__Origin,hdim);
 		boolean hx = (abs(lp.x())>abs(lp.y()))&&(abs(lp.x())>abs(lp.z()));
 		boolean hy = !hx&&(abs(lp.y())>abs(lp.z()));
 		Vec3 __Normal = normalize(vec3(hx?lp.x():0,hy?lp.y():0,!(hx||hy)?lp.z():0));
 
 		// texture coordinates
-		Vec2 __UV = vec2(0,__Origin.y()/hdim.y()-__Normal.y()*.5);
+		Vec2 __UV = multiply(vec2(((hx)?lp.z():lp.x())+1.,((hy)?lp.z():lp.y())+1.),vec2(.5,.5));
 
 		// finalize
 		return new Hit(t,__Position,__UV,__Normal,material);

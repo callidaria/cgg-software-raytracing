@@ -1,32 +1,44 @@
 * math.
 
-- [ ] panorama camera
-- [ ] preview panorama camera
+- [ ] panorama camera  (WIP)
+- [ ] preview panorama camera  (WIP)
 
 
 * geometry.
 
-- [ ] spheres
-- [ ] cylinders (after transformations)
-- [ ] cones (after transformations)
+- [ ] cylinders  (after transformations)
+- [ ] cones  (after transformations)
 - [ ] transparent geometry
+- [ ] NURBS
+- [ ] Subdivision Surfaces
 
 
 * lighting.
 
-- [ ] phong to pbs (after surface materials)
+- [X] phong to pbs (after surface materials)
 - [ ] volumetrics
 - [ ] caustics
 - [ ] pbb
 - [ ] subsurface scattering
+- [ ] emissive objects
+- [ ] shadow umbra & penumbra
+- [ ] anisotropic reflection
+
+
+* quality.
+
+- [X] colour correction
+- [ ] automatic camera exposure
+- [ ] denoising
+- [ ] depth of field
 
 
 * dictate.
 
 - [ ] super sampling (desired technique)
-- [ ] global illumination (already handled in a functioning pbs)
-- [ ] reflections (already handled in a functioning pbs)
+- [ ] global illumination
+- [ ] reflections
 - [ ] fixing glass deformation
-- [ ] texturing
-- [ ] surface materials
+- [X] texturing
+- [X] surface materials
 - [ ] transformations

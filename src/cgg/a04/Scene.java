@@ -24,18 +24,21 @@ public class Scene implements Stage
 		phong_lights = new ArrayList<>();
 
 		// projection
-		camera = new Camera(vec3(0,0,0),60.,width,height,1.);
+		camera = new Camera(vec3(0,0,0),60.,width,height,1.5);
 
 		// geometry
 		_flooring();
 		_testing();
 
 		// lighting
-		//phong_lights.add(new DirectionalLight(vec3(1,-1,1),color(.7,.7,.7),1.));
-		_craeveTheVorbiddenLaemp(vec3(-1,0,-1),color(1,1,1),4);
-		_craeveTheVorbiddenLaemp(vec3(1,-1,-4),color(1,.5,0),4);
-		_craeveTheVorbiddenLaemp(vec3(2,-2,0),color(.7,.7,.7),7);
-		_craeveTheVorbiddenLaemp(vec3(-1.25,-2,-5),color(0,0,.5),2);
+		/*
+		phong_lights.add(new DirectionalLight(vec3(1,-1,1),color(.7,.7,.7),1.));
+		phong_lights.add(new DirectionalLight(vec3(-1,1,-1),color(0,0,.1),1.));
+		*/
+		_craeveTheVorbiddenLaemp(vec3(-1,0,-1),color(1,1,1),2);
+		_craeveTheVorbiddenLaemp(vec3(1,-1,-4),color(1,.5,0),2);
+		_craeveTheVorbiddenLaemp(vec3(2,-2,0),color(.7,.7,.7),4);
+		_craeveTheVorbiddenLaemp(vec3(-1.25,-2,-5),color(0,0,.5),1);
 	}
 
 	private void _testing()
@@ -43,18 +46,23 @@ public class Scene implements Stage
 		Vec3 __Position = vec3(0,1,-4);
 		//objects.add(new Sphere(add(__Position,vec3(-1,0,0)),.5,new SurfaceMaterial("./res/checker.png")));
 		objects.add(new Sphere(add(__Position,vec3(-1,0,0)),.5,
-							   new PhysicalMaterial("./res/plastic/orange.png","./res/plastic/material.png")));
+							   new PhysicalMaterial(color(0,.05,0),"./res/plastic/material.png",1)));
 		objects.add(new Sphere(add(__Position,vec3(0,0,-1)),.5,
-							   new PhysicalMaterial("./res/gold/colour.png","./res/gold/material.png")));
+							   new PhysicalMaterial(color(1,.25,0),"./res/gold/material.png",1)));
 		objects.add(new Sphere(add(__Position,vec3(1,0,0)),.5,
-							   new PhysicalMaterial("./res/marble/colour.png","./res/marble/material.png")));
-		//objects.add(new Box(add(__Position,vec3(1,0,0)),1,1,1,new SurfaceMaterial(color(0,0,.5))));
+							   new PhysicalMaterial(color(.75,0,0),"./res/marble/material.png",1)));
+		/*
+		objects.add(new Box(add(__Position,vec3(-1,0,0)),1,1,1,
+							new PhysicalMaterial(color(0,.05,0),"./res/plastic/material.png")));
+		*/
 	}
 
 	private void _flooring()
 	{
 		Vec3 __Position = vec3(0,2,-4);
-		objects.add(new Box(__Position,10,1,10,new SurfaceMaterial(color(.7,.7,.7))));
+		//objects.add(new Box(__Position,10,1,10,new SurfaceMaterial(color(.7,.7,.7))));
+		objects.add(new Box(__Position,10,1,10,
+							new PhysicalMaterial("./res/checker_neo.png","./res/marble/material.png",4)));
 	}
 
 	private void _craeveTheVorbiddenLaemp(Vec3 position,Color colour,double intensity)

@@ -1208,6 +1208,11 @@ public class Functions {
 		return color(Math.exp(a.r()),Math.exp(a.g()),Math.exp(a.b()));
 	}
 
+	public static Vec3 abs(Vec3 v)
+	{
+		return vec3(Math.abs(v.x()),Math.abs(v.y()),Math.abs(v.z()));
+	}
+
     /**
      * Helper method for HSV to RGB conversion.
      * Calculates the RGB color for a given hue value.

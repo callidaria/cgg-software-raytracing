@@ -78,11 +78,6 @@ public class RayTracer implements Sampler
 		double __Metallic = p_Material.r();
 		double __Roughness = p_Material.g();
 		double __Occlusion = p_Material.b();
-		p_Colour = color(.75,0,0);
-		/*
-		__Metallic = 0;
-		__Roughness = .3;
-		*/
 
 		// precalculations
 		double aSq = pow(__Roughness,4.);
@@ -97,9 +92,10 @@ public class RayTracer implements Sampler
 		{
 			// shadow checking
 			Vec3 __LightDir = p_Light.direction(hit.position());
-			//if (_shadowCast(hit,__LightDir,p_Light.distance(hit.position()))) continue;
-			// TODO: test this in a complex environment
-			// TODO: reenable shadows and merge cutely with pbs environment
+			if (_shadowCast(hit,__LightDir,p_Light.distance(hit.position()))) continue;
+			// FIXME shadows look horrible in this pipeline. make it work!
+			// SIRE! colour correction is working against us! cant live with or without it my beautiful...
+			// TODO make this all work together with csg system (do it last, should be easy)
 
 			// distribution component
 			Vec3 __Halfway = normalize(add(__CameraDir,__LightDir));
@@ -121,7 +117,7 @@ public class RayTracer implements Sampler
 			// specular brdf
 			Vec3 __CT = divide(multiply(multiply(__TBR,__Fresnel),__Smith),4.*__dtLightIn*__dtLightOut+.0001);
 			Vec3 lR = multiply(subtract(vec3(1.),__Fresnel),1.-__Metallic);  // no fresnel on metallic surfaces
-			lR = multiply(lR,vec3(p_Colour));  // FIXME: define a method for such cases to avoid cast
+			lR = multiply(lR,vec3(p_Colour));  // FIXME define a method for such cases to avoid cast
 			lR = add(divide(lR,PI),__CT);  // combine fresnel & cook torrance brdf
 			lR = multiply(multiply(lR,vec3(p_Light.physicalInfluence(hit.position()))),__dtLightIn);
 			__Result = add(__Result,lR);
