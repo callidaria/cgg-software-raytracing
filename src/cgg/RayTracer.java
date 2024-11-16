@@ -56,11 +56,8 @@ public class RayTracer implements Sampler
 		};
 
 		// colour correction
-		/*
 		__Result = subtract(color(1.),exp(multiply(__Result,-scene.camera().exposure())));
 		return pow(__Result,1./2.2);
-		*/
-		return __Result;
 	}
 
 	private Color _shade(Hit hit)
@@ -82,8 +79,10 @@ public class RayTracer implements Sampler
 		double __Roughness = p_Material.g();
 		double __Occlusion = p_Material.b();
 		p_Colour = color(.75,0,0);
+		/*
 		__Metallic = 0;
 		__Roughness = .3;
+		*/
 
 		// precalculations
 		double aSq = pow(__Roughness,4.);
@@ -100,6 +99,7 @@ public class RayTracer implements Sampler
 			Vec3 __LightDir = p_Light.direction(hit.position());
 			//if (_shadowCast(hit,__LightDir,p_Light.distance(hit.position()))) continue;
 			// TODO: test this in a complex environment
+			// TODO: reenable shadows and merge cutely with pbs environment
 
 			// distribution component
 			Vec3 __Halfway = normalize(add(__CameraDir,__LightDir));

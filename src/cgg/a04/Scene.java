@@ -32,10 +32,10 @@ public class Scene implements Stage
 
 		// lighting
 		//phong_lights.add(new DirectionalLight(vec3(1,-1,1),color(.7,.7,.7),1.));
-		//_craeveTheVorbiddenLaemp(vec3(-1,0,1),color(1,1,1),.7);
-		//_craeveTheVorbiddenLaemp(vec3(1,-1,4),color(1,.5,0),.7);
-		_craeveTheVorbiddenLaemp(vec3(2,-2,0),color(.7,.7,.7),100);
-		//_craeveTheVorbiddenLaemp(vec3(-1.25,-2,5),color(0,0,.5),.4);
+		_craeveTheVorbiddenLaemp(vec3(-1,0,-1),color(1,1,1),4);
+		_craeveTheVorbiddenLaemp(vec3(1,-1,-4),color(1,.5,0),4);
+		_craeveTheVorbiddenLaemp(vec3(2,-2,0),color(.7,.7,.7),7);
+		_craeveTheVorbiddenLaemp(vec3(-1.25,-2,-5),color(0,0,.5),2);
 	}
 
 	private void _testing()
