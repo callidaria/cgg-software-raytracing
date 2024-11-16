@@ -56,8 +56,11 @@ public class RayTracer implements Sampler
 		};
 
 		// colour correction
+		/*
 		__Result = subtract(color(1.),exp(multiply(__Result,-scene.camera().exposure())));
 		return pow(__Result,1./2.2);
+		*/
+		return __Result;
 	}
 
 	private Color _shade(Hit hit)
@@ -78,13 +81,12 @@ public class RayTracer implements Sampler
 		double __Metallic = p_Material.r();
 		double __Roughness = p_Material.g();
 		double __Occlusion = p_Material.b();
-		/*
 		p_Colour = color(.75,0,0);
-		__Metallic = .0;
-		__Roughness = .2;
-		*/
+		__Metallic = 0;
+		__Roughness = .3;
 
 		// precalculations
+		double aSq = pow(__Roughness,4.);
 		Vec3 __CameraDir = normalize(subtract(scene.camera().position(),hit.position()));
 		Vec3 __Fresnel0 = mix(vec3(.04,.04,.04),vec3(p_Colour),__Metallic);
 		double __dtLightOut = max(dot(hit.normal(),__CameraDir),.0);
@@ -96,12 +98,11 @@ public class RayTracer implements Sampler
 		{
 			// shadow checking
 			Vec3 __LightDir = p_Light.direction(hit.position());
-			if (_shadowCast(hit,__LightDir,p_Light.distance(hit.position()))) continue;
+			//if (_shadowCast(hit,__LightDir,p_Light.distance(hit.position()))) continue;
 			// TODO: test this in a complex environment
 
 			// distribution component
 			Vec3 __Halfway = normalize(add(__CameraDir,__LightDir));
-			double aSq = pow(__Roughness,4.);
 			double __TBR = aSq/(PI*pow(pow(max(dot(hit.normal(),__Halfway),.0),2.)*(aSq-1.)+1.,2.));
 
 			// fresnel component as through approximation
@@ -119,14 +120,14 @@ public class RayTracer implements Sampler
 
 			// specular brdf
 			Vec3 __CT = divide(multiply(multiply(__TBR,__Fresnel),__Smith),4.*__dtLightIn*__dtLightOut+.0001);
-			Vec3 lR = divide(multiply(multiply(subtract(vec3(1.),__Fresnel),(1.-__Metallic)),vec3(p_Colour)),
-							 add(__CT,PI));
-			lR = multiply(lR,multiply(vec3(p_Light.physicalInfluence(hit.position())),__dtLightIn));
+			Vec3 lR = multiply(subtract(vec3(1.),__Fresnel),1.-__Metallic);  // no fresnel on metallic surfaces
+			lR = multiply(lR,vec3(p_Colour));  // FIXME: define a method for such cases to avoid cast
+			lR = add(divide(lR,PI),__CT);  // combine fresnel & cook torrance brdf
+			lR = multiply(multiply(lR,vec3(p_Light.physicalInfluence(hit.position()))),__dtLightIn);
 			__Result = add(__Result,lR);
 		}
-		// FIXME: no specular highlights on geometry, component specific debug necessary
 
-		return clamp(color(__Result));
+		return color(__Result);
 	}
 
 	private double _schlickBeckmannApprox(double l,double r)
