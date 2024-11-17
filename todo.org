@@ -13,6 +13,12 @@
 - [ ] Subdivision Surfaces
 
 
+* materials.
+
+- [ ] water
+- [ ] clouds/smoke
+
+
 * lighting.
 
 - [X] phong to pbs (after surface materials)
@@ -23,13 +29,14 @@
 - [ ] emissive objects
 - [ ] shadow umbra & penumbra
 - [ ] anisotropic reflection
+- [ ] normal mapping
 
 
 * quality.
 
 - [X] colour correction
 - [ ] automatic camera exposure
-- [ ] denoising
+- [ ] denoising  (after path tracing)
 - [ ] depth of field
 
 
@@ -38,7 +45,7 @@
 - [ ] super sampling (desired technique)
 - [ ] global illumination
 - [ ] reflections
-- [ ] fixing glass deformation
+- [ ] fixing glass
 - [X] texturing
 - [X] surface materials
 - [ ] transformations
