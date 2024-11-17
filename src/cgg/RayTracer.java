@@ -95,18 +95,24 @@ public class RayTracer implements Sampler
 
 		// precalculations
 		double aSq = pow(__Roughness,4.);
-		Vec3 __CameraDir = normalize(subtract(scene.camera().position(),hit.position()));
+		Vec3 __CameraDir = /*normalize(subtract(/*scene.camera().position()ray.d,hit.position()));*/
+			normalize(multiply(ray.direction(),-1));
 		Vec3 __Fresnel0 = mix(vec3(.04,.04,.04),vec3(p_Colour),__Metallic);
 		double __dtLightOut = max(dot(hit.normal(),__CameraDir),.0);
 		double __SchlickOut = _schlickBeckmannApprox(__dtLightOut,__Roughness);
 
 		// processing lights
+		int __InvLightCount = 0;
 		Vec3 __Result = vec3(0,0,0);
 		for (PhongIllumination p_Light : scene.phong_lights())
 		{
 			// shadow checking
 			Vec3 __LightDir = p_Light.direction(hit.position());
-			if (_shadowCast(hit,__LightDir,p_Light.distance(hit.position()))) continue;
+			if (_shadowCast(hit,__LightDir,p_Light.distance(hit.position())))
+			{
+				__InvLightCount++;
+				continue;
+			}
 			// FIXME shadows look horrible in this pipeline. make it work!
 			// SIRE! colour correction is working against us! cant live with or without it my beautiful...
 			// TODO make this all work together with csg system (do it last, should be easy)
@@ -141,6 +147,7 @@ public class RayTracer implements Sampler
 		// gi (testing)
 		// ...fresnel again (probata et commendatae!)
 		// the HLSL code uses saturate() (dumb name) here, but max is all we need, dot product is never <0
+		/*
 		double __Attitude = max(dot(hit.normal(),__CameraDir),.0);
 		Vec3 __GIFresnel = subtract(max(vec3(1.-__Roughness),__Fresnel0),__Fresnel0);
 		__GIFresnel = multiply(__GIFresnel,pow(clamp(1.-__Attitude,.0,1.),5.));
@@ -154,27 +161,35 @@ public class RayTracer implements Sampler
 
 		// sampling from the environment
 		// cant do this in a lookup table can you?
-		Vec3 __GIResult = vec3(0);
+		// the paper likes to do a little trolling over here it assumes V=N=R but then also uses V,N and R.
+		// this is completely scuffed and should be banned by international law, but we'll do i guess
+		Vec3 __GIResult = vec3(.0);
 		Vec3 __R = subtract(multiply(2*__Attitude,hit.normal()),__CameraDir);
 		double __SmpWeight = .0;  // dont forget this one, the goddamn paper forgets to declare this one!
-		final int SAMPLES = 1;
+		final int SAMPLES = 32;
 		for (int i=0;i<SAMPLES;i++)
 		{
 			// fpd avoidance trickery (there is a book with this hack & its generally used)
 			// bitshifting in java is a different kind of adventure
+			/*
 			int __VDCorput = (i<<16)|(i>>>16);
 			__VDCorput = ((__VDCorput&0x55555555)<<1|(__VDCorput&0xAAAAAAAA)>>>1);
 			__VDCorput = ((__VDCorput&0x33333333)<<2|(__VDCorput&0xCCCCCCCC)>>>2);
 			__VDCorput = ((__VDCorput&0x0F0F0F0F)<<4|(__VDCorput&0xF0F0F0F0)>>>4);
 			__VDCorput = ((__VDCorput&0x00FF00FF)<<8|(__VDCorput&0xFF00FF00)>>>8);
 			Vec2 __Hammersley = vec2(
-					(float)i/(float)SAMPLES,
+					(double)i/(double)SAMPLES,
 					Float.intBitsToFloat(__VDCorput)*2.3283064365386963e-10
 				);
+			*/
+		/*
+
+			// FIXME learn java exclusive bitshifting crap
 
 			// importance sample (your lobez quark! where is my oomox after implementing this huh?)
 			// the paper regenerates our aSq in two steps? we are just gonna reuse it, just aSqing questions!
-			double phi = 2*PI*__Hammersley.y();
+			// another very good example for confusing things in the epic paper
+			double phi = 2*PI*__Hammersley.x();
 			double thCos = sqrt((1-__Hammersley.y())/(1+(aSq-1)*__Hammersley.y()));
 			double thSin = sqrt(1-pow(thCos,2.));
 			Vec3 __IS = vec3(thSin*cos(phi),thSin*sin(phi),thCos);
@@ -184,8 +199,8 @@ public class RayTracer implements Sampler
 			__IS = add(multiply(xTan,__IS.x()),multiply(yTan,__IS.y()),multiply(__R,__IS.z()));
 
 			// samples generate lobecast
-			Vec3 __PEnvLight = subtract(multiply(2*dot(__CameraDir,__IS),__IS),__CameraDir);
-			double __DEnvLight = max(dot(hit.normal(),__PEnvLight),.0);
+			Vec3 __PEnvLight = subtract(multiply(2*dot(__R,__IS),__IS),__R);
+			double __DEnvLight = clamp(dot(__R,__PEnvLight),.0,1.);
 			if (__DEnvLight<.0001) continue;
 			Ray __GIR = new Ray(hit.position(),__PEnvLight,.001,1000.);
 			__GIResult = add(__GIResult,multiply(vec3(_processScene(__GIR,++depth)),__DEnvLight));
@@ -196,6 +211,11 @@ public class RayTracer implements Sampler
 		Vec3 __GI = divide(__GIResult,__SmpWeight);
 		__GI = multiply(__GI,add(multiply(__GIFresnel,__LUT.r()),__LUT.g()));
 		out = mix(out,color(__GI),.5);
+		*/
+
+		// shadows
+		//out = multiply(out,(double)__InvLightCount/(double)scene.phong_lights().size()*.75+.25);
+		// TODO only apply this to the gi later, because pointlight shadowing already exists through continue?
 
 		return out;
 	}
