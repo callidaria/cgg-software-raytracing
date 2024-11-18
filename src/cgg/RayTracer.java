@@ -1,8 +1,12 @@
 package cgg;
 
 import static java.lang.Math.*;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import static tools.Functions.*;
 import tools.*;
 import static cgg.Math.*;
@@ -19,11 +23,19 @@ public class RayTracer implements Sampler
 	private Stage scene;
 	private final Color background = color(0,0,0);
 	private final Color error = color(0,.9,1);
-	private final ImageTexture LUT_BRDF = new ImageTexture("./res/lut/brdf.png");
+	private final ImageTexture LUT_BRDF;
+	private final double[] LUT_CORPUT;
 
 	public RayTracer(Stage scene)
 	{
 		this.scene = scene;
+
+		// lookup tables
+		LUT_BRDF = new ImageTexture("./res/lut/brdf.png");
+		String line = "";
+		try { line = new BufferedReader(new FileReader("./res/lut/vdcorput")).readLine(); }
+		catch (IOException e) { System.out.println("vdcorput lut could not be read"); }
+		LUT_CORPUT = Arrays.stream(line.split(",")).mapToDouble(Double::parseDouble).toArray();
 	}
 
 	public Color getColor(Vec2 coord)
@@ -31,7 +43,6 @@ public class RayTracer implements Sampler
 		Ray __Ray = scene.camera().generateRay(coord);
 		return _processScene(__Ray,0);
 	}
-
 
 	private Color _processScene(Ray ray,int depth)
 	{
@@ -147,7 +158,6 @@ public class RayTracer implements Sampler
 		// gi (testing)
 		// ...fresnel again (probata et commendatae!)
 		// the HLSL code uses saturate() (dumb name) here, but max is all we need, dot product is never <0
-		/*
 		double __Attitude = max(dot(hit.normal(),__CameraDir),.0);
 		Vec3 __GIFresnel = subtract(max(vec3(1.-__Roughness),__Fresnel0),__Fresnel0);
 		__GIFresnel = multiply(__GIFresnel,pow(clamp(1.-__Attitude,.0,1.),5.));
@@ -166,11 +176,14 @@ public class RayTracer implements Sampler
 		Vec3 __GIResult = vec3(.0);
 		Vec3 __R = subtract(multiply(2*__Attitude,hit.normal()),__CameraDir);
 		double __SmpWeight = .0;  // dont forget this one, the goddamn paper forgets to declare this one!
-		final int SAMPLES = 32;
-		for (int i=0;i<SAMPLES;i++)
+		for (int i=0;i<LUT_CORPUT.length*.5;i++)
 		{
 			// fpd avoidance trickery (there is a book with this hack & its generally used)
 			// bitshifting in java is a different kind of adventure
+			// it seems like java offers us only "baby's first toybox bitshifting for beginners"
+			// there is no actual utility or even unsigneds
+			// because i'm sick and tired of this, this has been preprocessed in a c program and imported as lut
+			Vec2 __Hammersley = vec2(LUT_CORPUT[i*2],LUT_CORPUT[i*2+1]);
 			/*
 			int __VDCorput = (i<<16)|(i>>>16);
 			__VDCorput = ((__VDCorput&0x55555555)<<1|(__VDCorput&0xAAAAAAAA)>>>1);
@@ -182,9 +195,6 @@ public class RayTracer implements Sampler
 					Float.intBitsToFloat(__VDCorput)*2.3283064365386963e-10
 				);
 			*/
-		/*
-
-			// FIXME learn java exclusive bitshifting crap
 
 			// importance sample (your lobez quark! where is my oomox after implementing this huh?)
 			// the paper regenerates our aSq in two steps? we are just gonna reuse it, just aSqing questions!
@@ -211,7 +221,6 @@ public class RayTracer implements Sampler
 		Vec3 __GI = divide(__GIResult,__SmpWeight);
 		__GI = multiply(__GI,add(multiply(__GIFresnel,__LUT.r()),__LUT.g()));
 		out = mix(out,color(__GI),.5);
-		*/
 
 		// shadows
 		//out = multiply(out,(double)__InvLightCount/(double)scene.phong_lights().size()*.75+.25);
