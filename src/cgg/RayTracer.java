@@ -184,24 +184,13 @@ public class RayTracer implements Sampler
 			// there is no actual utility or even unsigneds
 			// because i'm sick and tired of this, this has been preprocessed in a c program and imported as lut
 			Vec2 __Hammersley = vec2(LUT_CORPUT[i*2],LUT_CORPUT[i*2+1]);
-			/*
-			int __VDCorput = (i<<16)|(i>>>16);
-			__VDCorput = ((__VDCorput&0x55555555)<<1|(__VDCorput&0xAAAAAAAA)>>>1);
-			__VDCorput = ((__VDCorput&0x33333333)<<2|(__VDCorput&0xCCCCCCCC)>>>2);
-			__VDCorput = ((__VDCorput&0x0F0F0F0F)<<4|(__VDCorput&0xF0F0F0F0)>>>4);
-			__VDCorput = ((__VDCorput&0x00FF00FF)<<8|(__VDCorput&0xFF00FF00)>>>8);
-			Vec2 __Hammersley = vec2(
-					(double)i/(double)SAMPLES,
-					Float.intBitsToFloat(__VDCorput)*2.3283064365386963e-10
-				);
-			*/
 
 			// importance sample (your lobez quark! where is my oomox after implementing this huh?)
 			// the paper regenerates our aSq in two steps? we are just gonna reuse it, just aSqing questions!
 			// another very good example for confusing things in the epic paper
 			double phi = 2*PI*__Hammersley.x();
 			double thCos = sqrt((1-__Hammersley.y())/(1+(aSq-1)*__Hammersley.y()));
-			double thSin = sqrt(1-pow(thCos,2.));
+			double thSin = sqrt(1-pow(thCos,2));
 			Vec3 __IS = vec3(thSin*cos(phi),thSin*sin(phi),thCos);
 			Vec3 up = (abs(__R.z())<.999) ? vec3(0,0,1) : vec3(1,0,0);
 			Vec3 xTan = normalize(cross(up,__R));
