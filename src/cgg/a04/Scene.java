@@ -46,7 +46,7 @@ public class Scene implements Stage
 		objects.add(new Sphere(add(__Position,vec3(0,0,-1)),.5,
 							   new PhysicalMaterial(color(.75,.25,0),"./res/gold/material.png",1)));
 		objects.add(new Sphere(add(__Position,vec3(1,0,0)),.5,
-							   new PhysicalMaterial(color(.75,0,0),"./res/marble/material.png",1)));
+							   new PhysicalMaterial(color(.75,0,0),"./res/marble/material.png",16)));
 	}
 
 	private void _flooring()

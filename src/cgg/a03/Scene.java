@@ -31,12 +31,8 @@ public class Scene implements Stage
 		_die();
 		_yummy();
 		_deathstar();
-		// cylinders shall not be used until basic geometry transform is implemented
-		// and also the inside-geometry extras are to be fixed
-		//_cylinder();
 
 		// lighting
-		//phong_lights.add(new DirectionalLight(vec3(1,-.7,-.7),color(.7,.7,.7),1));
 		_craeveTheVorbiddenLaemp(vec3(1.25,-1,-4),color(1,.5,0),.7);
 		_craeveTheVorbiddenLaemp(vec3(1.25,-1.5,-2),color(0,.5,1),1);
 		_craeveTheVorbiddenLaemp(vec3(1.5,.75,-1),color(.7,.7,.7),.4);
@@ -103,17 +99,6 @@ public class Scene implements Stage
 	{
 		Vec3 __Position = vec3(0,2,-4);
 		objects.add(new Box(__Position,10,1,10,new SurfaceMaterial(color(.7,.7,.7))));
-	}
-
-	private void _cylinder()
-	{
-		Vec3 __Position = vec3(0,1.5,-3);
-		objects.add(new Cylinder(__Position,.25,.5,color(.5,0,0)));
-		/*
-		Cylinder outer = new Cylinder(__Position,.25,.5,color(.5,0,0));
-		Cylinder inner = new Cylinder(__Position,.25,.4,color(.5,0,0));
-		objects.add(new Complex(outer,inner,JoinOperation.DIFFERENCE));
-		*/
 	}
 
 	private void _craeveTheVorbiddenLaemp(Vec3 position,Color colour,double intensity)

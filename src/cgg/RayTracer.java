@@ -67,15 +67,24 @@ public class RayTracer implements Sampler
 		}
 
 		// switch shading
-		if (__Hits.size()==0) return background;
-		Hit __Recent = __Hits.peek().front();
-		Color __Result = switch (__Recent.material())
+		Color __Result = background;
+		double __Distance = 1000;
+		if (__Hits.size()>0)
 		{
-		case PhysicalMaterial c -> _shadePhysical(__Recent,ray,depth);
-		case SurfaceMaterial c -> _shadePhong(__Recent);
-		case SurfaceColour c -> _shadeLaemp(__Recent);
-		default -> error;
-		};
+			Hit __Recent = __Hits.peek().front();
+			__Result = switch (__Recent.material())
+			{
+			case PhysicalMaterial c -> _shadePhysical(__Recent,ray,depth);
+			case SurfaceMaterial c -> _shadePhong(__Recent);
+			case SurfaceColour c -> _shadeLaemp(__Recent);
+			default -> error;
+			};
+			__Distance = __Recent.param();
+		}
+
+		// computing volumetric properties
+		Color __Atmosphere = _computeVolumetric(ray,__Distance);
+		__Result = add(__Result,__Atmosphere);
 
 		// colour correction
 		__Result = subtract(color(1.),exp(multiply(__Result,-scene.camera().exposure())));
@@ -275,6 +284,32 @@ public class RayTracer implements Sampler
 			if (g.intersect(__ShadowRay).size()>0) return true;
 		}
 		return false;
+	}
+
+	private Color _computeVolumetric(Ray ray,double t)
+	{
+		final int VOLUMETRIC_SAMPLES = 0;
+		final double STEP_SIZE = .1;
+		Color __Result = color(.0,.0,.0);
+		double __Current = .0;
+		int i = 0;
+		while (__Current<t&&i<VOLUMETRIC_SAMPLES)
+		{
+			for (PhongIllumination l : scene.phong_lights())
+			{
+				Vec3 __StepPosition = ray.calculatePosition(__Current);
+				Ray __Probe = new Ray(__StepPosition,l.direction(__StepPosition),0,1000);
+				for (Geometry g : scene.objects())
+				{
+					if (g.intersect(__Probe).size()==0)
+						__Result = add(__Result,multiply(l.intensity(__Probe.origin()),.001));
+				}
+			}
+			__Current += STEP_SIZE;
+			i++;
+		}
+		return __Result;//divide(__Result,i);
+		// TODO: skip for all directional lights, this only fogs up the environment render
 	}
 
 	private Color _shadeLaemp(Hit hit)
