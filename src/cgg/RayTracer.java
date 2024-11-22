@@ -21,7 +21,7 @@ import cgg.a03.Scene;
 public class RayTracer implements Sampler
 {
 	private Stage scene;
-	private final Color background = color(0,0,0);
+	private final Color background = color(.0015,.0071,.01);
 	private final Color error = color(0,.9,1);
 	private final ImageTexture LUT_BRDF;
 	private final double[] LUT_CORPUT;
@@ -40,8 +40,19 @@ public class RayTracer implements Sampler
 
 	public Color getColor(Vec2 coord)
 	{
+		// compute geometry intersection
 		Ray __Ray = scene.camera().generateRay(coord);
-		return _processScene(__Ray,0);
+		Color __Result = _processScene(__Ray,0);
+
+		// compute volumetric properties
+		/*
+		  Color __Atmosphere = _computeVolumetric(ray,__Distance);
+		  __Result = add(__Result,__Atmosphere);
+		*/
+
+		// colour correction
+		__Result = subtract(color(1.),exp(multiply(__Result,-scene.camera().exposure())));
+		return pow(__Result,1./2.2);
 	}
 
 	private Color _processScene(Ray ray,int depth)
@@ -67,29 +78,15 @@ public class RayTracer implements Sampler
 		}
 
 		// switch shading
-		Color __Result = background;
-		double __Distance = 1000;
-		if (__Hits.size()>0)
+		if (__Hits.size()==0) return background;
+		Hit __Recent = __Hits.peek().front();
+		return switch (__Recent.material())
 		{
-			Hit __Recent = __Hits.peek().front();
-			__Result = switch (__Recent.material())
-			{
-			case PhysicalMaterial c -> _shadePhysical(__Recent,ray,depth);
-			case SurfaceMaterial c -> _shadePhong(__Recent);
-			case SurfaceColour c -> _shadeLaemp(__Recent);
-			default -> error;
-			};
-			__Distance = __Recent.param();
-		}
-
-		// computing volumetric properties
-		Color __Atmosphere = _computeVolumetric(ray,__Distance);
-		__Result = add(__Result,__Atmosphere);
-
-		// colour correction
-		__Result = subtract(color(1.),exp(multiply(__Result,-scene.camera().exposure())));
-		return pow(__Result,1./2.2);
-		// FIXME multiple colour corrections when bouncing
+		case PhysicalMaterial c -> _shadePhysical(__Recent,ray,depth);
+		case SurfaceMaterial c -> _shadePhong(__Recent);
+		case SurfaceColour c -> _shadeLaemp(__Recent);
+		default -> error;
+		};
 	}
 
 	private Color _shade(Hit hit)
@@ -210,6 +207,10 @@ public class RayTracer implements Sampler
 			Vec3 __PEnvLight = subtract(multiply(2*dot(__R,__IS),__IS),__R);
 			double __DEnvLight = clamp(dot(__R,__PEnvLight),.0,1.);
 			if (__DEnvLight<.0001) continue;
+			/*
+			__GIResult = add(__GIResult,__PEnvLight);
+			__SmpWeight += __DEnvLight;
+			*/
 			Ray __GIR = new Ray(hit.position(),__PEnvLight,.001,1000.);
 			__GIResult = add(__GIResult,multiply(vec3(_processScene(__GIR,++depth)),__DEnvLight));
 			__SmpWeight += __DEnvLight;
@@ -219,6 +220,7 @@ public class RayTracer implements Sampler
 		Vec3 __GI = divide(__GIResult,__SmpWeight);
 		__GI = multiply(__GI,add(multiply(__GIFresnel,__LUT.r()),__LUT.g()));
 		out = mix(out,color(__GI),.5);
+		// FIXME: convolution seems to be broken, the oversaturation is fixed now but not the sampling
 
 		// shadows
 		//out = multiply(out,(double)__InvLightCount/(double)scene.phong_lights().size()*.75+.25);
