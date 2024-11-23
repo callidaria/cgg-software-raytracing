@@ -21,7 +21,7 @@ import cgg.a03.Scene;
 public class RayTracer implements Sampler
 {
 	private Stage scene;
-	private final Color background = color(.0015,.0071,.01);
+	private final Color background = color(.0015,.0071,.015);
 	private final Color error = color(0,.9,1);
 	private final ImageTexture LUT_BRDF;
 	private final double[] LUT_CORPUT;
@@ -207,10 +207,6 @@ public class RayTracer implements Sampler
 			Vec3 __PEnvLight = subtract(multiply(2*dot(__R,__IS),__IS),__R);
 			double __DEnvLight = clamp(dot(__R,__PEnvLight),.0,1.);
 			if (__DEnvLight<.0001) continue;
-			/*
-			__GIResult = add(__GIResult,__PEnvLight);
-			__SmpWeight += __DEnvLight;
-			*/
 			Ray __GIR = new Ray(hit.position(),__PEnvLight,.001,1000.);
 			__GIResult = add(__GIResult,multiply(vec3(_processScene(__GIR,++depth)),__DEnvLight));
 			__SmpWeight += __DEnvLight;
@@ -221,10 +217,6 @@ public class RayTracer implements Sampler
 		__GI = multiply(__GI,add(multiply(__GIFresnel,__LUT.r()),__LUT.g()));
 		out = mix(out,color(__GI),.5);
 		// FIXME: convolution seems to be broken, the oversaturation is fixed now but not the sampling
-
-		// shadows
-		//out = multiply(out,(double)__InvLightCount/(double)scene.phong_lights().size()*.75+.25);
-		// TODO only apply this to the gi later, because pointlight shadowing already exists through continue?
 
 		return out;
 	}

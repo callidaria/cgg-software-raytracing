@@ -24,7 +24,7 @@ public class Scene implements Stage
 		phong_lights = new ArrayList<>();
 
 		// projection
-		camera = new Camera(vec3(0,0,0),60.,width,height,1.5);
+		camera = new Camera(vec3(0,0,0),60.,vec3(0,0,0),width,height,1.5);
 
 		// geometry
 		_testing();

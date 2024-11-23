@@ -21,7 +21,6 @@
 
 * lighting.
 
-- [X] phong to pbs (after surface materials)
 - [ ] volumetrics
 - [ ] caustics
 - [ ] pbb
@@ -29,12 +28,13 @@
 - [ ] emissive objects
 - [ ] shadow umbra & penumbra
 - [ ] anisotropic reflection
+- [ ] sheen effect
+- [ ] specular as described in dp
 - [ ] normal mapping
 
 
 * quality.
 
-- [X] colour correction
 - [ ] automatic camera exposure
 - [ ] denoising  (after path tracing)
 - [ ] depth of field
@@ -46,6 +46,4 @@
 - [ ] global illumination
 - [ ] reflections
 - [ ] fixing glass
-- [X] texturing
-- [X] surface materials
 - [ ] transformations
