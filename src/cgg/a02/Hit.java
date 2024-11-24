@@ -35,6 +35,7 @@ public class Hit
 	public Color colour() { return material.getComponent(MaterialComponent.COLOUR,hit_pointblank(vec3(0,0,0),material)); }
 	public Material material() { return material; }
 	public void overwritePosition(Vec3 position) { this.position = position; }
+	public void overwriteUV(Vec2 uv) { this.uv = uv; }
 	public void overwriteNormal(Vec3 normal) { this.normal = normal; }
 	public void overwriteColour(Color colour) { this.material = new SurfaceMaterial(colour); }
 	public void overwriteMaterial(Material material) { this.material = material; }

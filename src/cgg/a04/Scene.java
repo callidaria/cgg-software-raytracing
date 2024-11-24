@@ -63,6 +63,7 @@ public class Scene implements Stage
 	}
 
 	public Camera camera() { return camera; }
+	public Geometry groot() { return null; }
 	public ArrayList<Geometry> objects() { return objects; }
 	public ArrayList<Geometry> emitter() { return emitter; }
 	public ArrayList<PhongIllumination> phong_lights() { return phong_lights; }

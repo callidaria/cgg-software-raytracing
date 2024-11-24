@@ -44,12 +44,6 @@ public class RayTracer implements Sampler
 		Ray __Ray = scene.camera().generateRay(coord);
 		Color __Result = _processScene(__Ray,0);
 
-		// compute volumetric properties
-		/*
-		  Color __Atmosphere = _computeVolumetric(ray,__Distance);
-		  __Result = add(__Result,__Atmosphere);
-		*/
-
 		// colour correction
 		__Result = subtract(color(1.),exp(multiply(__Result,-scene.camera().exposure())));
 		return pow(__Result,1./2.2);
@@ -66,16 +60,13 @@ public class RayTracer implements Sampler
 			for (Geometry g : scene.emitter())
 			{
 				Queue<HitTuple> __Proc = g.intersect(ray);
-				if (recentGeometry(__Hits,__Proc)) __Hits = __Proc;
+				__Hits = (recentGeometry(__Hits,__Proc)) ? __Proc : __Hits;
 			}
 		}
 
 		// opaque geometry
-		for (Geometry g : scene.objects())
-		{
-			Queue<HitTuple> __Proc = g.intersect(ray);
-			if (recentGeometry(__Hits,__Proc)) __Hits = __Proc;
-		}
+		Queue<HitTuple> __Proc = scene.groot().intersect(ray);
+		__Hits = (recentGeometry(__Hits,__Proc)) ? __Proc : __Hits;
 
 		// switch shading
 		if (__Hits.size()==0) return background;
@@ -119,17 +110,12 @@ public class RayTracer implements Sampler
 		double __SchlickOut = _schlickBeckmannApprox(__dtLightOut,__Roughness);
 
 		// processing lights
-		int __InvLightCount = 0;
 		Vec3 __Result = vec3(0,0,0);
 		for (PhongIllumination p_Light : scene.phong_lights())
 		{
 			// shadow checking
 			Vec3 __LightDir = p_Light.direction(hit.position());
-			if (_shadowCast(hit,__LightDir,p_Light.distance(hit.position())))
-			{
-				__InvLightCount++;
-				continue;
-			}
+			if (_shadowCast(hit,__LightDir,p_Light.distance(hit.position()))) continue;
 			// FIXME shadows look horrible in this pipeline. make it work!
 			// SIRE! colour correction is working against us! cant live with or without it my beautiful...
 			// TODO make this all work together with csg system (do it last, should be easy)
@@ -273,37 +259,7 @@ public class RayTracer implements Sampler
 	private boolean _shadowCast(Hit hit,Vec3 ldir,double ldist)
 	{
 		Ray __ShadowRay = new Ray(hit.position(),ldir,.0001,ldist);
-		for (Geometry g : scene.objects())
-		{
-			if (g.intersect(__ShadowRay).size()>0) return true;
-		}
-		return false;
-	}
-
-	private Color _computeVolumetric(Ray ray,double t)
-	{
-		final int VOLUMETRIC_SAMPLES = 0;
-		final double STEP_SIZE = .1;
-		Color __Result = color(.0,.0,.0);
-		double __Current = .0;
-		int i = 0;
-		while (__Current<t&&i<VOLUMETRIC_SAMPLES)
-		{
-			for (PhongIllumination l : scene.phong_lights())
-			{
-				Vec3 __StepPosition = ray.calculatePosition(__Current);
-				Ray __Probe = new Ray(__StepPosition,l.direction(__StepPosition),0,1000);
-				for (Geometry g : scene.objects())
-				{
-					if (g.intersect(__Probe).size()==0)
-						__Result = add(__Result,multiply(l.intensity(__Probe.origin()),.001));
-				}
-			}
-			__Current += STEP_SIZE;
-			i++;
-		}
-		return __Result;//divide(__Result,i);
-		// TODO: skip for all directional lights, this only fogs up the environment render
+		return scene.groot().intersect(__ShadowRay).size()>0;
 	}
 
 	private Color _shadeLaemp(Hit hit)

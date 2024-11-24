@@ -841,6 +841,14 @@ public class Functions {
         return rotate(vec3(ax, ay, az), angle);
     }
 
+	public static Mat44 rotate(Vec3 angles)
+	{
+		return multiply(rotate(vec3(0,0,1),angles.z()),
+						multiply(rotate(vec3(0,1,0),angles.y()),rotate(vec3(0,0,1),angles.z())));
+	}
+	// TODO: optimize, maybe normalize angle vector and pass maximum angle once
+	//		 is this even faster though?
+
     /**
      * Creates a scaling matrix.
      *
