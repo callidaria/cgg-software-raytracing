@@ -843,7 +843,7 @@ public class Functions {
 
 	public static Mat44 rotate(Vec3 angles)
 	{
-		return multiply(rotate(vec3(0,0,1),angles.z()),
+		return multiply(rotate(vec3(1,0,0),angles.x()),
 						multiply(rotate(vec3(0,1,0),angles.y()),rotate(vec3(0,0,1),angles.z())));
 	}
 	// TODO: optimize, maybe normalize angle vector and pass maximum angle once

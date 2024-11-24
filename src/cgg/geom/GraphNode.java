@@ -2,6 +2,7 @@ package cgg.geom;
 
 import java.util.Queue;
 import java.util.LinkedList;
+import java.util.ArrayList;
 import tools.*;
 import static tools.Functions.*;
 import static cgg.Math.*;
@@ -14,16 +15,16 @@ public class GraphNode implements Geometry
 	Mat44 transform;
 	Mat44 inv_transform;
 	Mat44 tinv_transform;
-	Geometry[] geometry;
+	ArrayList<Geometry> geometry;
 
-	public GraphNode(Geometry[] geometry)
+	public GraphNode(ArrayList<Geometry> geometry)
 	{
 		this.transform = identity();
 		this.geometry = geometry;
 		_cacheTransform();
 	}
 
-	public GraphNode(Geometry[] geometry,Vec3 position,Vec3 scale,Vec3 rotation)
+	public GraphNode(ArrayList<Geometry> geometry,Vec3 position,Vec3 scale,Vec3 rotation)
 	{
 		this.transform = multiply(move(position),multiply(scale(scale),rotate(rotation)));
 		this.geometry = geometry;
