@@ -161,6 +161,20 @@ public class RayTracer implements Sampler
 		// and yes i just ripped it from the paper directly instead of computing it, no time for shenanigansry
 		Color __LUT = LUT_BRDF.getColor(vec2(__Attitude,__Roughness));
 
+		// diffuse component
+		final int SAMPLES = 1;
+		Vec3 __DGI = vec3(0,0,0);
+		for (int i=0;i<SAMPLES;i++)
+		{
+			Vec3 __DiffSample = normalize(add(hit.normal(),normalize(randomDirection())));
+			Ray __DIR = new Ray(hit.position(),__DiffSample,.001,1000);
+			__DGI = add(__DGI,vec3(_processScene(__DIR,depth+1)));
+		}
+		__DGI = divide(__DGI,SAMPLES);
+		__DGI = multiply(__DGI,subtract(vec3(1),__GIFresnel));
+		__DGI = multiply(__DGI,subtract(vec3(1),__Metallic));
+
+		// specular component
 		// sampling from the environment
 		// cant do this in a lookup table can you?
 		// the paper likes to do a little trolling over here it assumes V=N=R but then also uses V,N and R.
@@ -194,13 +208,14 @@ public class RayTracer implements Sampler
 			double __DEnvLight = clamp(dot(__R,__PEnvLight),.0,1.);
 			if (__DEnvLight<.0001) continue;
 			Ray __GIR = new Ray(hit.position(),__PEnvLight,.001,1000.);
-			__GIResult = add(__GIResult,multiply(vec3(_processScene(__GIR,++depth)),__DEnvLight));
+			__GIResult = add(__GIResult,multiply(vec3(_processScene(__GIR,depth+1)),__DEnvLight));
 			__SmpWeight += __DEnvLight;
 		}
 
 		// convolute samples and mix
 		Vec3 __GI = divide(__GIResult,__SmpWeight);
 		__GI = multiply(__GI,add(multiply(__GIFresnel,__LUT.r()),__LUT.g()));
+		__GI = multiply(add(__GI,/*__DGI*/vec3(0)),__Cavity);
 		out = mix(out,color(__GI),.5);
 		// FIXME: convolution seems to be broken, the oversaturation is fixed now but not the sampling
 

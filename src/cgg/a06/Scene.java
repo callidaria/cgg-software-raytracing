@@ -1,4 +1,4 @@
-package cgg.a05;
+package cgg.a06;
 
 import java.util.ArrayList;
 import static tools.Functions.*;

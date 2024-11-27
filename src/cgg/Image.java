@@ -1,5 +1,6 @@
 package cgg;
 
+import java.util.stream.Stream;
 import static tools.Functions.*;
 import tools.*;
 
@@ -8,21 +9,29 @@ public class Image implements tools.Image {
 
 	private final int width;
 	private final int height;
+	private final int pxs;
 	private double[] data;
+	private int adv;
 
     public Image(int width, int height) {
 		this.width = width;
 		this.height = height;
+		this.pxs = width*height;
 		this.data = new double[width*height*3];
+		this.adv = 0;
     }
 
 	public void sample(Sampler sampler)
 	{
-		for (int x=0;x<width;x++)
-		{
-			for (int y=0;y<height;y++)
-				setPixel(x,y,sampler.getColor(vec2(x,y)));
-		}
+		Stream.iterate(0,y->y<height,y->y+1)
+			.unordered()
+			.parallel()
+			.forEach(y->Stream.iterate(0,x->x<width,x->x+1)
+					 .forEach(x->{
+							 setPixel(x,y,sampler.getColor(vec2(x,y)));
+							 adv++;
+							 if (adv%(width*17)==0) System.out.println(((double)adv/(double)pxs)*100+"% done");
+				}));
 	}
 
     public void setPixel(int x, int y, Color color) {
