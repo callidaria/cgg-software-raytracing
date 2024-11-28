@@ -4,7 +4,10 @@
 
 package tools;
 
+import java.util.ArrayList;
 import static tools.Functions.*;
+import cgg.geom.Geometry;
+import cgg.a02.Ray;
 
 /**
  * Represents a bounding box in 3D space defined by two points: minimum and maximum.
@@ -60,6 +63,13 @@ public record BoundingBox(Vec3 min, Vec3 max) {
         for (var box : boxes) bounds = bounds.extend(box);
         return bounds;
     }
+
+	public static BoundingBox around(ArrayList<Geometry> geometry)
+	{
+        var bounds = BoundingBox.empty;
+		for (Geometry gx : geometry) bounds = bounds.extend(gx.bounding_box());
+        return bounds;
+	}
 
     /**
      * Extends the current bounding box to include another bounding box.
@@ -249,12 +259,12 @@ public record BoundingBox(Vec3 min, Vec3 max) {
      * @param tMax The maximum distance along the ray to check for intersection.
      * @return true if the ray intersects the bounding box, false otherwise.
      */
-    public boolean intersect(
-        Vec3 origin,
-        Vec3 direction,
-        double tMin,
-        double tMax
-    ) {
+    public boolean intersect(Ray ray)
+	{
+		Vec3 origin = ray.origin();
+        Vec3 direction = ray.direction();
+        double tMin = ray.near();
+        double tMax = ray.far();
         if (this.equals(everything)) return true;
         if (this.contains(add(origin, multiply(direction, tMin)))) return true;
         if (this.contains(add(origin, multiply(direction, tMax)))) return true;

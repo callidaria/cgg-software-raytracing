@@ -30,6 +30,9 @@ public class Cylinder implements Geometry
 
 	public Queue<HitTuple> intersect(Ray r)
 	{
+		// check bounds
+		// TODO
+
 		// spherical component precalculation
 		double a = pow(r.direction().x(),2)+pow(r.direction().z(),2);
 		double b = 2*(r.direction().x()*(r.origin().x()-position.x())
@@ -61,6 +64,12 @@ public class Cylinder implements Geometry
 		if (__Front==null&&__Back==null) return new LinkedList<HitTuple>();
 		__Front = (__Front==null&&__Back!=null) ? hit_pointblank(r.origin(),colour) : __Front;
 		return primitive_hit(new HitTuple(__Front,__Back));
+	}
+
+	public BoundingBox bounding_box()
+	{
+		// TODO
+		return BoundingBox.empty;
 	}
 
 	private int _probe(Ray r,double t)

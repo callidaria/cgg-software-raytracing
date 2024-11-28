@@ -19,9 +19,9 @@ class AdvancementPrinter implements Runnable
 	{
 		while (!ref.done())
 		{
-			System.out.print("processing: "+ref.progress()+"%\r");
-			try { Thread.sleep(1000); }
+			try { Thread.sleep(200); }
 			catch (InterruptedException e) {  }
+			System.out.print("processing: "+ref.progress()+"%\r");
 		}
 	}
 }
@@ -53,17 +53,27 @@ public class Image implements tools.Image {
 		__AllFaxNoPrinter.start();
 
 		// multithreading pixel processing
+		StopWatch __Timing = new StopWatch();
 		Stream.iterate(0,y -> y<height,y -> y+1)
 			.unordered()
 			.parallel()
 			.forEach(y -> Stream.iterate(0,x -> x<width,x -> x+1)
-					 .forEach(x -> { setPixel(x,y,sampler.getColor(vec2(x,y)));adv++; }));
+					 .forEach(x -> {
+							 setPixel(x,y,sampler.getColor(vec2(x,y)));
+							 adv++;
+						 }));
 		done = true;
 
 		// finishing progress communication
 		try { __AllFaxNoPrinter.join(); }
 		catch (InterruptedException e) { }
-		System.out.println("\ndone.");
+
+		// print statistics
+		__Timing.stop();
+		System.out.println();
+		System.out.printf("render time: %.2fs\n",__Timing.time_seconds());
+		System.out.printf("average pixel time: %fms\n",(double)__Timing.time_milliseconds()*pxs);
+		System.out.println("done.");
 	}
 
     public void setPixel(int x, int y, Color color) {

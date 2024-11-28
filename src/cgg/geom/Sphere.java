@@ -17,6 +17,7 @@ public class Sphere implements Geometry
 	private double radius;
 	private double sq_radius;
 	private Material material;
+	private BoundingBox bounds;
 
 	public Sphere(Vec3 center,double radius,Material material)
 	{
@@ -24,10 +25,14 @@ public class Sphere implements Geometry
 		this.radius = radius;
 		this.sq_radius = pow(radius,2);
 		this.material = material;
+		this.bounds = new BoundingBox(radius).transform(move(this.center));
 	}
 
 	public Queue<HitTuple> intersect(Ray r)
 	{
+		// check bounds
+		if (!bounds.intersect(r)) return new LinkedList<HitTuple>();
+
 		// component precalculation
 		Vec3 __Center = subtract(r.origin(),center);
 		double a = dot(r.direction(),r.direction());
@@ -50,6 +55,11 @@ public class Sphere implements Geometry
 		// combine hits as primitive geometry output
 		__Front = (__Front==null&&__Back!=null) ? hit_pointblank(r.origin(),material) : __Front;
 		return primitive_hit(new HitTuple(__Front,__Back));
+	}
+
+	public BoundingBox bounding_box()
+	{
+		return bounds;
 	}
 
 	private Hit _assembleHit(Ray r,double t,int nmod)

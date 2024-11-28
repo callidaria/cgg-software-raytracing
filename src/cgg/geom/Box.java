@@ -30,6 +30,7 @@ public class Box implements Geometry
 	private Vec3 bmin;
 	private Vec3 bmax;
 	private Material material;
+	private BoundingBox bounds;
 
 	public Box(Vec3 position,double width,double height,double depth,Material material)
 	{
@@ -38,10 +39,14 @@ public class Box implements Geometry
 		this.bmin = subtract(position,hdim);
 		this.bmax = add(position,hdim);
 		this.material = material;
+		this.bounds = BoundingBox.around(this.bmin,this.bmax);
 	}
 
 	public Queue<HitTuple> intersect(Ray r)
 	{
+		// check bounds
+		if (!bounds.intersect(r)) return new LinkedList<HitTuple>();
+
 		// calculating quad intersections
 		TValueTuple t = new TValueTuple();
 		_clipAxis(t,bmin.x(),bmax.x(),r.origin().x(),r.direction().x());
@@ -56,6 +61,11 @@ public class Box implements Geometry
 		// combine
 		__Front = (__Back!=null&&__Front==null) ? hit_pointblank(r.origin(),material) : __Front;
 		return primitive_hit(new HitTuple(__Front,__Back));
+	}
+
+	public BoundingBox bounding_box()
+	{
+		return bounds;
 	}
 
 	private void _clipAxis(TValueTuple t,double bmin,double bmax,double origin,double direction)

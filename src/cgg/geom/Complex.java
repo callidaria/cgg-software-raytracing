@@ -2,6 +2,7 @@ package cgg.geom;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import tools.*;
 import static cgg.Math.*;
 import cgg.a02.Ray;
 import cgg.a02.Hit;
@@ -9,19 +10,22 @@ import cgg.a02.Hit;
 
 public class Complex implements Geometry
 {
-	Geometry g0;
-	Geometry g1;
-	JoinOperation jop;
+	private Geometry g0;
+	private Geometry g1;
+	private JoinOperation jop;
+	private BoundingBox bounds;
 
 	public Complex(Geometry g0,Geometry g1,JoinOperation jop)
 	{
 		this.g0 = g0;
 		this.g1 = g1;
 		this.jop = jop;
+		this.bounds = BoundingBox.around(g0.bounding_box(),g1.bounding_box());
 	}
 
 	public Queue<HitTuple> intersect(Ray ray)
 	{
+		if (!bounds.intersect(ray)) return new LinkedList<HitTuple>();
 		if (g1==null) return g0.intersect(ray);
 		Queue<HitTuple> __Hits0 = g0.intersect(ray);
 		Queue<HitTuple> __Hits1 = g1.intersect(ray);
@@ -32,6 +36,11 @@ public class Complex implements Geometry
 			case DIFFERENCE: return _difference(__Hits0,__Hits1);
 		}
 		return null;
+	}
+
+	public BoundingBox bounding_box()
+	{
+		return bounds;
 	}
 
 	private Queue<HitTuple> _union(Queue<HitTuple> h0,Queue<HitTuple> h1)
