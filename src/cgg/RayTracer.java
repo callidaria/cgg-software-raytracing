@@ -161,8 +161,8 @@ public class RayTracer implements Sampler
 		// and yes i just ripped it from the paper directly instead of computing it, no time for shenanigansry
 		Color __LUT = LUT_BRDF.getColor(vec2(__Attitude,__Roughness));
 
-		// diffuse component
-		final int SAMPLES = 8;
+		// global diffuse component
+		final int SAMPLES = 4;
 		Vec3 __DGI = vec3(0,0,0);
 		for (int i=0;i<SAMPLES;i++)
 		{
