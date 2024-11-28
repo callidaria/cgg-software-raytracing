@@ -22,10 +22,10 @@
 * lighting.
 
 - [ ] volumetrics
-- [ ] caustics
+- [X] caustics
 - [ ] pbb
 - [ ] subsurface scattering
-- [ ] emissive objects
+- [X] emissive objects
 - [ ] shadow umbra & penumbra
 - [ ] anisotropic reflection
 - [ ] sheen effect
@@ -38,12 +38,17 @@
 - [ ] automatic camera exposure
 - [ ] denoising  (after path tracing)
 - [ ] depth of field
+- [ ] easy configuration by terminal commands: rff
 
 
 * dictate.
 
 - [ ] super sampling (desired technique)
 - [ ] global illumination
-- [ ] reflections
+- [X] reflections
 - [ ] fixing glass
-- [ ] transformations
+- [X] transformations
+- [X] multithreading
+- [ ] bounding boxes optimization
+- [ ] meshes
+- [ ] animations

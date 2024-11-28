@@ -21,7 +21,7 @@ import cgg.a03.Scene;
 public class RayTracer implements Sampler
 {
 	private Stage scene;
-	private final Color background = color(.0015,.0071,.015);
+	private final Color background = color(.0,.0,.0);
 	private final Color error = color(0,.9,1);
 	private final ImageTexture LUT_BRDF;
 	private final double[] LUT_CORPUT;
@@ -51,7 +51,7 @@ public class RayTracer implements Sampler
 
 	private Color _processScene(Ray ray,int depth)
 	{
-		if (depth>4) return color(0,0,0);
+		if (depth>3) return color(0,0,0);
 		Queue<HitTuple> __Hits = new LinkedList<>();
 
 		// emitter
@@ -162,7 +162,7 @@ public class RayTracer implements Sampler
 		Color __LUT = LUT_BRDF.getColor(vec2(__Attitude,__Roughness));
 
 		// diffuse component
-		final int SAMPLES = 1;
+		final int SAMPLES = 16;
 		Vec3 __DGI = vec3(0,0,0);
 		for (int i=0;i<SAMPLES;i++)
 		{
@@ -170,7 +170,7 @@ public class RayTracer implements Sampler
 			Ray __DIR = new Ray(hit.position(),__DiffSample,.001,1000);
 			__DGI = add(__DGI,vec3(_processScene(__DIR,depth+1)));
 		}
-		__DGI = divide(__DGI,SAMPLES);
+		__DGI = multiply(divide(__DGI,SAMPLES),vec3(hit.colour()));
 		__DGI = multiply(__DGI,subtract(vec3(1),__GIFresnel));
 		__DGI = multiply(__DGI,subtract(vec3(1),__Metallic));
 
@@ -215,9 +215,8 @@ public class RayTracer implements Sampler
 		// convolute samples and mix
 		Vec3 __GI = divide(__GIResult,__SmpWeight);
 		__GI = multiply(__GI,add(multiply(__GIFresnel,__LUT.r()),__LUT.g()));
-		__GI = multiply(add(__GI,/*__DGI*/vec3(0)),__Cavity);
+		__GI = multiply(add(__GI,__DGI),__Cavity);
 		out = mix(out,color(__GI),.5);
-		// FIXME: convolution seems to be broken, the oversaturation is fixed now but not the sampling
 
 		return out;
 	}

@@ -1,37 +1,69 @@
 package cgg;
 
+import java.lang.InterruptedException;
 import java.util.stream.Stream;
 import static tools.Functions.*;
 import tools.*;
+
+
+class AdvancementPrinter implements Runnable
+{
+	private Image ref;
+
+	public AdvancementPrinter(Image ref)
+	{
+		this.ref = ref;
+	}
+
+	public void run()
+	{
+		while (!ref.done())
+		{
+			System.out.print("processing: "+ref.progress()+"%\r");
+			try { Thread.sleep(1000); }
+			catch (InterruptedException e) {  }
+		}
+	}
+}
+// FIXME worst case, the printing is done and the sample method waits a full second for this thread to join
 
 
 public class Image implements tools.Image {
 
 	private final int width;
 	private final int height;
-	private final int pxs;
+	private final double pxs;
 	private double[] data;
 	private int adv;
+	private boolean done;
 
     public Image(int width, int height) {
 		this.width = width;
 		this.height = height;
-		this.pxs = width*height;
+		this.pxs = 1./(double)(width*height);
 		this.data = new double[width*height*3];
 		this.adv = 0;
+		this.done = false;
     }
 
 	public void sample(Sampler sampler)
 	{
-		Stream.iterate(0,y->y<height,y->y+1)
+		// progress communication thread
+		Thread __AllFaxNoPrinter = new Thread(new AdvancementPrinter(this));
+		__AllFaxNoPrinter.start();
+
+		// multithreading pixel processing
+		Stream.iterate(0,y -> y<height,y -> y+1)
 			.unordered()
 			.parallel()
-			.forEach(y->Stream.iterate(0,x->x<width,x->x+1)
-					 .forEach(x->{
-							 setPixel(x,y,sampler.getColor(vec2(x,y)));
-							 adv++;
-							 if (adv%(width*17)==0) System.out.println(((double)adv/(double)pxs)*100+"% done");
-				}));
+			.forEach(y -> Stream.iterate(0,x -> x<width,x -> x+1)
+					 .forEach(x -> { setPixel(x,y,sampler.getColor(vec2(x,y)));adv++; }));
+		done = true;
+
+		// finishing progress communication
+		try { __AllFaxNoPrinter.join(); }
+		catch (InterruptedException e) { }
+		System.out.println("\ndone.");
 	}
 
     public void setPixel(int x, int y, Color color) {
@@ -61,6 +93,16 @@ public class Image implements tools.Image {
     public int height() {
         return height;
     }
+
+	public boolean done()
+	{
+		return done;
+	}
+
+	public int progress()
+	{
+		return (int)((double)adv*pxs*100);
+	}
 
 	private int calculatePixelIndex(int x,int y) {
 		return (y*width+x)*3;
