@@ -33,6 +33,7 @@ public class StratifiedSampler implements Sampler
 			}
 		}
 		return divide(__Result,pow(samples,2.));
+
 		/*collection = color(0,0,0);
 		Stream.iterate(0,y -> y<samples,y -> y+1)
 			.unordered()

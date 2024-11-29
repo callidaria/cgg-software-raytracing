@@ -1,0 +1,47 @@
+* Measurements
+
+** Recursion Depth
+
+|--------------------------+----------------+------------------+-------------------+-----------------|
+| AMD Ryzen 7950X 16-core  | Depth = 1      | Depth = 2        | Depth = 3         | Depth = 4       |
+|--------------------------+----------------+------------------+-------------------+-----------------|
+| Diff=1;Spec=16;Sample=1  | 5.03s/0.0022ms | 35.19s/0.0156ms  | 239.78s/0.1066ms  | 2416.52s/1.0740 |
+| Diff=4;Spec=16;Sample=1  | 5.43s/0.0024ms | 47.00s/0.0209ms  | 370.03s/0.1645ms  | I Refuse        |
+| Diff=8;Spec=16;Sample=1  | 6.63s/0.0029ms | 68.28s/0.0303ms  | 664.45s/0.2953ms  | I Refuse        |
+| Diff=16;Spec=16;Sample=1 | 8.82s/0.0039ms | 105.26s/0.0468ms | 1693.67s/0.7527ms | I Refuse        |
+|--------------------------+----------------+------------------+-------------------+-----------------|
+
+
+* Findings & Analysis regarding Recursion Depth
+
+** Performance
+
+With increasing workload, the CPU downtime increases drastically towards the end of the rendering process.
+This is probably due to the fact, that the heaviest pixel "scanline" processes hog single threads,
+while others are keepin idle, having only a few lines left without all given pixels processed.
+Maybe the significant runtime increase can be reduced once this is fixed?
+
+
+** Diffuse
+
+There has been a significant increase in picture quality when increasing the recursion depth.
+The effects were most notable when incrementing from depth=1 to depth=2.
+For depth>2 the accuracy for more occluded pixels were increased, but not significantly enough, to warrant the
+runtime implications.
+Also after playing around with supersampling of images with a recursion depth of 2 i noticed, that the image
+appeared more accurate even though this is not mathematically true.
+The darker edges are a lot more intense, but the eye does not revolt due to the smoothness of the occluded areas.
+A result with similar quality to Diff=16;Spec=16;Sample=1;Depth=3 might have been Diff8;Spec=16;Sample=2;Depth=2,
+which finished astonishingly in only 240.84s, especially in comparison to the 1693.67s the depth=3 image took.
+So we willingly sacrifice a lot of accuracy for quick beauty. Such is the way of man anyways.
+
+Further action will be, trying to increase image quality with the given samplesizes.
+This can hopefully be achieved by using a less random diffuse pattern and trying to denoise however I can?
+
+
+** Specular
+
+Specular cannot be beautifully sampled below 16 traces, rougher surfaces exhibit a washy effect, that is to be
+avoided even in spite of the costly implications of this decision.
+At a sample size of 16 it is convoluted just enough to look passable on maximally transitioning surfaces
+such as plastic.

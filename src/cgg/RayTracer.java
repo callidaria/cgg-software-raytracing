@@ -51,7 +51,7 @@ public class RayTracer implements Sampler
 
 	private Color _processScene(Ray ray,int depth)
 	{
-		if (depth>3) return color(0,0,0);
+		if (depth>2) return color(0,0,0);
 		Queue<HitTuple> __Hits = new LinkedList<>();
 
 		// emitter
@@ -162,7 +162,7 @@ public class RayTracer implements Sampler
 		Color __LUT = LUT_BRDF.getColor(vec2(__Attitude,__Roughness));
 
 		// global diffuse component
-		final int SAMPLES = 4;
+		final int SAMPLES = 8;
 		Vec3 __DGI = vec3(0,0,0);
 		for (int i=0;i<SAMPLES;i++)
 		{

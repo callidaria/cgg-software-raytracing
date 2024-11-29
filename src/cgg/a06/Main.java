@@ -17,7 +17,7 @@ public class Main
 		Scene scene = new Scene(width,height);
 
 		// samplers
-		Sampler rt = new StratifiedSampler(new RayTracer(scene),4);
+		Sampler rt = new StratifiedSampler(new RayTracer(scene),2);
 
 		// images
 		cgg.Image image = new cgg.Image(width,height);

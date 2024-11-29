@@ -30,9 +30,6 @@ public class Cylinder implements Geometry
 
 	public Queue<HitTuple> intersect(Ray r)
 	{
-		// check bounds
-		// TODO
-
 		// spherical component precalculation
 		double a = pow(r.direction().x(),2)+pow(r.direction().z(),2);
 		double b = 2*(r.direction().x()*(r.origin().x()-position.x())

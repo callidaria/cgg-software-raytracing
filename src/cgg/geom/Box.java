@@ -44,9 +44,6 @@ public class Box implements Geometry
 
 	public Queue<HitTuple> intersect(Ray r)
 	{
-		// check bounds
-		if (!bounds.intersect(r)) return new LinkedList<HitTuple>();
-
 		// calculating quad intersections
 		TValueTuple t = new TValueTuple();
 		_clipAxis(t,bmin.x(),bmax.x(),r.origin().x(),r.direction().x());

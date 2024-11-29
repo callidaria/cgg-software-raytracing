@@ -30,9 +30,6 @@ public class Sphere implements Geometry
 
 	public Queue<HitTuple> intersect(Ray r)
 	{
-		// check bounds
-		if (!bounds.intersect(r)) return new LinkedList<HitTuple>();
-
 		// component precalculation
 		Vec3 __Center = subtract(r.origin(),center);
 		double a = dot(r.direction(),r.direction());
