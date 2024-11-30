@@ -28,6 +28,7 @@ There has been a significant increase in picture quality when increasing the rec
 The effects were most notable when incrementing from depth=1 to depth=2.
 For depth>2 the accuracy for more occluded pixels were increased, but not significantly enough, to warrant the
 runtime implications.
+
 Also after playing around with supersampling of images with a recursion depth of 2 i noticed, that the image
 appeared more accurate even though this is not mathematically true.
 The darker edges are a lot more intense, but the eye does not revolt due to the smoothness of the occluded areas.
@@ -41,7 +42,7 @@ This can hopefully be achieved by using a less random diffuse pattern and trying
 
 ** Specular
 
-Specular cannot be beautifully sampled below 16 traces, rougher surfaces exhibit a washy effect, that is to be
-avoided even in spite of the costly implications of this decision.
+Specular cannot be beautifully sampled below 16 traces, rougher surfaces exhibit a washy circular effect,
+that has to be avoided even in spite of the costly implications of this decision.
 At a sample size of 16 it is convoluted just enough to look passable on maximally transitioning surfaces
 such as plastic.

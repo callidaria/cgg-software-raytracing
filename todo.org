@@ -8,7 +8,6 @@
 
 - [ ] cylinders  (after transformations)
 - [ ] cones  (after transformations)
-- [ ] transparent geometry
 - [ ] NURBS
 - [ ] Subdivision Surfaces
 
@@ -43,8 +42,8 @@
 
 * dictate.
 
-- [ ] super sampling (desired technique)
-- [ ] global illumination
+- [X] super sampling (desired technique)
+- [X] global illumination
 - [X] reflections
 - [ ] fixing glass
 - [X] transformations

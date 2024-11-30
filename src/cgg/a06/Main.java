@@ -10,14 +10,14 @@ public class Main
 	public static void main(String[] args)
 	{
 		// setup frame
-		int width = 1500;
-		int height = 1500;
+		int width = 1000;
+		int height = 1000;
 
 		// generate scene
 		Scene scene = new Scene(width,height);
 
 		// samplers
-		Sampler rt = new StratifiedSampler(new RayTracer(scene),2);
+		Sampler rt = new StratifiedSampler(new RayTracer(scene),4);
 
 		// images
 		cgg.Image image = new cgg.Image(width,height);

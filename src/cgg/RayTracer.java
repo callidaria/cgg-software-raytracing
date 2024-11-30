@@ -24,6 +24,7 @@ public class RayTracer implements Sampler
 	private final Color background = color(.0,.0,.0);
 	private final Color error = color(0,.9,1);
 	private final ImageTexture LUT_BRDF;
+	private final double[] LUT_DIFFUSE;
 	private final double[] LUT_CORPUT;
 
 	public RayTracer(Stage scene)
@@ -33,6 +34,9 @@ public class RayTracer implements Sampler
 		// lookup tables
 		LUT_BRDF = new ImageTexture("./res/lut/brdf.png");
 		String line = "";
+		try { line = new BufferedReader(new FileReader("./res/lut/diffuse")).readLine(); }
+		catch (IOException e) { System.out.println("vdcorput lut could not be read"); }
+		LUT_DIFFUSE = Arrays.stream(line.split(",")).mapToDouble(Double::parseDouble).toArray();
 		try { line = new BufferedReader(new FileReader("./res/lut/vdcorput")).readLine(); }
 		catch (IOException e) { System.out.println("vdcorput lut could not be read"); }
 		LUT_CORPUT = Arrays.stream(line.split(",")).mapToDouble(Double::parseDouble).toArray();
@@ -162,22 +166,30 @@ public class RayTracer implements Sampler
 		Color __LUT = LUT_BRDF.getColor(vec2(__Attitude,__Roughness));
 
 		// global diffuse component
-		final int SAMPLES = 8;
 		Vec3 __DGI = vec3(0,0,0);
-		for (int i=0;i<SAMPLES;i++)
+		for (int i=0;i<LUT_DIFFUSE.length*.5;i++)
 		{
-			Vec3 __DiffSample = normalize(add(hit.normal(),normalize(randomDirection())));
+			// hämis hämis hämisphere!
+			/*
+			Vec2 __Pattern = vec2(LUT_DIFFUSE[i*2],LUT_DIFFUSE[i*2+1]);
+			Vec2 __UV = vec2(2*PI*__Pattern.x(),sqrt(__Pattern.y()*(1-__Pattern.y())));
+			Vec3 __DiffSample = vec3(2*__UV.y()*cos(__UV.x()),1-2*__Pattern.y(),2*__UV.y()*sin(__UV.x()));
+			*/
+			Vec3 __DiffSample = normalize(randomDirection());
+			__DiffSample = normalize(add(hit.normal(),__DiffSample));
+
+			// trace sample
 			Ray __DIR = new Ray(hit.position(),__DiffSample,.001,1000);
 			__DGI = add(__DGI,vec3(_processScene(__DIR,depth+1)));
 		}
-		__DGI = multiply(divide(__DGI,SAMPLES),vec3(hit.colour()));
+		__DGI = multiply(divide(__DGI,LUT_DIFFUSE.length*.5),vec3(hit.colour()));
 		__DGI = multiply(__DGI,subtract(vec3(1),__GIFresnel));
 		__DGI = multiply(__DGI,subtract(vec3(1),__Metallic));
 
 		// specular component
 		// sampling from the environment
 		// cant do this in a lookup table can you?
-		// the paper likes to do a little trolling over here it assumes V=N=R but then also uses V,N and R.
+		// the paper likes to do a little trolling over here, it assumes V=N=R but then also uses V,N and R.
 		// this is completely scuffed and should be banned by international law, but we'll do i guess
 		Vec3 __GIResult = vec3(.0);
 		Vec3 __R = subtract(multiply(2*__Attitude,hit.normal()),__CameraDir);
