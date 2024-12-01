@@ -38,6 +38,7 @@
 - [ ] denoising  (after path tracing)
 - [ ] depth of field
 - [ ] easy configuration by terminal commands: rff
+- [ ] supersampling pseudorandom pattern
 
 
 * dictate.

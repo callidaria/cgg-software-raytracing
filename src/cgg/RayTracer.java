@@ -95,7 +95,7 @@ public class RayTracer implements Sampler
 	private Color _shadePhysical(Hit hit,Ray ray,int depth)
 	{
 		// extract colour information
-		// colour preferredly to be a constant colour because the loader does not translate into sRGB colourspace
+		// colour preferredly to be a constant because the loader does not translate into sRGB colourspace
 		// FIXME or else albedo textures are utterly useless
 		Color p_Colour = hit.material().getComponent(MaterialComponent.COLOUR,hit);
 		Color p_Material = hit.material().getComponent(MaterialComponent.MATERIAL,hit);
@@ -166,8 +166,9 @@ public class RayTracer implements Sampler
 		Color __LUT = LUT_BRDF.getColor(vec2(__Attitude,__Roughness));
 
 		// global diffuse component
+		final int SAMPLES = 4;
 		Vec3 __DGI = vec3(0,0,0);
-		for (int i=0;i<LUT_DIFFUSE.length*.5;i++)
+		for (int i=0;i<SAMPLES;i++)
 		{
 			// hämis hämis hämisphere!
 			/*
@@ -182,7 +183,7 @@ public class RayTracer implements Sampler
 			Ray __DIR = new Ray(hit.position(),__DiffSample,.001,1000);
 			__DGI = add(__DGI,vec3(_processScene(__DIR,depth+1)));
 		}
-		__DGI = multiply(divide(__DGI,LUT_DIFFUSE.length*.5),vec3(hit.colour()));
+		__DGI = multiply(divide(__DGI,SAMPLES),vec3(hit.colour()));
 		__DGI = multiply(__DGI,subtract(vec3(1),__GIFresnel));
 		__DGI = multiply(__DGI,subtract(vec3(1),__Metallic));
 
