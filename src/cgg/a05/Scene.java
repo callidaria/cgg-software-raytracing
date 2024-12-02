@@ -18,6 +18,11 @@ public class Scene implements Stage
 	private ArrayList<Geometry> emitter;
 	private ArrayList<PhongIllumination> phong_lights;
 
+	private ImageTexture mat_glosswood;
+	private ImageTexture mat_plastic;
+	private ImageTexture mat_gold;
+	private ImageTexture mat_marble;
+
 	public Scene(int width,int height)
 	{
 		this.objects = new ArrayList<>();
@@ -26,6 +31,12 @@ public class Scene implements Stage
 
 		// projection
 		this.camera = new Camera(vec3(.3,-.5,1),60.,vec3(15,7,0),width,height,1.5);
+
+		// materials
+		this.mat_glosswood = new ImageTexture("./res/glosswood/material.png");
+		this.mat_plastic = new ImageTexture("./res/plastic/material.png");
+		this.mat_gold = new ImageTexture("./res/gold/material.png");
+		this.mat_marble = new ImageTexture("./res/marble/material.png");
 
 		// geometry
 		_die();
@@ -43,13 +54,13 @@ public class Scene implements Stage
 	{
 		// corpus
 		Box corpus = new Box(vec3(.0),1,1,1,
-							 new PhysicalMaterial(color(.7,.7,.7),"./res/glosswood/material.png",1));
+							 new PhysicalMaterial(color(.7,.7,.7),mat_glosswood,1));
 		Sphere rounding = new Sphere(vec3(.0),.75,
-									 new PhysicalMaterial(color(.6,.6,.6),"./res/glosswood/material.png",1));
+									 new PhysicalMaterial(color(.6,.6,.6),mat_glosswood,1));
 		Complex __Die = new Complex(corpus,rounding,JoinOperation.INTERSECTION);
 
 		// number cutouts
-		PhysicalMaterial __Cutouts = new PhysicalMaterial(color(.0,.05,.0),"./res/plastic/material.png",.1);
+		PhysicalMaterial __Cutouts = new PhysicalMaterial(color(.0,.05,.0),mat_plastic,.1);
 		Sphere one0 = new Sphere(vec3(.0,-.5,.0),.1,__Cutouts);
 		Sphere two0 = new Sphere(vec3(-.5,.25,.25),.1,__Cutouts);
 		Sphere two1 = new Sphere(vec3(-.5,-.2,-.2),.1,__Cutouts);
@@ -79,11 +90,11 @@ public class Scene implements Stage
 		// triplesphere
 		ArrayList<Geometry> __Node = new ArrayList<Geometry>();
 		__Node.add(new Sphere(vec3(-1,0,0),.5,
-							  new PhysicalMaterial(color(0,.05,0),"./res/plastic/material.png",1)));
+							  new PhysicalMaterial(color(0,.05,0),mat_plastic,1)));
 		__Node.add(new Sphere(vec3(0,0,-1),.5,
-							  new PhysicalMaterial(color(.75,.25,0),"./res/gold/material.png",1)));
+							  new PhysicalMaterial(color(.75,.25,0),mat_gold,1)));
 		__Node.add(new Sphere(vec3(1,0,0),.5,
-							  new PhysicalMaterial(color(.75,0,0),"./res/marble/material.png",1)));
+							  new PhysicalMaterial(color(.75,0,0),mat_marble,1)));
 		objects.add(new GraphNode(__Node,vec3(-1,1,-3),vec3(1),vec3(0,0,0)));
 
 		// sphereflower
@@ -98,7 +109,7 @@ public class Scene implements Stage
 	{
 		Vec3 __Position = vec3(0,2,-4);
 		objects.add(new Box(__Position,10,1,10,
-							new PhysicalMaterial("./res/checker_neo.png","./res/marble/material.png",4)));
+							new PhysicalMaterial(new ImageTexture("./res/checker_neo.png"),mat_marble,4)));
 	}
 
 	private void _craeveTheVorbiddenLaemp(Vec3 position,Color colour,double intensity)

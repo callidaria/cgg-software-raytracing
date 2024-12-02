@@ -12,17 +12,17 @@ public class PhysicalMaterial implements Material
 	private ImageTexture material;
 	private double texel;
 
-	public PhysicalMaterial(String colour_path,String material_path,double texel)
+	public PhysicalMaterial(ImageTexture colour,ImageTexture material,double texel)
 	{
-		this.colour = new ImageTexture(colour_path);
-		this.material = new ImageTexture(material_path);
+		this.colour = colour;
+		this.material = material;
 		this.texel = texel;
 	}
 
-	public PhysicalMaterial(Color colour,String material_path,double texel)
+	public PhysicalMaterial(Color colour,ImageTexture material,double texel)
 	{
 		this.fallback = colour;
-		this.material = new ImageTexture(material_path);
+		this.material = material;
 		this.texel = texel;
 	}
 

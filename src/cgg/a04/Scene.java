@@ -17,6 +17,10 @@ public class Scene implements Stage
 	private ArrayList<Geometry> emitter;
 	private ArrayList<PhongIllumination> phong_lights;
 
+	private ImageTexture mat_plastic;
+	private ImageTexture mat_gold;
+	private ImageTexture mat_marble;
+
 	public Scene(int width,int height)
 	{
 		objects = new ArrayList<>();
@@ -25,6 +29,11 @@ public class Scene implements Stage
 
 		// projection
 		camera = new Camera(vec3(0,0,0),60.,width,height,1.5);
+
+		// materials
+		this.mat_plastic = new ImageTexture("./res/plastic/material.png");
+		this.mat_gold = new ImageTexture("./res/gold/material.png");
+		this.mat_marble = new ImageTexture("./res/marble/material.png");
 
 		// geometry
 		_testing();
@@ -42,18 +51,18 @@ public class Scene implements Stage
 	{
 		Vec3 __Position = vec3(0,1,-4);
 		objects.add(new Sphere(add(__Position,vec3(-1,0,0)),.5,
-							   new PhysicalMaterial(color(0,.05,0),"./res/plastic/material.png",1)));
+							   new PhysicalMaterial(color(0,.05,0),mat_plastic,1)));
 		objects.add(new Sphere(add(__Position,vec3(0,0,-1)),.5,
-							   new PhysicalMaterial(color(.75,.25,0),"./res/gold/material.png",1)));
+							   new PhysicalMaterial(color(.75,.25,0),mat_gold,1)));
 		objects.add(new Sphere(add(__Position,vec3(1,0,0)),.5,
-							   new PhysicalMaterial(color(.75,0,0),"./res/marble/material.png",16)));
+							   new PhysicalMaterial(color(.75,0,0),mat_marble,16)));
 	}
 
 	private void _flooring()
 	{
 		Vec3 __Position = vec3(0,2,-4);
 		objects.add(new Box(__Position,10,1,10,
-							new PhysicalMaterial("./res/checker_neo.png","./res/marble/material.png",4)));
+							new PhysicalMaterial(new ImageTexture("./res/checker_neo.png"),mat_marble,4)));
 	}
 
 	private void _craeveTheVorbiddenLaemp(Vec3 position,Color colour,double intensity)
