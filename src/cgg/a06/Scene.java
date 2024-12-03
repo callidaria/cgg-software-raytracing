@@ -18,9 +18,15 @@ public class Scene implements Stage
 	private ArrayList<Geometry> emitter;
 	private ArrayList<PhongIllumination> phong_lights;
 
+	// materials
 	private ImageTexture mat_plastic;
 	private ImageTexture mat_gold;
 	private ImageTexture mat_marble;
+
+	// normal maps
+	private NormalMap nrm_plastic;
+	private NormalMap nrm_gold;
+	private NormalMap nrm_marble;
 
 	public Scene(int width,int height)
 	{
@@ -36,6 +42,11 @@ public class Scene implements Stage
 		this.mat_gold = new ImageTexture("./res/gold/material.png");
 		this.mat_marble = new ImageTexture("./res/marble/material.png");
 
+		// normal maps
+		this.nrm_plastic = new NormalMap("./res/plastic/normals.png");
+		this.nrm_gold = new NormalMap("./res/gold/normals.png");
+		this.nrm_marble = new NormalMap("./res/marble/normals.png");
+
 		// geometry
 		_testing();
 		_flooring();
@@ -49,11 +60,14 @@ public class Scene implements Stage
 	{
 		ArrayList<Geometry> __Node = new ArrayList<Geometry>();
 		__Node.add(new Sphere(vec3(-1,0,0),.5,
-							  new PhysicalMaterial(color(0,.05,0),mat_plastic,1)));
+							  new PhysicalMaterial(color(0,.05,0),mat_plastic,1),
+							  nrm_plastic));
 		__Node.add(new Sphere(vec3(0,0,-1),.5,
-							  new PhysicalMaterial(color(.75,.25,0),mat_gold,1)));
+							  new PhysicalMaterial(color(.75,.25,0),mat_gold,1),
+							  nrm_gold));
 		__Node.add(new Sphere(vec3(1,0,0),.5,
-							  new PhysicalMaterial(color(.75,0,0),mat_marble,1)));
+							  new PhysicalMaterial(color(.75,0,0),mat_marble,1),
+							  nrm_marble));
 		objects.add(new GraphNode(__Node,vec3(0,1,-4),vec3(1),vec3(0,0,0)));
 	}
 

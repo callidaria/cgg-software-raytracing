@@ -17,9 +17,22 @@ public class Sphere implements Geometry
 	private double radius;
 	private double sq_radius;
 	private Material material;
+	private NormalMap normal_map;
 	private BoundingBox bounds;
 
 	public Sphere(Vec3 center,double radius,Material material)
+	{
+		_init(center,radius,material);
+		this.normal_map = null;
+	}
+
+	public Sphere(Vec3 center,double radius,Material material,NormalMap normal_map)
+	{
+		_init(center,radius,material);
+		this.normal_map = normal_map;
+	}
+
+	private void _init(Vec3 center,double radius,Material material)
 	{
 		this.center = center;
 		this.radius = radius;
@@ -62,10 +75,23 @@ public class Sphere implements Geometry
 	private Hit _assembleHit(Ray r,double t,int nmod)
 	{
 		if (!r.paramInRange(t)) return null;
+
+		// position
 		Vec3 __Position = r.calculatePosition(t);
 		Vec3 __Origin = subtract(__Position,center);
-		Vec2 __UV = vec2((atan2(__Origin.z(),__Origin.x())+PI)/(2*PI),(PI-acos(__Origin.y()/radius))/PI);
+
+		// global coordinates
+		double __Phi = atan2(__Origin.z(),__Origin.x());
+		double __Theta = acos(__Origin.y()/radius);
+		Vec2 __UV = vec2((__Phi+PI)/(2*PI),(PI-__Theta)/PI);
+
+		// normal mapping
 		Vec3 __Normal = multiply(divide(__Origin,radius),nmod);
+		if (normal_map!=null)
+		{
+			Vec3 __Tangent = vec3(-sin(__Phi),cos(__Phi),0);
+			__Normal = normal_map.produceNormal(__UV,__Normal,__Tangent);
+		}
 		return new Hit(t,__Position,__UV,__Normal,material);
 	}
 }
