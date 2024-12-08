@@ -25,7 +25,7 @@ class AdvancementPrinter implements Runnable
 		}
 	}
 }
-// FIXME worst case, the printing is done and the sample method waits a full second for this thread to join
+// FIXME worst case, the printing is done and the sample method waits a FIFTH of a second for this thread to join
 
 
 public class Image implements tools.Image {

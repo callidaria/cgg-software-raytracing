@@ -46,3 +46,10 @@ Specular cannot be beautifully sampled below 16 traces, rougher surfaces exhibit
 that has to be avoided even in spite of the costly implications of this decision.
 At a sample size of 16 it is convoluted just enough to look passable on maximally transitioning surfaces
 such as plastic.
+
+Specular component quality might be improved at lower sample rates by convoluting the result in a bilateral
+filter, similar to the approach we shall use to denoise the diffuse.
+Because global specular processing weighs extremely heavy on the performance budget, this is definitely worth
+a try even though it should not mitigate the mirroring effect at higher roughness, produced by our pseudorandom
+sampling pattern.
+It is not yet clear how to filter over a single pixel sample, but once it is it will be implemented.

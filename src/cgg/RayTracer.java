@@ -194,7 +194,7 @@ public class RayTracer implements Sampler
 		// this is completely scuffed and should be banned by international law, but we'll do i guess
 		Vec3 __GIResult = vec3(.0);
 		Vec3 __R = subtract(multiply(2*__Attitude,hit.normal()),__CameraDir);
-		double __SmpWeight = .0;  // dont forget this one, the goddamn paper forgets to declare this one!
+		double __SmpWeight = .0;  // don't forget this one, the goddamn paper forgets to declare this one!
 		for (int i=0;i<LUT_CORPUT.length*.5;i++)
 		{
 			// fpd avoidance trickery (there is a book with this hack & its generally used)
