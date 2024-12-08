@@ -10,8 +10,8 @@ public class Main
 	public static void main(String[] args)
 	{
 		// setup frame
-		int width = 800;
-		int height = 800;
+		int width = 1500;
+		int height = 1500;
 
 		// generate scene
 		Scene scene = new Scene(width,height);

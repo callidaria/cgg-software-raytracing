@@ -87,11 +87,13 @@ public class Sphere implements Geometry
 
 		// normal mapping
 		Vec3 __Normal = multiply(divide(__Origin,radius),nmod);
+		/*
 		if (normal_map!=null)
 		{
 			Vec3 __Tangent = vec3(-sin(__Phi),cos(__Phi),0);
 			__Normal = normal_map.produceNormal(__UV,__Normal,__Tangent);
 		}
+		*/
 		return new Hit(t,__Position,__UV,__Normal,material);
 	}
 }

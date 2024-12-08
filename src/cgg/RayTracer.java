@@ -21,7 +21,7 @@ import cgg.a03.Scene;
 public class RayTracer implements Sampler
 {
 	private Stage scene;
-	private final Color background = color(.0,.0,.0);
+	private final Color background = color(.0000278,.0001247,.000352);
 	private final Color error = color(0,.9,1);
 	private final ImageTexture LUT_BRDF;
 	private final double[] LUT_DIFFUSE;
@@ -120,9 +120,6 @@ public class RayTracer implements Sampler
 			// shadow checking
 			Vec3 __LightDir = p_Light.direction(hit.position());
 			if (_shadowCast(hit,__LightDir,p_Light.distance(hit.position()))) continue;
-			// FIXME shadows look horrible in this pipeline. make it work!
-			// SIRE! colour correction is working against us! cant live with or without it my beautiful...
-			// TODO make this all work together with csg system (do it last, should be easy)
 
 			// distribution component
 			Vec3 __Halfway = normalize(add(__CameraDir,__LightDir));
@@ -166,7 +163,7 @@ public class RayTracer implements Sampler
 		Color __LUT = LUT_BRDF.getColor(vec2(__Attitude,__Roughness));
 
 		// global diffuse component
-		final int SAMPLES = 4;
+		final int SAMPLES = 16;
 		Vec3 __DGI = vec3(0,0,0);
 		for (int i=0;i<SAMPLES;i++)
 		{
@@ -183,7 +180,7 @@ public class RayTracer implements Sampler
 			Ray __DIR = new Ray(hit.position(),__DiffSample,.001,1000);
 			__DGI = add(__DGI,vec3(_processScene(__DIR,depth+1)));
 		}
-		__DGI = multiply(divide(__DGI,SAMPLES),vec3(hit.colour()));
+		__DGI = multiply(divide(__DGI,SAMPLES),vec3(p_Colour));
 		__DGI = multiply(__DGI,subtract(vec3(1),__GIFresnel));
 		__DGI = multiply(__DGI,subtract(vec3(1),__Metallic));
 
