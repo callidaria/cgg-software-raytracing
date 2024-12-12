@@ -21,10 +21,8 @@
 * lighting.
 
 - [ ] volumetrics
-- [X] caustics
 - [ ] pbb
 - [ ] subsurface scattering
-- [X] emissive objects
 - [ ] shadow umbra & penumbra
 - [ ] anisotropic reflection
 - [ ] sheen effect
@@ -34,8 +32,9 @@
 
 * quality.
 
+- [ ] refactor scene graph creation
 - [ ] automatic camera exposure
-- [ ] denoising  (after path tracing)
+- [ ] denoising
 - [ ] depth of field
 - [ ] easy configuration by terminal commands: rff
 - [ ] supersampling pseudorandom pattern
@@ -43,12 +42,7 @@
 
 * dictate.
 
-- [X] super sampling (desired technique)
-- [X] global illumination
-- [X] reflections
 - [ ] fixing glass
-- [X] transformations
-- [X] multithreading
 - [ ] bounding boxes optimization
 - [ ] meshes
 - [ ] animations

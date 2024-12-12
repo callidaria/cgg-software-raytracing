@@ -21,7 +21,7 @@ import cgg.a03.Scene;
 public class RayTracer implements Sampler
 {
 	private Stage scene;
-	private final Color background = color(.0000278,.0001247,.000352);
+	private final Color background = color(0);
 	private final Color error = color(0,.9,1);
 	private final ImageTexture LUT_BRDF;
 	private final double[] LUT_DIFFUSE;
@@ -113,7 +113,7 @@ public class RayTracer implements Sampler
 		double __dtLightOut = max(dot(hit.normal(),__CameraDir),.0);
 		double __SchlickOut = _schlickBeckmannApprox(__dtLightOut,__Roughness);
 
-		// processing lights
+		// direct lighting
 		Vec3 __Result = vec3(0,0,0);
 		for (PhongIllumination p_Light : scene.phong_lights())
 		{
@@ -148,7 +148,7 @@ public class RayTracer implements Sampler
 		}
 		Color out = color(__Result);
 
-		// gi (testing)
+		// gi segment
 		// ...fresnel again (probata et commendatae!)
 		// the HLSL code uses saturate() (dumb name) here, but max is all we need, dot product is never <0
 		double __Attitude = max(dot(hit.normal(),__CameraDir),.0);
@@ -168,11 +168,6 @@ public class RayTracer implements Sampler
 		for (int i=0;i<SAMPLES;i++)
 		{
 			// hämis hämis hämisphere!
-			/*
-			Vec2 __Pattern = vec2(LUT_DIFFUSE[i*2],LUT_DIFFUSE[i*2+1]);
-			Vec2 __UV = vec2(2*PI*__Pattern.x(),sqrt(__Pattern.y()*(1-__Pattern.y())));
-			Vec3 __DiffSample = vec3(2*__UV.y()*cos(__UV.x()),1-2*__Pattern.y(),2*__UV.y()*sin(__UV.x()));
-			*/
 			Vec3 __DiffSample = normalize(randomDirection());
 			__DiffSample = normalize(add(hit.normal(),__DiffSample));
 

@@ -12,35 +12,48 @@ import cgg.a02.Hit;
 
 public class GraphNode implements Geometry
 {
+	private ArrayList<Geometry> geometry;
 	private Mat44 transform;
 	private Mat44 inv_transform;
 	private Mat44 tinv_transform;
-	private ArrayList<Geometry> geometry;
 	private BoundingBox bounds;
+
+	public GraphNode()
+	{
+		this.geometry = new ArrayList<Geometry>();
+		this.transform = identity();
+		_cacheTransform();
+	}
+
+	public GraphNode(Vec3 position,Vec3 scale,Vec3 rotation)
+	{
+		this.geometry = new ArrayList<Geometry>();
+		_calculateTransform(position,scale,rotation);
+		_cacheTransform();
+	}
 
 	public GraphNode(ArrayList<Geometry> geometry)
 	{
-		this.transform = identity();
 		this.geometry = geometry;
+		this.transform = identity();
 		_cacheTransform();
-		_createBoundingBox();
+		update_bounds();
 	}
 
 	public GraphNode(ArrayList<Geometry> geometry,Vec3 position,Vec3 scale,Vec3 rotation)
 	{
-		this.transform = multiply(move(position),multiply(scale(scale),rotate(rotation)));
 		this.geometry = geometry;
+		_calculateTransform(position,scale,rotation);
 		_cacheTransform();
-		_createBoundingBox();
+		update_bounds();
 	}
 
-	private void _cacheTransform()
+	public void register_geometry(Geometry g)
 	{
-		this.inv_transform = invert(transform);
-		this.tinv_transform = transpose(inv_transform);
+		this.geometry.add(g);
 	}
 
-	private void _createBoundingBox()
+	public void update_bounds()
 	{
 		this.bounds = BoundingBox.around(geometry).transform(this.transform);
 	}
@@ -77,6 +90,17 @@ public class GraphNode implements Geometry
 	public BoundingBox bounding_box()
 	{
 		return bounds;
+	}
+
+	private void _calculateTransform(Vec3 position,Vec3 scale,Vec3 rotation)
+	{
+		this.transform = multiply(move(position),multiply(scale(scale),rotate(rotation)));
+	}
+
+	private void _cacheTransform()
+	{
+		this.inv_transform = invert(transform);
+		this.tinv_transform = transpose(inv_transform);
 	}
 
 	private Hit _processTransformation(Hit hit)
