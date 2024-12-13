@@ -4,7 +4,7 @@ import static tools.Functions.*;
 import tools.*;
 
 
-public class DirectionalLight implements PhongIllumination
+public class DirectionalLight implements Illumination
 {
 	private Vec3 direction;
 	private Color colour;

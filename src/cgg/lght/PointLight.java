@@ -5,7 +5,7 @@ import static tools.Functions.*;
 import tools.*;
 
 
-public class PointLight implements PhongIllumination
+public class PointLight implements Illumination
 {
 	private Vec3 position;
 	private Color colour;

@@ -10,7 +10,6 @@ public interface Stage
 {
 	public Camera camera();
 	public Geometry groot();
-	public ArrayList<Geometry> objects();
 	public ArrayList<Geometry> emitter();
-	public ArrayList<PhongIllumination> phong_lights();
+	public ArrayList<Illumination> lights();
 };

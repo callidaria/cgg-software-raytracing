@@ -13,8 +13,8 @@ import cgg.a02.Camera;
 public class Scene implements Stage
 {
 	private Camera camera;
-	private Geometry groot;
-	private ArrayList<PhongIllumination> phong_lights;
+	private GraphNode groot;
+	private ArrayList<Illumination> lights;
 	private ArrayList<Geometry> emitter;
 
 	public Scene(int width,int height)
@@ -22,18 +22,16 @@ public class Scene implements Stage
 		// setup
 		this.camera = new Camera(vec3(0),60,vec3(0),width,height,1);
 		this.groot = new GraphNode();
-		this.phong_lights = new ArrayList<PhongIllumination>();
+		this.lights = new ArrayList<Illumination>();
 		this.emitter = new ArrayList<Geometry>();
 
 		// assemble
 		groot.update_bounds();
-
 		// TODO
 	}
 
 	public Camera camera() { return camera; }
 	public Geometry groot() { return groot; }
-	public ArrayList<Geometry> objects() { return null; }
-	public ArrayList<PhongIllumination> phong_lights() { return phong_lights; }
+	public ArrayList<Illumination> lights() { return lights; }
 	public ArrayList<Geometry> emitter() { return emitter; }
 }

@@ -115,7 +115,7 @@ public class RayTracer implements Sampler
 
 		// direct lighting
 		Vec3 __Result = vec3(0,0,0);
-		for (PhongIllumination p_Light : scene.phong_lights())
+		for (Illumination p_Light : scene.lights())
 		{
 			// shadow checking
 			Vec3 __LightDir = p_Light.direction(hit.position());
@@ -239,15 +239,15 @@ public class RayTracer implements Sampler
 
 		// ambient component
 		Color __Ambient = color(0,0,0);
-		for (PhongIllumination p_Light : scene.phong_lights())
+		for (Illumination p_Light : scene.lights())
 		{
 			Color __LightIntensity = p_Light.intensity(hit.position());
 			__Ambient = multiply(p_Colour,multiply(__LightIntensity,.7));
 		}
-		__Ambient = divide(__Ambient,scene.phong_lights().size());
+		__Ambient = divide(__Ambient,scene.lights().size());
 
 		Color __Result = color(0,0,0);
-		for (PhongIllumination p_Light : scene.phong_lights())
+		for (Illumination p_Light : scene.lights())
 		{
 			// precalculations
 			Color __LightIntensity = p_Light.intensity(hit.position());

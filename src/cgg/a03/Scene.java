@@ -14,13 +14,13 @@ public class Scene implements Stage
 	private Camera camera;
 	private ArrayList<Geometry> objects;
 	private ArrayList<Geometry> emitter;
-	private ArrayList<PhongIllumination> phong_lights;
+	private ArrayList<Illumination> lights;
 
 	public Scene(int width,int height)
 	{
 		objects = new ArrayList<>();
 		emitter = new ArrayList<>();
-		phong_lights = new ArrayList<>();
+		lights = new ArrayList<>();
 
 		// projection
 		camera = new Camera(vec3(0,0,0),60.,width,height,1.);
@@ -104,12 +104,11 @@ public class Scene implements Stage
 	private void _craeveTheVorbiddenLaemp(Vec3 position,Color colour,double intensity)
 	{
 		emitter.add(new Sphere(position,.25,new SurfaceColour(colour)));
-		phong_lights.add(new PointLight(position,colour,intensity));
+		lights.add(new PointLight(position,colour,intensity));
 	}
 
 	public Camera camera() { return camera; }
 	public Geometry groot() { return null; }
-	public ArrayList<Geometry> objects() { return objects; }
 	public ArrayList<Geometry> emitter() { return emitter; }
-	public ArrayList<PhongIllumination> phong_lights() { return phong_lights; }
+	public ArrayList<Illumination> lights() { return lights; }
 }

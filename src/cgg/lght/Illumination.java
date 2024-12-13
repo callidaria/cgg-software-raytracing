@@ -3,7 +3,7 @@ package cgg.lght;
 import tools.*;
 
 
-public interface PhongIllumination
+public interface Illumination
 {
 	Vec3 direction(Vec3 position);
 	double distance(Vec3 position);

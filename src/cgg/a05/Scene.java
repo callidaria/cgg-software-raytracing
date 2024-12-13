@@ -16,7 +16,7 @@ public class Scene implements Stage
 	private Geometry groot;
 	private ArrayList<Geometry> objects;
 	private ArrayList<Geometry> emitter;
-	private ArrayList<PhongIllumination> phong_lights;
+	private ArrayList<Illumination> lights;
 
 	private ImageTexture mat_glosswood;
 	private ImageTexture mat_plastic;
@@ -27,7 +27,7 @@ public class Scene implements Stage
 	{
 		this.objects = new ArrayList<>();
 		this.emitter = new ArrayList<>();
-		this.phong_lights = new ArrayList<>();
+		this.lights = new ArrayList<>();
 
 		// projection
 		this.camera = new Camera(vec3(.3,-.5,1),60.,vec3(15,7,0),width,height,1.5);
@@ -115,12 +115,11 @@ public class Scene implements Stage
 	private void _craeveTheVorbiddenLaemp(Vec3 position,Color colour,double intensity)
 	{
 		emitter.add(new Sphere(position,.25,new SurfaceColour(colour)));
-		phong_lights.add(new PointLight(position,colour,intensity,1.,.7,1.8));
+		lights.add(new PointLight(position,colour,intensity,1.,.7,1.8));
 	}
 
 	public Camera camera() { return camera; }
 	public Geometry groot() { return groot; }
-	public ArrayList<Geometry> objects() { return objects; }
 	public ArrayList<Geometry> emitter() { return emitter; }
-	public ArrayList<PhongIllumination> phong_lights() { return phong_lights; }
+	public ArrayList<Illumination> lights() { return lights; }
 }
