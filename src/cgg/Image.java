@@ -63,7 +63,7 @@ public class Image implements tools.Image {
 							 adv++;
 						 }));
 		done = true;
-		// FIXME work on cpu idle issue and find out why this variant uses more memory than the pixel by pixel one
+		// FIXME work on cpu idle issue and find out why this variant uses more memory than the by pixel one
 
 		// finishing progress communication
 		try { __AllFaxNoPrinter.join(); }

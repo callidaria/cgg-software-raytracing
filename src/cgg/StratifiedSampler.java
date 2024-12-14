@@ -11,7 +11,6 @@ public class StratifiedSampler implements Sampler
 	private Sampler sampler;
 	private int samples;
 	private double dvsamples;
-	//private Color collection;
 
 	public StratifiedSampler(Sampler sampler,int samples)
 	{
@@ -33,19 +32,5 @@ public class StratifiedSampler implements Sampler
 			}
 		}
 		return divide(__Result,pow(samples,2.));
-
-		/*collection = color(0,0,0);
-		Stream.iterate(0,y -> y<samples,y -> y+1)
-			.unordered()
-			.parallel()
-			.forEach(y -> Stream.iterate(0,x -> x<samples,x -> x+1)
-					 .forEach(x -> {
-							 Vec2 __Subpixel = add(coord,vec2(x*dvsamples,
-															  y*dvsamples));
-							 collection = add(collection,sampler.getColor(__Subpixel));
-						 }));
-		return divide(collection,pow(samples,2.));
-		*/
 	}
-	// TODO randomize!
 }

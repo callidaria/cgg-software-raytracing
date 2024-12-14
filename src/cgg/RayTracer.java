@@ -1,12 +1,8 @@
 package cgg;
 
 import static java.lang.Math.*;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import static tools.Functions.*;
 import tools.*;
 import static cgg.Math.*;
@@ -23,23 +19,17 @@ public class RayTracer implements Sampler
 	private Stage scene;
 	private final Color background = color(0);
 	private final Color error = color(0,.9,1);
+
+	// lookup
 	private final ImageTexture LUT_BRDF;
-	private final double[] LUT_DIFFUSE;
-	private final double[] LUT_CORPUT;
+	private final Vec2[][] SPECULAR_SETS;
+	private int spec_iteration = 0;
 
 	public RayTracer(Stage scene)
 	{
 		this.scene = scene;
-
-		// lookup tables
-		LUT_BRDF = new ImageTexture("./res/lut/brdf.png");
-		String line = "";
-		try { line = new BufferedReader(new FileReader("./res/lut/diffuse")).readLine(); }
-		catch (IOException e) { System.out.println("vdcorput lut could not be read"); }
-		LUT_DIFFUSE = Arrays.stream(line.split(",")).mapToDouble(Double::parseDouble).toArray();
-		try { line = new BufferedReader(new FileReader("./res/lut/vdcorput")).readLine(); }
-		catch (IOException e) { System.out.println("vdcorput lut could not be read"); }
-		LUT_CORPUT = Arrays.stream(line.split(",")).mapToDouble(Double::parseDouble).toArray();
+		this.LUT_BRDF = new ImageTexture("./res/lut/brdf.png");
+		this.SPECULAR_SETS = LUT.lookup().subsets(16);
 	}
 
 	public Color getColor(Vec2 coord)
@@ -187,14 +177,14 @@ public class RayTracer implements Sampler
 		Vec3 __GIResult = vec3(.0);
 		Vec3 __R = subtract(multiply(2*__Attitude,hit.normal()),__CameraDir);
 		double __SmpWeight = .0;  // don't forget this one, the goddamn paper forgets to declare this one!
-		for (int i=0;i<LUT_CORPUT.length*.5;i++)
+		for (int i=0;i<SPECULAR_SETS[spec_iteration].length;i++)
 		{
 			// fpd avoidance trickery (there is a book with this hack & its generally used)
 			// bitshifting in java is a different kind of adventure
 			// it seems like java offers us only "baby's first toybox bitshifting for beginners"
 			// there is no actual utility or even unsigneds
 			// because i'm sick and tired of this, this has been preprocessed in a c program and imported as lut
-			Vec2 __Hammersley = vec2(LUT_CORPUT[i*2],LUT_CORPUT[i*2+1]);
+			Vec2 __Hammersley = SPECULAR_SETS[spec_iteration][i];
 
 			// importance sample (your lobez quark! where is my oomox after implementing this huh?)
 			// the paper regenerates our aSq in two steps? we are just gonna reuse it, just aSqing questions!
@@ -222,6 +212,11 @@ public class RayTracer implements Sampler
 		__GI = multiply(__GI,add(multiply(__GIFresnel,__LUT.r()),__LUT.g()));
 		__GI = multiply(add(__GI,__DGI),__Cavity);
 		out = mix(out,color(__GI),.5);
+
+		// process specular iteration
+		spec_iteration++;
+		spec_iteration = spec_iteration%16;
+		// FIXME RACE CONDITION
 
 		return out;
 	}
