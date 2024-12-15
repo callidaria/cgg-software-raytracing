@@ -30,14 +30,14 @@ public class Scene implements Stage
 	private NormalMap nrm_gold;
 	private NormalMap nrm_marble;
 
-	public Scene(int width,int height)
+	public Scene()
 	{
 		this.objects = new ArrayList<>();
 		this.emitter = new ArrayList<>();
 		this.lights = new ArrayList<>();
 
 		// projection
-		this.camera = new Camera(vec3(0),60.,vec3(0),width,height,1.5);
+		this.camera = new Camera(vec3(0),vec3(0));
 		this.dice = new ArrayList<Geometry>();
 		this.spheres = new ArrayList<Geometry>();
 
@@ -52,13 +52,9 @@ public class Scene implements Stage
 		this.nrm_marble = new NormalMap("./res/marble/normals.png");
 
 		// geometry
-		//_testing();
-		//_die();
 		_childsplay();
-		//for (int i=0;i<5;i++) _die(vec3((i-2)*1.5,1,0),color(.1*i,0,.5-.1*i),0,i*.2);
 		for (int i=0;i<5;i++) _sphere(vec3((i-2)*1.5,1,0),color(.1*i,0,.5-.1*i),0,i*.2);
 		for (int i=0;i<5;i++) _die(vec3((i-2)*1.5,-.5,0),color(1-.2*i,.5+i*.05,0),1,i*.2);
-		//for (int i=0;i<5;i++) _sphere(vec3((i-2)*1.5,-.5,0),color(.1*i,.1*i,.5-.1*i),1,i*.2);
 		_flooring();
 		objects.add(new GraphNode(dice,vec3(0,0,-5.5),vec3(1),vec3(0,0,0)));
 		objects.add(new GraphNode(spheres,vec3(0,0,-5.5),vec3(1),vec3(0,0,0)));

@@ -2,16 +2,18 @@ package cgg.a01;
 
 import java.util.Random;
 import java.util.ArrayList;
+import cgg.Config;
 import cgg.Image;
 import tools.*;
+
 
 public class Main {
 
 	public static void main(String[] args) {
 
 		// setup frame
-		int width = 400;
-		int height = 400;
+		int width = Config.WIDTH;
+		int height = Config.HEIGHT;
 		Vec2 center = new Vec2(width/2,height/2);
 
 		// generate multicircles
@@ -19,7 +21,7 @@ public class Main {
 		ArrayList<Circle> circles = new ArrayList<Circle>();
 		for (int i=0;i<17;i++) {
 			circles.add(new Circle(
-					new Vec2(rand.nextInt(401),rand.nextInt(401)),
+					new Vec2(rand.nextInt(width+1),rand.nextInt(height+1)),
 					rand.nextInt(65)+10,
 					new Color(rand.nextFloat(1.f),rand.nextFloat(1.f),rand.nextFloat(1.f))
 				));
@@ -33,11 +35,11 @@ public class Main {
 		Sampler smp_waves = new Waves(circles);
 
 		// images
-		Image image_multi = new Image(width,height);
-		Image image_orbz = new Image(width,height);
-		Image image_disc = new Image(width,height);
-		Image image_halo = new Image(width,height);
-		Image image_waves = new Image(width,height);
+		Image image_multi = new Image();
+		Image image_orbz = new Image();
+		Image image_disc = new Image();
+		Image image_halo = new Image();
+		Image image_waves = new Image();
 
 		// draw multicircles
 		for (int x=0;x<width;x++) {

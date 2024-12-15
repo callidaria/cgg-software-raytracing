@@ -9,7 +9,7 @@
 - [ ] cylinders  (after transformations)
 - [ ] cones  (after transformations)
 - [ ] NURBS
-- [ ] Subdivision Surfaces
+- [ ] subdivision surfaces
 
 
 * materials.
@@ -32,12 +32,13 @@
 
 * quality.
 
-- [ ] refactor scene graph creation
+- [X] refactor scene graph creation
 - [ ] automatic camera exposure
 - [ ] denoising
 - [ ] depth of field
-- [ ] easy configuration by terminal commands: rff
+- [X] easy configuration by filechange
 - [ ] supersampling pseudorandom pattern
+- [ ] tone mapping
 
 
 * dictate.

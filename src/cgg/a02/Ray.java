@@ -2,8 +2,10 @@ package cgg.a02;
 
 import static tools.Functions.*;
 import tools.*;
+import cgg.*;
 
-public record Ray(Vec3 origin,Vec3 direction,double near,double far)
+
+public record Ray(Vec3 origin,Vec3 direction)
 {
 	public Vec3 calculatePosition(double t)
 	{
@@ -12,7 +14,7 @@ public record Ray(Vec3 origin,Vec3 direction,double near,double far)
 
 	public boolean paramInRange(double t)
 	{
-		return (t>=near)&&(t<=far);
+		return (t>=Config.NEAR)&&(t<=Config.FAR);
 	}
 
 	public String toString()

@@ -28,20 +28,17 @@ class AdvancementPrinter implements Runnable
 // FIXME worst case, the printing is done and the sample method waits a FIFTH of a second for this thread to join
 
 
-public class Image implements tools.Image {
-
-	private final int width;
-	private final int height;
+public class Image implements tools.Image
+{
 	private final double pxs;
 	private double[] data;
 	private int adv;
 	private boolean done;
 
-    public Image(int width, int height) {
-		this.width = width;
-		this.height = height;
-		this.pxs = 1./(double)(width*height);
-		this.data = new double[width*height*3];
+    public Image()
+	{
+		this.pxs = 1./(double)(Config.WIDTH*Config.HEIGHT);
+		this.data = new double[Config.WIDTH*Config.HEIGHT*3];
 		this.adv = 0;
 		this.done = false;
     }
@@ -54,10 +51,10 @@ public class Image implements tools.Image {
 
 		// multithreading pixel processing
 		StopWatch __Timing = new StopWatch();
-		Stream.iterate(0,y -> y<height,y -> y+1)
+		Stream.iterate(0,y -> y<Config.HEIGHT,y -> y+1)
 			.unordered()
 			.parallel()
-			.forEach(y -> Stream.iterate(0,x -> x<width,x -> x+1)
+			.forEach(y -> Stream.iterate(0,x -> x<Config.WIDTH,x -> x+1)
 					 .forEach(x -> {
 							 setPixel(x,y,sampler.getColor(vec2(x,y)));
 							 adv++;
@@ -77,32 +74,28 @@ public class Image implements tools.Image {
 		System.out.println("done.");
 	}
 
-    public void setPixel(int x, int y, Color color) {
+    public void setPixel(int x, int y, Color color)
+	{
 		int __PixelIndex = calculatePixelIndex(x,y);
 		data[__PixelIndex] = color.r();
 		data[__PixelIndex+1] = color.g();
 		data[__PixelIndex+2] = color.b();
     }
 
-    public Color getPixel(int x, int y) {
+    public Color getPixel(int x, int y)
+	{
 		int __PixelIndex = calculatePixelIndex(x,y);
 		return new Color(data[__PixelIndex],data[__PixelIndex+1],data[__PixelIndex+2]);
     }
 
-    public void writePng(String name) {
-		ImageWriter.writePng(name,data,width,height);
+    public void writePng(String name)
+	{
+		ImageWriter.writePng(name,data,Config.WIDTH,Config.HEIGHT);
     }
 
-    public void writeHdr(String name) {
-		ImageWriter.writeHdr(name,data,width,height);
-    }
-
-    public int width() {
-        return width;
-    }
-
-    public int height() {
-        return height;
+    public void writeHdr(String name)
+	{
+		ImageWriter.writeHdr(name,data,Config.WIDTH,Config.HEIGHT);
     }
 
 	public boolean done()
@@ -115,7 +108,8 @@ public class Image implements tools.Image {
 		return (int)((double)adv*pxs*100);
 	}
 
-	private int calculatePixelIndex(int x,int y) {
-		return (y*width+x)*3;
+	private int calculatePixelIndex(int x,int y)
+	{
+		return (y*Config.WIDTH+x)*3;
 	}
 }

@@ -6,6 +6,7 @@ package tools;
 
 import java.util.ArrayList;
 import static tools.Functions.*;
+import cgg.Config;
 import cgg.geom.Geometry;
 import cgg.a02.Ray;
 
@@ -263,8 +264,8 @@ public record BoundingBox(Vec3 min, Vec3 max) {
 	{
 		Vec3 origin = ray.origin();
         Vec3 direction = ray.direction();
-        double tMin = ray.near();
-        double tMax = ray.far();
+        double tMin = Config.NEAR;
+        double tMax = Config.FAR;
         if (this.equals(everything)) return true;
         if (this.contains(add(origin, multiply(direction, tMin)))) return true;
         if (this.contains(add(origin, multiply(direction, tMax)))) return true;

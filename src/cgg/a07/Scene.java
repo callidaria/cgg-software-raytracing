@@ -23,10 +23,10 @@ public class Scene implements Stage
 	// materials
 	private ImageTexture mat_marble;
 
-	public Scene(int width,int height)
+	public Scene()
 	{
 		// setup
-		this.camera = new Camera(vec3(0),60,vec3(0),width,height,1);
+		this.camera = new Camera(vec3(0),vec3(0));
 		this.groot = new GraphNode();
 		this.lights = new ArrayList<Illumination>();
 		this.emitter = new ArrayList<Geometry>();

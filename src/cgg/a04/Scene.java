@@ -21,14 +21,14 @@ public class Scene implements Stage
 	private ImageTexture mat_gold;
 	private ImageTexture mat_marble;
 
-	public Scene(int width,int height)
+	public Scene()
 	{
 		objects = new ArrayList<>();
 		emitter = new ArrayList<>();
 		lights = new ArrayList<>();
 
 		// projection
-		camera = new Camera(vec3(0,0,0),60.,width,height,1.5);
+		camera = new Camera(vec3(0,0,0));
 
 		// materials
 		this.mat_plastic = new ImageTexture("./res/plastic/material.png");

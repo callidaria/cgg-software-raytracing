@@ -9,18 +9,9 @@ public class Main
 {
 	public static void main(String[] args)
 	{
-		// setup frame
-		int width = 1500;
-		int height = 1500;
-
-		// generate scene
-		Scene scene = new Scene(width,height);
-
-		// samplers
-		Sampler rt = new StratifiedSampler(new RayTracer(scene),2);
-
-		// images
-		cgg.Image image = new cgg.Image(width,height);
+		Scene scene = new Scene();
+		Sampler rt = new StratifiedSampler(new RayTracer(scene));
+		cgg.Image image = new cgg.Image();
 		image.sample(rt);
 		image.writePng("a06-image");
 	}

@@ -137,7 +137,7 @@ public class RayTracer implements Sampler
 		// calculate reflective bouncing ray
 		Vec3 __OutBounce = bounce(ray.direction(),hit.normal());
 		__OutBounce = randomRoughness(__OutBounce,7);
-		Ray __Ray = new Ray(hit.position(),__OutBounce,0,10000);
+		Ray __Ray = new Ray(hit.position(),__OutBounce);
 
 		// receive colour source & combine
 		Hit __Hit = processScene(__Ray);
@@ -149,8 +149,8 @@ public class RayTracer implements Sampler
 	private Color shadeGlass(Ray ray,Hit hit)
 	{
 		// calculate glass ray deformation
-		Ray __RayThrough = new Ray(hit.position(),multiply(hit.normal(),-1),0,10000);
-		Ray __RayBounce = new Ray(hit.position(),randomRoughness(bounce(ray.direction(),hit.normal()),2),0,10000);
+		Ray __RayThrough = new Ray(hit.position(),multiply(hit.normal(),-1));
+		Ray __RayBounce = new Ray(hit.position(),randomRoughness(bounce(ray.direction(),hit.normal()),2));
 
 		// assemble material colour
 		double fresnel_mod = pow(angle(ray.direction(),hit.normal())/(Math.PI*.5),4);

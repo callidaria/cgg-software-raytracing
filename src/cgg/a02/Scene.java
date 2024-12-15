@@ -12,10 +12,10 @@ public class Scene
 	private ArrayList<Sphere> glass;
 	private Sphere reflector;
 
-	public Scene(int width,int height)
+	public Scene()
 	{
 		// camera setup
-		this.camera = new Camera(vec3(0,0,0),90,width,height,1.);
+		this.camera = new Camera(vec3(0));
 
 		// bland sphere setup
 		blands = new ArrayList<Sphere>();

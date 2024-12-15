@@ -23,27 +23,26 @@ public class RayTracer implements Sampler
 	// lookup
 	private final ImageTexture LUT_BRDF;
 	private final Vec2[][] SPECULAR_SETS;
-	private int spec_iteration = 0;
 
 	public RayTracer(Stage scene)
 	{
 		this.scene = scene;
 		this.LUT_BRDF = new ImageTexture("./res/lut/brdf.png");
-		this.SPECULAR_SETS = LUT.lookup().subsets(16);
+		this.SPECULAR_SETS = LUT.lookup().subsets_sequence(Config.SPECULAR_SAMPLES);
 	}
 
 	public Color getColor(Vec2 coord)
 	{
 		// compute geometry intersection
 		Ray __Ray = scene.camera().generateRay(coord);
-		Color __Result = _processScene(__Ray,0);
+		Color __Result = _processScene(__Ray,coord,0);
 
 		// colour correction
-		__Result = subtract(color(1.),exp(multiply(__Result,-scene.camera().exposure())));
-		return pow(__Result,1./2.2);
+		__Result = subtract(color(1.),exp(multiply(__Result,-Config.EXPOSURE)));
+		return pow(__Result,1./Config.GAMMA);
 	}
 
-	private Color _processScene(Ray ray,int depth)
+	private Color _processScene(Ray ray,Vec2 coord,int depth)
 	{
 		if (depth>2) return color(0,0,0);
 		Queue<HitTuple> __Hits = new LinkedList<>();
@@ -67,7 +66,7 @@ public class RayTracer implements Sampler
 		Hit __Recent = __Hits.peek().front();
 		return switch (__Recent.material())
 		{
-		case PhysicalMaterial c -> _shadePhysical(__Recent,ray,depth);
+		case PhysicalMaterial c -> _shadePhysical(__Recent,ray,coord,depth);
 		case SurfaceMaterial c -> _shadePhong(__Recent);
 		case SurfaceColour c -> _shadeLaemp(__Recent);
 		default -> error;
@@ -82,7 +81,7 @@ public class RayTracer implements Sampler
 		return add(ambient,diffuse);
 	}
 
-	private Color _shadePhysical(Hit hit,Ray ray,int depth)
+	private Color _shadePhysical(Hit hit,Ray ray,Vec2 coord,int depth)
 	{
 		// extract colour information
 		// colour preferredly to be a constant because the loader does not translate into sRGB colourspace
@@ -153,19 +152,18 @@ public class RayTracer implements Sampler
 		Color __LUT = LUT_BRDF.getColor(vec2(__Attitude,__Roughness));
 
 		// global diffuse component
-		final int SAMPLES = 16;
 		Vec3 __DGI = vec3(0,0,0);
-		for (int i=0;i<SAMPLES;i++)
+		for (int i=0;i<Config.DIFFUSE_SAMPLES;i++)
 		{
 			// hämis hämis hämisphere!
 			Vec3 __DiffSample = normalize(randomDirection());
 			__DiffSample = normalize(add(hit.normal(),__DiffSample));
 
 			// trace sample
-			Ray __DIR = new Ray(hit.position(),__DiffSample,.001,1000);
-			__DGI = add(__DGI,vec3(_processScene(__DIR,depth+1)));
+			Ray __DIR = new Ray(hit.position(),__DiffSample);
+			__DGI = add(__DGI,vec3(_processScene(__DIR,coord,depth+1)));
 		}
-		__DGI = multiply(divide(__DGI,SAMPLES),vec3(p_Colour));
+		__DGI = multiply(divide(__DGI,Config.DIFFUSE_SAMPLES),vec3(p_Colour));
 		__DGI = multiply(__DGI,subtract(vec3(1),__GIFresnel));
 		__DGI = multiply(__DGI,subtract(vec3(1),__Metallic));
 
@@ -177,14 +175,15 @@ public class RayTracer implements Sampler
 		Vec3 __GIResult = vec3(.0);
 		Vec3 __R = subtract(multiply(2*__Attitude,hit.normal()),__CameraDir);
 		double __SmpWeight = .0;  // don't forget this one, the goddamn paper forgets to declare this one!
-		for (int i=0;i<SPECULAR_SETS[spec_iteration].length;i++)
+		int smp_specular = (int)(coord.y()*Config.WIDTH+coord.x())%SPECULAR_SETS.length;
+		for (int i=0;i<Config.SPECULAR_SAMPLES;i++)
 		{
 			// fpd avoidance trickery (there is a book with this hack & its generally used)
 			// bitshifting in java is a different kind of adventure
 			// it seems like java offers us only "baby's first toybox bitshifting for beginners"
 			// there is no actual utility or even unsigneds
 			// because i'm sick and tired of this, this has been preprocessed in a c program and imported as lut
-			Vec2 __Hammersley = SPECULAR_SETS[spec_iteration][i];
+			Vec2 __Hammersley = SPECULAR_SETS[smp_specular][i];
 
 			// importance sample (your lobez quark! where is my oomox after implementing this huh?)
 			// the paper regenerates our aSq in two steps? we are just gonna reuse it, just aSqing questions!
@@ -202,8 +201,8 @@ public class RayTracer implements Sampler
 			Vec3 __PEnvLight = subtract(multiply(2*dot(__R,__IS),__IS),__R);
 			double __DEnvLight = clamp(dot(__R,__PEnvLight),.0,1.);
 			if (__DEnvLight<.0001) continue;
-			Ray __GIR = new Ray(hit.position(),__PEnvLight,.001,1000.);
-			__GIResult = add(__GIResult,multiply(vec3(_processScene(__GIR,depth+1)),__DEnvLight));
+			Ray __GIR = new Ray(hit.position(),__PEnvLight);
+			__GIResult = add(__GIResult,multiply(vec3(_processScene(__GIR,coord,depth+1)),__DEnvLight));
 			__SmpWeight += __DEnvLight;
 		}
 
@@ -212,11 +211,6 @@ public class RayTracer implements Sampler
 		__GI = multiply(__GI,add(multiply(__GIFresnel,__LUT.r()),__LUT.g()));
 		__GI = multiply(add(__GI,__DGI),__Cavity);
 		out = mix(out,color(__GI),.5);
-
-		// process specular iteration
-		spec_iteration++;
-		spec_iteration = spec_iteration%16;
-		// FIXME RACE CONDITION
 
 		return out;
 	}
@@ -272,7 +266,7 @@ public class RayTracer implements Sampler
 
 	private boolean _shadowCast(Hit hit,Vec3 ldir,double ldist)
 	{
-		Ray __ShadowRay = new Ray(hit.position(),ldir,.0001,ldist);
+		Ray __ShadowRay = new Ray(hit.position(),ldir);
 		return scene.groot().intersect(__ShadowRay).size()>0;
 	}
 

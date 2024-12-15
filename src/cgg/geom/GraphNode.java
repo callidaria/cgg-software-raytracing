@@ -63,8 +63,7 @@ public class GraphNode implements Geometry
 		// transform
 		Ray __Local = new Ray(
 				multiplyPoint(inv_transform,ray.origin()),
-				multiplyDirection(inv_transform,ray.direction()),
-				.0001,1000
+				multiplyDirection(inv_transform,ray.direction())
 			);
 
 		// check bounds
