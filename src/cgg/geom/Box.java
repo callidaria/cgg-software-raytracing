@@ -60,11 +60,6 @@ public class Box implements Geometry
 		return primitive_hit(new HitTuple(__Front,__Back));
 	}
 
-	public BoundingBox bounding_box()
-	{
-		return bounds;
-	}
-
 	private void _clipAxis(TValueTuple t,double bmin,double bmax,double origin,double direction)
 	{
 		double __DFac = 1/direction;  // FIXME: div by zero possible for cube .5 xy
@@ -92,4 +87,6 @@ public class Box implements Geometry
 		// finalize
 		return new Hit(t,__Position,__UV,__Normal,material);
 	}
+
+	public BoundingBox bounding_box() { return bounds; }
 }

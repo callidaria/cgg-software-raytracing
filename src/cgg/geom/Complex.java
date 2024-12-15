@@ -20,7 +20,9 @@ public class Complex implements Geometry
 		this.g0 = g0;
 		this.g1 = g1;
 		this.jop = jop;
-		this.bounds = BoundingBox.around(g0.bounding_box(),g1.bounding_box());
+		this.bounds = (g1!=null) ? BoundingBox.around(g0.bounding_box(),g1.bounding_box()) : g0.bounding_box();
+		// TODO bounding boxes of intersection and difference should not be same as union!
+		//		this can be sped up when correctly boxed in precalculation
 	}
 
 	public Queue<HitTuple> intersect(Ray ray)
@@ -36,11 +38,6 @@ public class Complex implements Geometry
 			case DIFFERENCE: return _difference(__Hits0,__Hits1);
 		}
 		return null;
-	}
-
-	public BoundingBox bounding_box()
-	{
-		return bounds;
 	}
 
 	private Queue<HitTuple> _union(Queue<HitTuple> h0,Queue<HitTuple> h1)
@@ -182,4 +179,6 @@ public class Complex implements Geometry
 		}
 		return __Final;
 	}
+
+	public BoundingBox bounding_box() { return bounds; }
 }

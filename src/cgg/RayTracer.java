@@ -1,6 +1,7 @@
 package cgg;
 
 import static java.lang.Math.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import static tools.Functions.*;
@@ -17,18 +18,16 @@ import cgg.a03.Scene;
 public class RayTracer implements Sampler
 {
 	private Stage scene;
-	private final Color background = color(0);
-	private final Color error = color(0,.9,1);
 
 	// lookup
 	private final ImageTexture LUT_BRDF;
-	private final Vec2[][] SPECULAR_SETS;
+	private final ArrayList<ArrayList<Vec2>> SPECULAR_SETS;
 
 	public RayTracer(Stage scene)
 	{
 		this.scene = scene;
 		this.LUT_BRDF = new ImageTexture("./res/lut/brdf.png");
-		this.SPECULAR_SETS = LUT.lookup().subsets_sequence(Config.SPECULAR_SAMPLES);
+		this.SPECULAR_SETS = LUT.lookup().subsets_raster(Config.SPECULAR_SAMPLES);
 	}
 
 	public Color getColor(Vec2 coord)
@@ -44,7 +43,7 @@ public class RayTracer implements Sampler
 
 	private Color _processScene(Ray ray,Vec2 coord,int depth)
 	{
-		if (depth>2) return color(0,0,0);
+		if (depth>Config.RECURSION_DEPTH) return color(0,0,0);
 		Queue<HitTuple> __Hits = new LinkedList<>();
 
 		// emitter
@@ -62,14 +61,14 @@ public class RayTracer implements Sampler
 		__Hits = (recentGeometry(__Hits,__Proc)) ? __Proc : __Hits;
 
 		// switch shading
-		if (__Hits.size()==0) return background;
+		if (__Hits.size()==0) return Config.CLEARCOLOUR;
 		Hit __Recent = __Hits.peek().front();
 		return switch (__Recent.material())
 		{
 		case PhysicalMaterial c -> _shadePhysical(__Recent,ray,coord,depth);
 		case SurfaceMaterial c -> _shadePhong(__Recent);
 		case SurfaceColour c -> _shadeLaemp(__Recent);
-		default -> error;
+		default -> Config.ERRORCOLOUR;
 		};
 	}
 
@@ -175,15 +174,15 @@ public class RayTracer implements Sampler
 		Vec3 __GIResult = vec3(.0);
 		Vec3 __R = subtract(multiply(2*__Attitude,hit.normal()),__CameraDir);
 		double __SmpWeight = .0;  // don't forget this one, the goddamn paper forgets to declare this one!
-		int smp_specular = (int)(coord.y()*Config.WIDTH+coord.x())%SPECULAR_SETS.length;
-		for (int i=0;i<Config.SPECULAR_SAMPLES;i++)
+		//int smp_specular = (int)(coord.y()*Config.WIDTH+coord.x())%SPECULAR_SETS.length;
+		for (Vec2 __Hammersley : LUT.map_subset(SPECULAR_SETS,coord,Config.SPECULAR_SAMPLES))
 		{
 			// fpd avoidance trickery (there is a book with this hack & its generally used)
 			// bitshifting in java is a different kind of adventure
 			// it seems like java offers us only "baby's first toybox bitshifting for beginners"
 			// there is no actual utility or even unsigneds
 			// because i'm sick and tired of this, this has been preprocessed in a c program and imported as lut
-			Vec2 __Hammersley = SPECULAR_SETS[smp_specular][i];
+			//Vec2 __Hammersley = SPECULAR_SETS[smp_specular][i];
 
 			// importance sample (your lobez quark! where is my oomox after implementing this huh?)
 			// the paper regenerates our aSq in two steps? we are just gonna reuse it, just aSqing questions!
@@ -275,18 +274,7 @@ public class RayTracer implements Sampler
 		return multiply(hit.material().getComponent(MaterialComponent.COLOUR,hit),.7);
 	}
 
-	private Color _shadePosition(Hit hit,double intent)
-	{
-		return color(multiply(hit.position(),intent));
-	}
-
-	private Color _shadeTexture(Hit hit)
-	{
-		return color(hit.uv().x(),hit.uv().y(),0);
-	}
-
-	private Color _shadeNormals(Hit hit)
-	{
-		return color(hit.normal());
-	}
+	private Color _shadePosition(Hit hit,double intent) { return color(multiply(hit.position(),intent)); }
+	private Color _shadeTexture(Hit hit) { return color(hit.uv().x(),hit.uv().y(),0); }
+	private Color _shadeNormals(Hit hit) { return color(hit.normal()); }
 }
