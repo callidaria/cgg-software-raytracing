@@ -17,31 +17,55 @@ public class Scene implements Stage
 	private ArrayList<Illumination> lights;
 	private ArrayList<Geometry> emitter;
 
+	// textures
+	private ImageTexture tex_checker;
+
 	// materials
 	private ImageTexture mat_fabric;
+	private ImageTexture mat_plastic;
+	private ImageTexture mat_gold;
+	private ImageTexture mat_marble;
+
+	// normal maps
+	private NormalMap nrm_plastic;
+	private NormalMap nrm_gold;
+	private NormalMap nrm_marble;
 
 	public Scene()
 	{
 		// setup
-		this.camera = new Camera(vec3(0,-1,0),vec3(20,0,0));
+		//this.camera = new Camera(vec3(0,-1,0),vec3(20,0,0));
+		this.camera = new Camera(vec3(0,-1,0),vec3(0,0,0));
 		this.groot = new GraphNode();
 		this.lights = new ArrayList<Illumination>();
 		this.emitter = new ArrayList<Geometry>();
 
+		// textures
+		this.tex_checker = new ImageTexture("./res/checker_neo.png");
+
 		// material
 		this.mat_fabric = new ImageTexture("./res/fabric/material.png");
+		this.mat_plastic = new ImageTexture("./res/plastic/material.png");
+		this.mat_gold = new ImageTexture("./res/gold/material.png");
+		this.mat_marble = new ImageTexture("./res/marble/material.png");
+
+		// normal maps
+		this.nrm_plastic = new NormalMap("./res/plastic/normals.png");
+		this.nrm_gold = new NormalMap("./res/gold/normals.png");
+		this.nrm_marble = new NormalMap("./res/marble/normals.png");
 
 		// geometry
-		//_testing();
-		_flooring(vec3(0,3,-50),100);
-		groot.register_geometry(_diceStack(vec3(0,2,-7)));
+		_testing();
+		_flooring(vec3(0,1,-50),100);
+		//groot.register_geometry(_diceStack(vec3(0,2,-7)));
 		//groot.register_geometry(_die(vec3(0,2,-7),color(.7,0,0),1,1,.2));
 
 		// assemble
 		groot.update_bounds();
 
 		// lighting
-		_craeveTheVorbiddenLaemp(vec3(0,-2,-10),color(1,1,1),.7);
+		_craeveTheVorbiddenLaemp(vec3(0,-2,-7),color(1,1,1),.4);
+		//_craeveTheVorbiddenLaemp(vec3(-2,-2,0),color(1,1,1),.4);
 	}
 
 	private Geometry _diceStack(Vec3 position)
@@ -89,9 +113,27 @@ public class Scene implements Stage
 		return __Node;
 	}
 
+	private void _testing()
+	{
+		GraphNode __Node = new GraphNode(vec3(0,0,-4),vec3(1),vec3(0));
+		__Node.register_geometry(new Sphere(vec3(-1,0,0),.5,
+							  new PhysicalMaterial(color(0,.05,0),mat_plastic,1),
+							  nrm_plastic));
+		__Node.register_geometry(new Sphere(vec3(0,0,-1),.5,
+							  new PhysicalMaterial(color(.75,.25,0),mat_gold,1),
+							  nrm_gold));
+		__Node.register_geometry(new Sphere(vec3(1,0,0),.5,
+							  new PhysicalMaterial(color(.75,0,0),mat_marble,1),
+							  nrm_marble));
+
+		// write
+		__Node.update_bounds();
+		groot.register_geometry(__Node);
+	}
+
 	private void _flooring(Vec3 position,int size)
 	{
-		groot.register_geometry(new Box(position,size,1,size,new PhysicalMaterial(color(0,.5,0),mat_fabric,4)));
+		groot.register_geometry(new Box(position,size,1,size,new PhysicalMaterial(tex_checker,mat_marble,30)));
 	}
 
 	private void _craeveTheVorbiddenLaemp(Vec3 position,Color colour,double intensity)
