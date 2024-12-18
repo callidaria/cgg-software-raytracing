@@ -21,12 +21,14 @@ public class RayTracer implements Sampler
 
 	// lookup
 	private final ImageTexture LUT_BRDF;
+	private final ArrayList<ArrayList<Vec2>> DIFFUSE_SETS;
 	private final ArrayList<ArrayList<Vec2>> SPECULAR_SETS;
 
 	public RayTracer(Stage scene)
 	{
 		this.scene = scene;
 		this.LUT_BRDF = new ImageTexture("./res/lut/brdf.png");
+		this.DIFFUSE_SETS = LUT.lookup().subsets_raster(Config.DIFFUSE_SAMPLES);
 		this.SPECULAR_SETS = LUT.lookup().subsets_raster(Config.SPECULAR_SAMPLES);
 	}
 
@@ -152,10 +154,15 @@ public class RayTracer implements Sampler
 
 		// global diffuse component
 		Vec3 __DGI = vec3(0,0,0);
-		for (int i=0;i<Config.DIFFUSE_SAMPLES;i++)
+		for (Vec2 __Hammersley : LUT.map_subset(DIFFUSE_SETS,coord,Config.DIFFUSE_SAMPLES))
 		{
 			// hämis hämis hämisphere!
-			Vec3 __DiffSample = normalize(randomDirection());
+			/*
+			double u = 2*PI*__Hammersley.x();
+			double v = sqrt(1-pow(__Hammersley.y(),2.));
+			Vec3 __DiffDirection = vec3(v*cos(u),__Hammersley.y(),v*sin(u));
+			*/
+			Vec3 __DiffSample = normalize(randomDirection()/*__DiffDirection*/);
 			__DiffSample = normalize(add(hit.normal(),__DiffSample));
 
 			// trace sample
@@ -181,7 +188,7 @@ public class RayTracer implements Sampler
 			// bitshifting in java is a different kind of adventure
 			// it seems like java offers us only "baby's first toybox bitshifting for beginners"
 			// there is no actual utility or even unsigneds
-			// because i'm sick and tired of this, this has been preprocessed in a c program and imported as lut
+			// because i'm sick and tired of this, this has been preprocessed in c and imported as lut
 			//Vec2 __Hammersley = SPECULAR_SETS[smp_specular][i];
 
 			// importance sample (your lobez quark! where is my oomox after implementing this huh?)
