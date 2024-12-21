@@ -59,3 +59,5 @@
 
 - [ ] lookup for log(x)/log(2)%2!=0 fault
 - [ ] background colour intensity is completely disproportional
+- [ ] ray tracer refactor
+- [ ] parallel diffuse preprocessing

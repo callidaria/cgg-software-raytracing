@@ -18,6 +18,7 @@ import cgg.a03.Scene;
 public class RayTracer implements Sampler
 {
 	private Stage scene;
+	private Vec3[] diffuse;
 
 	// lookup
 	private final ImageTexture LUT_BRDF;
@@ -27,9 +28,46 @@ public class RayTracer implements Sampler
 	public RayTracer(Stage scene)
 	{
 		this.scene = scene;
+
+		// lookup
 		this.LUT_BRDF = new ImageTexture("./res/lut/brdf.png");
 		this.DIFFUSE_SETS = LUT.lookup().subsets_raster(Config.DIFFUSE_SAMPLES);
 		this.SPECULAR_SETS = LUT.lookup().subsets_raster(Config.SPECULAR_SAMPLES);
+
+		// diffuse precalculation
+		System.out.print("pre-processing global diffuse... ");
+		int bsize = Config.WIDTH*Config.HEIGHT;
+		diffuse = new Vec3[bsize];
+		for (int i=0;i<bsize;i++)
+		{
+			// intersection
+			Vec2 __Coord = vec2(i%Config.WIDTH,(int)i/Config.WIDTH);
+			Ray __Ray = scene.camera().generateRay(__Coord);
+			Hit __Hit = _recentIntersection(__Ray,0);
+			if (__Hit==null)
+			{
+				diffuse[i] = vec3(0);
+				continue;
+			}
+
+			// material
+			Color p_Colour = __Hit.material().getComponent(MaterialComponent.COLOUR,__Hit);
+			Color p_Material = __Hit.material().getComponent(MaterialComponent.MATERIAL,__Hit);
+			double __Metallic = p_Material.r();
+			double __Roughness = p_Material.g();
+			Vec3 __CameraDir = normalize(multiply(__Ray.direction(),-1));
+			double __Attitude = max(dot(__Hit.normal(),__CameraDir),.0);
+			Vec3 __Fresnel0 = mix(vec3(.04,.04,.04),vec3(p_Colour),__Metallic);
+			Vec3 __GIFresnel = subtract(max(vec3(1.-__Roughness),__Fresnel0),__Fresnel0);
+			__GIFresnel = multiply(__GIFresnel,pow(clamp(1.-__Attitude,.0,1.),5.));
+			__GIFresnel = add(__Fresnel0,__GIFresnel);
+			// FIXME code duplications all over the place
+
+			// diffuse colour
+			diffuse[i] = _diffuseComponent(__Coord,0,__Hit,__GIFresnel,__Metallic);
+		}
+		System.out.println("done.");
+		// TODO parallel preprocessing
 	}
 
 	public Color getColor(Vec2 coord)
@@ -46,6 +84,19 @@ public class RayTracer implements Sampler
 	private Color _processScene(Ray ray,Vec2 coord,int depth)
 	{
 		if (depth>Config.RECURSION_DEPTH) return color(0,0,0);
+		Hit __Recent = _recentIntersection(ray,depth);
+		if (__Recent==null) return Config.CLEARCOLOUR;
+		return switch (__Recent.material())
+		{
+		case PhysicalMaterial c -> _shadePhysical(__Recent,ray,coord,depth);
+		case SurfaceMaterial c -> _shadePhong(__Recent);
+		case SurfaceColour c -> _shadeLaemp(__Recent);
+		default -> Config.ERRORCOLOUR;
+		};
+	}
+
+	private Hit _recentIntersection(Ray ray,int depth)
+	{
 		Queue<HitTuple> __Hits = new LinkedList<>();
 
 		// emitter
@@ -63,15 +114,8 @@ public class RayTracer implements Sampler
 		__Hits = (recentGeometry(__Hits,__Proc)) ? __Proc : __Hits;
 
 		// switch shading
-		if (__Hits.size()==0) return Config.CLEARCOLOUR;
-		Hit __Recent = __Hits.peek().front();
-		return switch (__Recent.material())
-		{
-		case PhysicalMaterial c -> _shadePhysical(__Recent,ray,coord,depth);
-		case SurfaceMaterial c -> _shadePhong(__Recent);
-		case SurfaceColour c -> _shadeLaemp(__Recent);
-		default -> Config.ERRORCOLOUR;
-		};
+		if (__Hits.size()==0) return null;
+		return __Hits.peek().front();
 	}
 
 	private Color _shade(Hit hit)
@@ -84,6 +128,9 @@ public class RayTracer implements Sampler
 
 	private Color _shadePhysical(Hit hit,Ray ray,Vec2 coord,int depth)
 	{
+		// §§test output
+		if (depth==0) return color(diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]);
+
 		// extract colour information
 		// colour preferredly to be a constant because the loader does not translate into sRGB colourspace
 		// FIXME or else albedo textures are utterly useless
@@ -153,6 +200,11 @@ public class RayTracer implements Sampler
 		Color __LUT = LUT_BRDF.getColor(vec2(__Attitude,__Roughness));
 
 		// global diffuse component
+		Vec3 __DGI = (depth==0)
+				? diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]
+				: _diffuseComponent(coord,depth,hit,__GIFresnel,__Metallic);
+		//Vec3 __DGI = _diffuseComponent(coord,depth,hit,__GIFresnel,__Metallic);
+		/*
 		Vec3 __DGI = vec3(0,0,0);
 		for (Vec2 __Hammersley : LUT.map_subset(DIFFUSE_SETS,coord,Config.DIFFUSE_SAMPLES))
 		{
@@ -162,7 +214,8 @@ public class RayTracer implements Sampler
 			double v = sqrt(1-pow(__Hammersley.y(),2.));
 			Vec3 __DiffDirection = vec3(v*cos(u),__Hammersley.y(),v*sin(u));
 			*/
-			Vec3 __DiffSample = normalize(randomDirection()/*__DiffDirection*/);
+		//Vec3 __DiffSample = normalize(randomDirection()/*__DiffDirection*/);
+			/*
 			__DiffSample = normalize(add(hit.normal(),__DiffSample));
 
 			// trace sample
@@ -172,6 +225,7 @@ public class RayTracer implements Sampler
 		__DGI = multiply(divide(__DGI,Config.DIFFUSE_SAMPLES),vec3(p_Colour));
 		__DGI = multiply(__DGI,subtract(vec3(1),__GIFresnel));
 		__DGI = multiply(__DGI,subtract(vec3(1),__Metallic));
+		*/
 
 		// specular component
 		// sampling from the environment
@@ -218,6 +272,32 @@ public class RayTracer implements Sampler
 		__GI = multiply(add(__GI,__DGI),__Cavity);
 		out = mix(out,color(__GI),.5);
 
+		return out;
+	}
+
+	private Vec3 _diffuseComponent(Vec2 coord,int depth,Hit hit,Vec3 fresnel,double metallic)
+	{
+		Color p_Colour = hit.material().getComponent(MaterialComponent.COLOUR,hit);
+		Vec3 out = vec3(0,0,0);
+		for (Vec2 __Hammersley : LUT.map_subset(DIFFUSE_SETS,coord,Config.DIFFUSE_SAMPLES))
+		{
+			// hämis hämis hämisphere!
+			/*
+			double u = 2*PI*__Hammersley.x();
+			double v = sqrt(1-pow(__Hammersley.y(),2.));
+			Vec3 __DiffDirection = vec3(v*cos(u),__Hammersley.y(),v*sin(u));
+			Vec3 __DiffSample = normalize(__DiffDirection);
+			*/
+			Vec3 __DiffSample = normalize(randomDirection());
+			__DiffSample = normalize(add(hit.normal(),__DiffSample));
+
+			// trace sample
+			Ray __DIR = new Ray(hit.position(),__DiffSample);
+			out = add(out,vec3(_processScene(__DIR,coord,depth+1)));
+		}
+		out = multiply(divide(out,Config.DIFFUSE_SAMPLES),vec3(p_Colour));
+		out = multiply(out,subtract(vec3(1),fresnel));
+		out = multiply(out,subtract(vec3(1),metallic));
 		return out;
 	}
 
