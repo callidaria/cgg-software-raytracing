@@ -26,5 +26,10 @@ public class Config
 	public static final int DIFFUSE_SAMPLES = 16;
 	public static final int SPECULAR_SAMPLES = 16;
 
+	// corrections
+	public static final int BF_DIAMETER = 2;
+	public static final double BF_SIGMA0 = 12.;
+	public static final double BF_SIGMA1 = 16.;
+
 	private Config() {  }
 }

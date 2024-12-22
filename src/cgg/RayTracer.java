@@ -37,6 +37,7 @@ public class RayTracer implements Sampler
 		// diffuse precalculation
 		System.out.print("pre-processing global diffuse... ");
 		int bsize = Config.WIDTH*Config.HEIGHT;
+		Vec3[] __Diffuse = new Vec3[bsize];
 		diffuse = new Vec3[bsize];
 		for (int i=0;i<bsize;i++)
 		{
@@ -46,7 +47,7 @@ public class RayTracer implements Sampler
 			Hit __Hit = _recentIntersection(__Ray,0);
 			if (__Hit==null)
 			{
-				diffuse[i] = vec3(0);
+				__Diffuse[i] = vec3(0);
 				continue;
 			}
 
@@ -64,10 +65,63 @@ public class RayTracer implements Sampler
 			// FIXME code duplications all over the place
 
 			// diffuse colour
-			diffuse[i] = _diffuseComponent(__Coord,0,__Hit,__GIFresnel,__Metallic);
+			__Diffuse[i] = _diffuseComponent(__Coord,0,__Hit,__GIFresnel,__Metallic);
 		}
 		System.out.println("done.");
 		// TODO parallel preprocessing
+
+		// diffuse map convolution through bilateral filtering
+		// java language specs guarantee 0 as initial value for each array element
+		System.out.print("filtering diffuse buffer... ");
+		diffuse = new Vec3[bsize];
+		for (int y=0;y<Config.HEIGHT;y++)
+		{
+			for (int x=0;x<Config.WIDTH;x++)
+			{
+				if (y<2||y>Config.HEIGHT-3||x<2||x>Config.WIDTH-3)
+				{
+					diffuse[y*Config.WIDTH+x] = vec3(0);
+					continue;
+				}
+
+				// bilateral pixel processing
+				Vec3 __Center = __Diffuse[y*Config.WIDTH+x];
+				Vec3 __Result = vec3(0);
+				double __Weight = 0;
+
+				for (int i=-Config.BF_DIAMETER;i<Config.BF_DIAMETER;i++)
+				{
+					for (int j=-Config.BF_DIAMETER;j<Config.BF_DIAMETER;j++)
+					{
+						// current sample
+						int __NX = x-i;
+						int __NY = y-j;
+						Vec3 __Sample = __Diffuse[__NY*Config.WIDTH+__NX];
+
+						// gauss procedere
+						/*
+						Vec3 __CSign = subtract(__Sample,__Center);
+						double __Gauss0 = exp(-(pow(__CSign.x(),2)+pow(__CSign.y(),2)+pow(__CSign.z(),2))
+											  /(2*Config.BF_SIGMA0));
+						double __Gauss1 = exp(-(pow(__NX-x,2)+pow(__NY-y,2))/(2*Config.BF_SIGMA1));
+						*/
+						// FIXME
+
+						// weight
+						//double __PixelWeight = __Gauss0*__Gauss1;
+						double __PixelWeight = 1.;
+						__Result = add(__Result,multiply(__Sample,__PixelWeight));
+						__Weight += __PixelWeight;
+					}
+				}
+
+				// weighing pixel result
+				diffuse[y*Config.WIDTH+x] = divide(__Result,__Weight);
+			}
+		}
+		// FIXME boundscheck for higher diameters
+		// FIXME breakdown into vertical & horizontal substeps for incredible performance benefits
+		System.out.println("done.");
 	}
 
 	public Color getColor(Vec2 coord)
