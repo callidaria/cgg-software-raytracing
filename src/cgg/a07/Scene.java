@@ -96,7 +96,7 @@ public class Scene implements Stage
 
 	private Geometry _diceStack(Vec3 position)
 	{
-		GraphNode out = new GraphNode(position,vec3(1),vec3(0));
+		GraphNode out = new GraphNode(add(position,multiply(randomDirection(),.15)),vec3(1),vec3(0));
 		for (int i=0;i<random()*6+1;i++)
 			out.register_geometry(_die(
 						vec3(0,-.5*i,0),  // ???
