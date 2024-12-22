@@ -16,6 +16,7 @@ public class Scene implements Stage
 	private GraphNode groot;
 	private ArrayList<Illumination> lights;
 	private ArrayList<Geometry> emitter;
+	private int dice_count;
 
 	// textures
 	private ImageTexture tex_checker;
@@ -35,7 +36,7 @@ public class Scene implements Stage
 	{
 		// setup
 		//this.camera = new Camera(vec3(0,-1,0),vec3(20,0,0));
-		this.camera = new Camera(vec3(0,-1,0),vec3(0,0,0));
+		this.camera = new Camera(vec3(0,-10,0),vec3(35,0,0));
 		this.groot = new GraphNode();
 		this.lights = new ArrayList<Illumination>();
 		this.emitter = new ArrayList<Geometry>();
@@ -55,28 +56,53 @@ public class Scene implements Stage
 		this.nrm_marble = new NormalMap("./res/marble/normals.png");
 
 		// geometry
-		_testing();
+		//_testing();
+		this.dice_count = 0;
 		_flooring(vec3(0,1,-50),100);
-		//groot.register_geometry(_diceStack(vec3(0,2,-7)));
-		//groot.register_geometry(_die(vec3(0,2,-7),color(.7,0,0),1,1,.2));
+		//groot.register_geometry(_diceStack(vec3(0,0,-10)));
+		GraphNode midline = new GraphNode();
+		for (int z=0;z>-100;z-=10) midline.register_geometry(_diceGroup(vec3(0,0,z)));
+		midline.update_bounds();
+		GraphNode leftline = new GraphNode();
+		for (int z=0;z>-100;z-=10) leftline.register_geometry(_diceGroup(vec3(-10,0,z)));
+		leftline.update_bounds();
+		GraphNode rightline = new GraphNode();
+		for (int z=0;z>-100;z-=10) rightline.register_geometry(_diceGroup(vec3(10,0,z)));
+		rightline.update_bounds();
+		System.out.println(dice_count);
 
 		// assemble
+		groot.register_geometry(midline);
+		groot.register_geometry(leftline);
+		groot.register_geometry(rightline);
 		groot.update_bounds();
 
 		// lighting
-		_craeveTheVorbiddenLaemp(vec3(0,-2,-7),color(1,1,1),.4);
+		_craeveTheVorbiddenLaemp(vec3(0,-4,-7),color(1,1,1),.4);
 		//_craeveTheVorbiddenLaemp(vec3(-2,-2,0),color(1,1,1),.4);
+	}
+
+	private Geometry _diceGroup(Vec3 chunk)
+	{
+		GraphNode out = new GraphNode(chunk,vec3(1),vec3(0));
+		for (int x=-5;x<5;x++)
+		{
+			for (int z=0;z>-10;z--)
+				out.register_geometry(_diceStack(vec3(x,0,z)));
+		}
+		out.update_bounds();
+		return out;
 	}
 
 	private Geometry _diceStack(Vec3 position)
 	{
 		GraphNode out = new GraphNode(position,vec3(1),vec3(0));
-		for (int i=0;i<random()*4;i++)
+		for (int i=0;i<random()*6+1;i++)
 			out.register_geometry(_die(
-						vec3(0,i*-1,0),
+						vec3(0,-.5*i,0),  // ???
 						vec3(0,20*random(),0),
 						randomHue(),
-						1,
+						.5,
 						random(),
 						random()
 				));
@@ -94,13 +120,14 @@ public class Scene implements Stage
 		Complex __Die = new Complex(corpus,rounding,JoinOperation.INTERSECTION);
 
 		// number cutouts
+		double cs = size*.1;
 		PhysicalMaterial __Cutouts = new PhysicalMaterial(color(.0,.05,.0),color(0,.7,1));
-		Sphere one0 = new Sphere(add(pos,vec3(.0,-.5,.0)),.1,__Cutouts);
-		Sphere two0 = new Sphere(add(pos,vec3(-.5,.25,.25)),.1,__Cutouts);
-		Sphere two1 = new Sphere(add(pos,vec3(-.5,-.2,-.2)),.1,__Cutouts);
-		Sphere three0 = new Sphere(add(pos,vec3(0,0,.5)),.1,__Cutouts);
-		Sphere three1 = new Sphere(add(pos,vec3(.25,-.25,.5)),.1,__Cutouts);
-		Sphere three2 = new Sphere(add(pos,vec3(-.25,.25,.5)),.1,__Cutouts);
+		Sphere one0 = new Sphere(add(pos,multiply(vec3(.0,-.5,.0),size)),cs,__Cutouts);
+		Sphere two0 = new Sphere(add(pos,multiply(vec3(-.5,.25,.25),size)),cs,__Cutouts);
+		Sphere two1 = new Sphere(add(pos,multiply(vec3(-.5,-.2,-.2),size)),cs,__Cutouts);
+		Sphere three0 = new Sphere(add(pos,multiply(vec3(0,0,.5),size)),cs,__Cutouts);
+		Sphere three1 = new Sphere(add(pos,multiply(vec3(.25,-.25,.5),size)),cs,__Cutouts);
+		Sphere three2 = new Sphere(add(pos,multiply(vec3(-.25,.25,.5),size)),cs,__Cutouts);
 		Complex numbers = new Complex(one0,two0,JoinOperation.UNION);
 		numbers = new Complex(numbers,two1,JoinOperation.UNION);
 		numbers = new Complex(numbers,three0,JoinOperation.UNION);
@@ -110,6 +137,7 @@ public class Scene implements Stage
 		GraphNode __Node = new GraphNode(vec3(0),vec3(1),rotation);
 		__Node.register_geometry(__Die);
 		__Node.update_bounds();
+		dice_count++;
 		return __Node;
 	}
 

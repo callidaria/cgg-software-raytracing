@@ -36,6 +36,7 @@ public class RayTracer implements Sampler
 
 		// diffuse precalculation
 		System.out.print("pre-processing global diffuse... ");
+		/*
 		int bsize = Config.WIDTH*Config.HEIGHT;
 		Vec3[] __Diffuse = new Vec3[bsize];
 		diffuse = new Vec3[bsize];
@@ -66,14 +67,16 @@ public class RayTracer implements Sampler
 
 			// diffuse colour
 			__Diffuse[i] = _diffuseComponent(__Coord,0,__Hit,__GIFresnel,__Metallic);
+			diffuse[i] = __Diffuse[i];
 		}
+		*/
 		System.out.println("done.");
 		// TODO parallel preprocessing
 
 		// diffuse map convolution through bilateral filtering
 		// java language specs guarantee 0 as initial value for each array element
 		System.out.print("filtering diffuse buffer... ");
-		diffuse = new Vec3[bsize];
+		/*
 		for (int y=0;y<Config.HEIGHT;y++)
 		{
 			for (int x=0;x<Config.WIDTH;x++)
@@ -83,6 +86,7 @@ public class RayTracer implements Sampler
 					diffuse[y*Config.WIDTH+x] = vec3(0);
 					continue;
 				}
+				// FIXME write pixel partly when diameter reaches out of bounds
 
 				// bilateral pixel processing
 				Vec3 __Center = __Diffuse[y*Config.WIDTH+x];
@@ -99,26 +103,29 @@ public class RayTracer implements Sampler
 						Vec3 __Sample = __Diffuse[__NY*Config.WIDTH+__NX];
 
 						// gauss procedere
-						/*
 						Vec3 __CSign = subtract(__Sample,__Center);
+						double __Gauss = exp((-pow(__NX-x,2)+pow(__NY-y,2))/(2*pow(Config.BF_SIGMA1,2)));
+						__Gauss *= exp((-pow(__CSign.x(),2)+pow(__CSign.y(),2)+pow(__CSign.z(),2))
+									   /(2*pow(Config.BF_SIGMA0,2)));
+						/*
 						double __Gauss0 = exp(-(pow(__CSign.x(),2)+pow(__CSign.y(),2)+pow(__CSign.z(),2))
 											  /(2*Config.BF_SIGMA0));
 						double __Gauss1 = exp(-(pow(__NX-x,2)+pow(__NY-y,2))/(2*Config.BF_SIGMA1));
-						*/
+		*//*
 						// FIXME
 
 						// weight
 						//double __PixelWeight = __Gauss0*__Gauss1;
-						double __PixelWeight = 1.;
-						__Result = add(__Result,multiply(__Sample,__PixelWeight));
-						__Weight += __PixelWeight;
+						__Result = add(__Result,multiply(__Sample,__Gauss));
+						__Weight += __Gauss;
 					}
 				}
 
 				// weighing pixel result
-				diffuse[y*Config.WIDTH+x] = divide(__Result,__Weight);
+				diffuse[y*Config.WIDTH+x] = divide(__Result,__Weight+.0001);
 			}
 		}
+		  */
 		// FIXME boundscheck for higher diameters
 		// FIXME breakdown into vertical & horizontal substeps for incredible performance benefits
 		System.out.println("done.");
@@ -183,7 +190,7 @@ public class RayTracer implements Sampler
 	private Color _shadePhysical(Hit hit,Ray ray,Vec2 coord,int depth)
 	{
 		// §§test output
-		if (depth==0) return color(diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]);
+		//if (depth==0) return color(diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]);
 
 		// extract colour information
 		// colour preferredly to be a constant because the loader does not translate into sRGB colourspace
@@ -254,32 +261,12 @@ public class RayTracer implements Sampler
 		Color __LUT = LUT_BRDF.getColor(vec2(__Attitude,__Roughness));
 
 		// global diffuse component
+		/*
 		Vec3 __DGI = (depth==0)
 				? diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]
 				: _diffuseComponent(coord,depth,hit,__GIFresnel,__Metallic);
-		//Vec3 __DGI = _diffuseComponent(coord,depth,hit,__GIFresnel,__Metallic);
-		/*
-		Vec3 __DGI = vec3(0,0,0);
-		for (Vec2 __Hammersley : LUT.map_subset(DIFFUSE_SETS,coord,Config.DIFFUSE_SAMPLES))
-		{
-			// hämis hämis hämisphere!
-			/*
-			double u = 2*PI*__Hammersley.x();
-			double v = sqrt(1-pow(__Hammersley.y(),2.));
-			Vec3 __DiffDirection = vec3(v*cos(u),__Hammersley.y(),v*sin(u));
-			*/
-		//Vec3 __DiffSample = normalize(randomDirection()/*__DiffDirection*/);
-			/*
-			__DiffSample = normalize(add(hit.normal(),__DiffSample));
-
-			// trace sample
-			Ray __DIR = new Ray(hit.position(),__DiffSample);
-			__DGI = add(__DGI,vec3(_processScene(__DIR,coord,depth+1)));
-		}
-		__DGI = multiply(divide(__DGI,Config.DIFFUSE_SAMPLES),vec3(p_Colour));
-		__DGI = multiply(__DGI,subtract(vec3(1),__GIFresnel));
-		__DGI = multiply(__DGI,subtract(vec3(1),__Metallic));
 		*/
+		Vec3 __DGI = _diffuseComponent(coord,depth,hit,__GIFresnel,__Metallic);
 
 		// specular component
 		// sampling from the environment
