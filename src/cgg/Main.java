@@ -1,19 +1,18 @@
-package cgg.a07;
+package cgg;
 
 import static tools.Functions.*;
 import tools.*;
-import cgg.*;
+import cgg.scne.*;
 
 
 public class Main
 {
 	public static void main(String[] args)
 	{
-		// setup
-		Scene scene = new Scene();
+		Scene scene = new TestingScene();
 		Sampler rt = new HaltonSampler(new RayTracer(scene));
-		cgg.Image image = new cgg.Image();
+		Image image = new Image();
 		image.sample(rt);
-		image.writePng("a07-image");
+		image.writePng("a08-image");
 	}
 }

@@ -10,14 +10,14 @@ import static cgg.Math.*;
 import cgg.geom.*;
 import cgg.lght.*;
 import cgg.mtrl.*;
+import cgg.scne.*;
 import cgg.a02.Ray;
 import cgg.a02.Hit;
-import cgg.a03.Scene;
 
 
 public class RayTracer implements Sampler
 {
-	private Stage scene;
+	private Scene scene;
 	private Vec3[] diffuse;
 
 	// lookup
@@ -25,7 +25,7 @@ public class RayTracer implements Sampler
 	private final ArrayList<ArrayList<Vec2>> DIFFUSE_SETS;
 	private final ArrayList<ArrayList<Vec2>> SPECULAR_SETS;
 
-	public RayTracer(Stage scene)
+	public RayTracer(Scene scene)
 	{
 		this.scene = scene;
 
@@ -44,7 +44,7 @@ public class RayTracer implements Sampler
 		{
 			// intersection
 			Vec2 __Coord = vec2(i%Config.WIDTH,(int)i/Config.WIDTH);
-			Ray __Ray = scene.camera().generateRay(__Coord);
+			Ray __Ray = scene.camera.generateRay(__Coord);
 			Hit __Hit = _recentIntersection(__Ray,0);
 			if (__Hit==null)
 			{
@@ -134,7 +134,7 @@ public class RayTracer implements Sampler
 	public Color getColor(Vec2 coord)
 	{
 		// compute geometry intersection
-		Ray __Ray = scene.camera().generateRay(coord);
+		Ray __Ray = scene.camera.generateRay(coord);
 		Color __Result = _processScene(__Ray,coord,0);
 
 		// colour correction
@@ -163,7 +163,7 @@ public class RayTracer implements Sampler
 		// emitter
 		if (depth<1)
 		{
-			for (Geometry g : scene.emitter())
+			for (Geometry g : scene.emitter)
 			{
 				Queue<HitTuple> __Proc = g.intersect(ray);
 				__Hits = (recentGeometry(__Hits,__Proc)) ? __Proc : __Hits;
@@ -171,7 +171,7 @@ public class RayTracer implements Sampler
 		}
 
 		// opaque geometry
-		Queue<HitTuple> __Proc = scene.groot().intersect(ray);
+		Queue<HitTuple> __Proc = scene.groot.intersect(ray);
 		__Hits = (recentGeometry(__Hits,__Proc)) ? __Proc : __Hits;
 
 		// switch shading
@@ -205,7 +205,7 @@ public class RayTracer implements Sampler
 
 		// precalculations
 		double aSq = pow(__Roughness,4.);
-		Vec3 __CameraDir = /*normalize(subtract(/*scene.camera().position()ray.d,hit.position()));*/
+		Vec3 __CameraDir = /*normalize(subtract(/*scene.camera.position()ray.d,hit.position()));*/
 			normalize(multiply(ray.direction(),-1));
 		Vec3 __Fresnel0 = mix(vec3(.04,.04,.04),vec3(p_Colour),__Metallic);
 		double __dtLightOut = max(dot(hit.normal(),__CameraDir),.0);
@@ -213,7 +213,7 @@ public class RayTracer implements Sampler
 
 		// direct lighting
 		Vec3 __Result = vec3(0,0,0);
-		for (Illumination p_Light : scene.lights())
+		for (Illumination p_Light : scene.lights)
 		{
 			// shadow checking
 			Vec3 __LightDir = p_Light.direction(hit.position());
@@ -355,15 +355,15 @@ public class RayTracer implements Sampler
 
 		// ambient component
 		Color __Ambient = color(0,0,0);
-		for (Illumination p_Light : scene.lights())
+		for (Illumination p_Light : scene.lights)
 		{
 			Color __LightIntensity = p_Light.intensity(hit.position());
 			__Ambient = multiply(p_Colour,multiply(__LightIntensity,.7));
 		}
-		__Ambient = divide(__Ambient,scene.lights().size());
+		__Ambient = divide(__Ambient,scene.lights.size());
 
 		Color __Result = color(0,0,0);
-		for (Illumination p_Light : scene.lights())
+		for (Illumination p_Light : scene.lights)
 		{
 			// precalculations
 			Color __LightIntensity = p_Light.intensity(hit.position());
@@ -383,7 +383,7 @@ public class RayTracer implements Sampler
 			{
 				Vec3 r = subtract(multiply(hit.normal(),2*dot(__LightDirection,hit.normal())),__LightDirection);
 				r = normalize(r);
-				Vec3 v = normalize(subtract(scene.camera().position(),hit.position()));
+				Vec3 v = normalize(subtract(scene.camera.position(),hit.position()));
 				Color __Specular = multiply(.2,multiply(__LightIntensity,pow(max(dot(r,v),0),50)));
 				__Result = add(__Result,__Specular);
 			}
@@ -394,7 +394,7 @@ public class RayTracer implements Sampler
 	private boolean _shadowCast(Hit hit,Vec3 ldir,double ldist)
 	{
 		Ray __ShadowRay = new Ray(hit.position(),ldir);
-		return scene.groot().intersect(__ShadowRay).size()>0;
+		return scene.groot.intersect(__ShadowRay).size()>0;
 	}
 
 	private Color _shadeLaemp(Hit hit)
