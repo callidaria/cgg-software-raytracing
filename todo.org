@@ -32,11 +32,8 @@
 
 * quality.
 
-- [X] refactor scene graph creation
 - [ ] denoising
 - [ ] depth of field
-- [X] easy configuration by filechange
-- [X] supersampling pseudorandom pattern
 - [ ] automatic camera exposure
 - [ ] tone mapping
 
@@ -44,15 +41,16 @@
 * dictate.
 
 - [ ] fixing glass
-- [ ] bounding boxes optimization
 - [ ] meshes
 - [ ] animations
+- [ ] video
 - [ ] planes
 
 
 * performance
 
 - [ ] csg: treat difference & intersection differently to unions when creating bounds
+- [ ] debug bounds by creating visual representations
 
 
 * fixes.
