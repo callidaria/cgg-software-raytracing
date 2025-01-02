@@ -179,14 +179,6 @@ public class RayTracer implements Sampler
 		return __Hits.peek().front();
 	}
 
-	private Color _shade(Hit hit)
-	{
-		Vec3 lightDir = normalize(vec3(1,-1,.7));
-		Color ambient = multiply(.05,hit.colour());
-		Color diffuse = multiply(.9*max(0,dot(lightDir,hit.normal())),hit.colour());
-		return add(ambient,diffuse);
-	}
-
 	private Color _shadePhysical(Hit hit,Ray ray,Vec2 coord,int depth)
 	{
 		// §§test output

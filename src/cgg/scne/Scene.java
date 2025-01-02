@@ -20,9 +20,26 @@ public abstract class Scene
 	public ArrayList<Illumination> lights;
 	public ArrayList<Geometry> emitter;
 
+	protected Scene()
+	{
+		this.camera = new Camera();
+		_init();
+	}
+
+	protected Scene(Vec3 position)
+	{
+		this.camera = new Camera(position);
+		_init();
+	}
+
 	protected Scene(Vec3 position,Vec3 rotation)
 	{
 		this.camera = new Camera(position,rotation);
+		_init();
+	}
+
+	private void _init()
+	{
 		this.groot = new GraphNode();
 		this.lights = new ArrayList<Illumination>();
 		this.emitter = new ArrayList<Geometry>();

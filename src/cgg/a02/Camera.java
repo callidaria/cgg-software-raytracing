@@ -13,6 +13,12 @@ public class Camera
 	private double hwidth;
 	private double hheight;
 
+	public Camera()
+	{
+		_init(vec3(0,0,0));
+		this.rotation = identity();
+	}
+
 	public Camera(Vec3 position)
 	{
 		_init(position);
