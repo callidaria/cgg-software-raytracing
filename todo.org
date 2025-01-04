@@ -1,12 +1,12 @@
 * math.
 
-- [ ] panorama camera  (WIP)
-- [ ] preview panorama camera  (WIP)
+- [ ] panorama camera  (WIP)  (?retired)
+- [ ] preview panorama camera  (WIP)  (?retired)
 
 
 * geometry.
 
-- [ ] cylinders  (after transformations)
+- [ ] cylinders  (after transformations)  (WIP)
 - [ ] cones  (after transformations)
 - [ ] NURBS
 - [ ] subdivision surfaces
@@ -27,12 +27,12 @@
 - [ ] anisotropic reflection
 - [ ] sheen effect
 - [ ] specular as described in dp
-- [ ] normal mapping
+- [ ] normal mapping  (WIP)
 
 
 * quality.
 
-- [ ] denoising
+- [ ] denoising  (WIP)
 - [ ] depth of field
 - [ ] automatic camera exposure
 - [ ] tone mapping
@@ -47,7 +47,7 @@
 - [ ] planes
 
 
-* performance
+* performance.
 
 - [ ] csg: treat difference & intersection differently to unions when creating bounds
 - [ ] debug bounds by creating visual representations
@@ -59,3 +59,4 @@
 - [ ] background colour intensity is completely disproportional
 - [ ] ray tracer refactor
 - [ ] parallel diffuse preprocessing
+- [ ] hollow geometry, to allow for camera to spawn inside of complex structures

@@ -9,7 +9,7 @@ public class Main
 {
 	public static void main(String[] args)
 	{
-		Scene scene = new AnimalFarm();
+		Scene scene = new TestingScene();
 		Sampler rt = new HaltonSampler(new RayTracer(scene));
 		Image image = new Image();
 		image.sample(rt);

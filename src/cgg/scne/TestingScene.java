@@ -33,12 +33,14 @@ public class TestingScene extends Scene
 		groot.register_geometry(__TestingSpheres);
 
 		// lighting
-		//craeveTheVorbiddenLaemp(vec3(0,-1.5,-7),color(1,1,1),.4);
+		craeveTheVorbiddenLaemp(vec3(0,-1.5,-7),color(1,1,1),.4);
+		/*
 		craeveTheVorbiddenLaemp(vec3(1.25,-1,-4),color(1,.5,0),.7);
 		craeveTheVorbiddenLaemp(vec3(1.25,-2,-1),color(0,.5,1),1);
 		craeveTheVorbiddenLaemp(vec3(1.5,.75,-1),color(.7,.7,.7),.4);
 		craeveTheVorbiddenLaemp(vec3(2.5,.75,-5.4),color(.7,.7,.7),.4);
 		craeveTheVorbiddenLaemp(vec3(-1.7,-2.15,-7),color(1,1,1),.2);
+		*/
 
 		groot.update_bounds();
 	}

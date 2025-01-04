@@ -22,8 +22,10 @@ public class RayTracer implements Sampler
 
 	// lookup
 	private final ImageTexture LUT_BRDF;
+	/*
 	private final ArrayList<ArrayList<Vec2>> DIFFUSE_SETS;
 	private final ArrayList<ArrayList<Vec2>> SPECULAR_SETS;
+	*/
 
 	public RayTracer(Scene scene)
 	{
@@ -31,12 +33,13 @@ public class RayTracer implements Sampler
 
 		// lookup
 		this.LUT_BRDF = new ImageTexture("./res/lut/brdf.png");
+		/*
 		this.DIFFUSE_SETS = LUT.lookup().subsets_raster(Config.DIFFUSE_SAMPLES);
 		this.SPECULAR_SETS = LUT.lookup().subsets_raster(Config.SPECULAR_SAMPLES);
+		*/
 
 		// diffuse precalculation
 		System.out.print("pre-processing global diffuse... ");
-		/*
 		int bsize = Config.WIDTH*Config.HEIGHT;
 		Vec3[] __Diffuse = new Vec3[bsize];
 		diffuse = new Vec3[bsize];
@@ -67,29 +70,27 @@ public class RayTracer implements Sampler
 
 			// diffuse colour
 			__Diffuse[i] = _diffuseComponent(__Coord,0,__Hit,__GIFresnel,__Metallic);
-			diffuse[i] = __Diffuse[i];
 		}
-		*/
 		System.out.println("done.");
 		// TODO parallel preprocessing
 
 		// diffuse map convolution through bilateral filtering
 		// java language specs guarantee 0 as initial value for each array element
 		System.out.print("filtering diffuse buffer... ");
-		/*
 		for (int y=0;y<Config.HEIGHT;y++)
 		{
 			for (int x=0;x<Config.WIDTH;x++)
 			{
+				int rlin = y*Config.WIDTH+x;
 				if (y<2||y>Config.HEIGHT-3||x<2||x>Config.WIDTH-3)
 				{
-					diffuse[y*Config.WIDTH+x] = vec3(0);
+					diffuse[rlin] = __Diffuse[rlin];
 					continue;
 				}
 				// FIXME write pixel partly when diameter reaches out of bounds
 
 				// bilateral pixel processing
-				Vec3 __Center = __Diffuse[y*Config.WIDTH+x];
+				Vec3 __Center = __Diffuse[rlin];
 				Vec3 __Result = vec3(0);
 				double __Weight = 0;
 
@@ -111,7 +112,7 @@ public class RayTracer implements Sampler
 						double __Gauss0 = exp(-(pow(__CSign.x(),2)+pow(__CSign.y(),2)+pow(__CSign.z(),2))
 											  /(2*Config.BF_SIGMA0));
 						double __Gauss1 = exp(-(pow(__NX-x,2)+pow(__NY-y,2))/(2*Config.BF_SIGMA1));
-		*//*
+						*/
 						// FIXME
 
 						// weight
@@ -125,7 +126,6 @@ public class RayTracer implements Sampler
 				diffuse[y*Config.WIDTH+x] = divide(__Result,__Weight+.0001);
 			}
 		}
-		  */
 		// FIXME boundscheck for higher diameters
 		// FIXME breakdown into vertical & horizontal substeps for incredible performance benefits
 		System.out.println("done.");
@@ -182,7 +182,7 @@ public class RayTracer implements Sampler
 	private Color _shadePhysical(Hit hit,Ray ray,Vec2 coord,int depth)
 	{
 		// §§test output
-		//if (depth==0) return color(diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]);
+		if (depth==0) return color(diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]);
 
 		// extract colour information
 		// colour preferredly to be a constant because the loader does not translate into sRGB colourspace
@@ -253,12 +253,10 @@ public class RayTracer implements Sampler
 		Color __LUT = LUT_BRDF.getColor(vec2(__Attitude,__Roughness));
 
 		// global diffuse component
-		/*
 		Vec3 __DGI = (depth==0)
 				? diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]
 				: _diffuseComponent(coord,depth,hit,__GIFresnel,__Metallic);
-		*/
-		Vec3 __DGI = _diffuseComponent(coord,depth,hit,__GIFresnel,__Metallic);
+		//Vec3 __DGI = _diffuseComponent(coord,depth,hit,__GIFresnel,__Metallic);
 
 		// specular component
 		// sampling from the environment
@@ -268,15 +266,15 @@ public class RayTracer implements Sampler
 		Vec3 __GIResult = vec3(.0);
 		Vec3 __R = subtract(multiply(2*__Attitude,hit.normal()),__CameraDir);
 		double __SmpWeight = .0;  // don't forget this one, the goddamn paper forgets to declare this one!
-		//int smp_specular = (int)(coord.y()*Config.WIDTH+coord.x())%SPECULAR_SETS.length;
-		for (Vec2 __Hammersley : LUT.map_subset(SPECULAR_SETS,coord,Config.SPECULAR_SAMPLES))
+		//for (Vec2 __Hammersley : LUT.map_subset(SPECULAR_SETS,coord,Config.SPECULAR_SAMPLES))
+		for (int i=0;i<LUT.lookup().lookup_static_range();i++)
 		{
 			// fpd avoidance trickery (there is a book with this hack & its generally used)
 			// bitshifting in java is a different kind of adventure
 			// it seems like java offers us only "baby's first toybox bitshifting for beginners"
 			// there is no actual utility or even unsigneds
 			// because i'm sick and tired of this, this has been preprocessed in c and imported as lut
-			//Vec2 __Hammersley = SPECULAR_SETS[smp_specular][i];
+			Vec2 __Hammersley = LUT.lookup().lookup_static(i);
 
 			// importance sample (your lobez quark! where is my oomox after implementing this huh?)
 			// the paper regenerates our aSq in two steps? we are just gonna reuse it, just aSqing questions!
@@ -312,8 +310,11 @@ public class RayTracer implements Sampler
 	{
 		Color p_Colour = hit.material().getComponent(MaterialComponent.COLOUR,hit);
 		Vec3 out = vec3(0,0,0);
-		for (Vec2 __Hammersley : LUT.map_subset(DIFFUSE_SETS,coord,Config.DIFFUSE_SAMPLES))
+		//for (Vec2 __Hammersley : LUT.map_subset(DIFFUSE_SETS,coord,Config.DIFFUSE_SAMPLES))
+		for (int i=0;i<LUT.lookup().lookup_static_range();i++)
 		{
+			Vec2 __Hammersley = LUT.lookup().lookup_static(i);
+
 			// hämis hämis hämisphere!
 			/*
 			double u = 2*PI*__Hammersley.x();
