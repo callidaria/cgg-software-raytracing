@@ -4,6 +4,7 @@ import static java.lang.Math.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.stream.Stream;
 import static tools.Functions.*;
 import tools.*;
 import static cgg.Math.*;
@@ -39,61 +40,51 @@ public class RayTracer implements Sampler
 		*/
 
 		// diffuse precalculation
-		System.out.print("pre-processing global diffuse... ");
+		System.out.println("pre-processing global diffuse...");
 		int bsize = Config.WIDTH*Config.HEIGHT;
 		Vec3[] __Diffuse = new Vec3[bsize];
-		diffuse = new Vec3[bsize];
-		for (int i=0;i<bsize;i++)
-		{
-			// intersection
-			Vec2 __Coord = vec2(i%Config.WIDTH,(int)i/Config.WIDTH);
-			Ray __Ray = scene.camera.generateRay(__Coord);
-			Hit __Hit = _recentIntersection(__Ray,0);
-			if (__Hit==null)
-			{
-				__Diffuse[i] = vec3(0);
-				continue;
-			}
-
-			// material
-			Color p_Colour = __Hit.material().getComponent(MaterialComponent.COLOUR,__Hit);
-			Color p_Material = __Hit.material().getComponent(MaterialComponent.MATERIAL,__Hit);
-			double __Metallic = p_Material.r();
-			double __Roughness = p_Material.g();
-			Vec3 __CameraDir = normalize(multiply(__Ray.direction(),-1));
-			double __Attitude = max(dot(__Hit.normal(),__CameraDir),.0);
-			Vec3 __Fresnel0 = mix(vec3(.04,.04,.04),vec3(p_Colour),__Metallic);
-			Vec3 __GIFresnel = subtract(max(vec3(1.-__Roughness),__Fresnel0),__Fresnel0);
-			__GIFresnel = multiply(__GIFresnel,pow(clamp(1.-__Attitude,.0,1.),5.));
-			__GIFresnel = add(__Fresnel0,__GIFresnel);
-			// FIXME code duplications all over the place
-
-			// diffuse colour
-			__Diffuse[i] = _diffuseComponent(__Coord,0,__Hit,__GIFresnel,__Metallic);
-		}
-		System.out.println("done.");
-		// TODO parallel preprocessing
+		AdvancementData adv_data = new AdvancementData(bsize);
+		Thread __AllFaxNoPrinter = new Thread(new AdvancementPrinter(adv_data));
+		__AllFaxNoPrinter.start();
+		StopWatch __Timing = new StopWatch();
+		Stream.iterate(0,i -> i<bsize,i -> i+1)
+			.unordered()
+			.parallel()
+			.forEach(i -> {
+					__Diffuse[i] = _precalculateDiffuse(i);
+					adv_data.adv++;
+				});
+		adv_data.done = true;
+		__Timing.stop();
+		try { __AllFaxNoPrinter.join(); }
+		catch (InterruptedException e) {  }
+		System.out.printf("\ndone in %.2fs\n",__Timing.time_seconds());
+		// TODO show progress and timing in terminal
 
 		// diffuse map convolution through bilateral filtering
 		// java language specs guarantee 0 as initial value for each array element
 		System.out.print("filtering diffuse buffer... ");
+		this.diffuse = new Vec3[bsize];
 		for (int y=0;y<Config.HEIGHT;y++)
 		{
 			for (int x=0;x<Config.WIDTH;x++)
 			{
 				int rlin = y*Config.WIDTH+x;
+				Vec3 __Center = __Diffuse[rlin];
+				Vec3 __Result = vec3(0);
+				double __Weight = 0;
+
+				// handle edges
 				if (y<2||y>Config.HEIGHT-3||x<2||x>Config.WIDTH-3)
 				{
-					diffuse[rlin] = __Diffuse[rlin];
+					diffuse[rlin] = __Center;
 					continue;
 				}
 				// FIXME write pixel partly when diameter reaches out of bounds
 
 				// bilateral pixel processing
-				Vec3 __Center = __Diffuse[rlin];
-				Vec3 __Result = vec3(0);
-				double __Weight = 0;
-
+				diffuse[rlin] = __Center;
+				/*
 				for (int i=-Config.BF_DIAMETER;i<Config.BF_DIAMETER;i++)
 				{
 					for (int j=-Config.BF_DIAMETER;j<Config.BF_DIAMETER;j++)
@@ -105,14 +96,14 @@ public class RayTracer implements Sampler
 
 						// gauss procedere
 						Vec3 __CSign = subtract(__Sample,__Center);
-						double __Gauss = exp((-pow(__NX-x,2)+pow(__NY-y,2))/(2*pow(Config.BF_SIGMA1,2)));
-						__Gauss *= exp((-pow(__CSign.x(),2)+pow(__CSign.y(),2)+pow(__CSign.z(),2))
-									   /(2*pow(Config.BF_SIGMA0,2)));
+						double __Gauss = exp(-(pow(__NX-x,2)+pow(__NY-y,2))/(2*pow(Config.BF_SIGMA0,2)));
+						__Gauss *= exp(-(pow(__CSign.x(),2)+pow(__CSign.y(),2)+pow(__CSign.z(),2))
+									   /(2*pow(Config.BF_SIGMA1,2)));
 						/*
 						double __Gauss0 = exp(-(pow(__CSign.x(),2)+pow(__CSign.y(),2)+pow(__CSign.z(),2))
 											  /(2*Config.BF_SIGMA0));
 						double __Gauss1 = exp(-(pow(__NX-x,2)+pow(__NY-y,2))/(2*Config.BF_SIGMA1));
-						*/
+				*//*
 						// FIXME
 
 						// weight
@@ -123,12 +114,38 @@ public class RayTracer implements Sampler
 				}
 
 				// weighing pixel result
-				diffuse[y*Config.WIDTH+x] = divide(__Result,__Weight+.0001);
+				diffuse[rlin] = divide(__Result,__Weight+.0001);
+				  */
 			}
 		}
+		System.out.println("done.");
 		// FIXME boundscheck for higher diameters
 		// FIXME breakdown into vertical & horizontal substeps for incredible performance benefits
-		System.out.println("done.");
+	}
+
+	private Vec3 _precalculateDiffuse(int i)
+	{
+		// intersection
+		Vec2 __Coord = vec2(i%Config.WIDTH,(int)i/Config.WIDTH);
+		Ray __Ray = scene.camera.generateRay(__Coord);
+		Hit __Hit = _recentIntersection(__Ray,0);
+		if (__Hit==null) return vec3(0);
+
+		// material
+		Color p_Colour = __Hit.material().getComponent(MaterialComponent.COLOUR,__Hit);
+		Color p_Material = __Hit.material().getComponent(MaterialComponent.MATERIAL,__Hit);
+		double __Metallic = p_Material.r();
+		double __Roughness = p_Material.g();
+		Vec3 __CameraDir = normalize(multiply(__Ray.direction(),-1));
+		double __Attitude = max(dot(__Hit.normal(),__CameraDir),.0);
+		Vec3 __Fresnel0 = mix(vec3(.04,.04,.04),vec3(p_Colour),__Metallic);
+		Vec3 __GIFresnel = subtract(max(vec3(1.-__Roughness),__Fresnel0),__Fresnel0);
+		__GIFresnel = multiply(__GIFresnel,pow(clamp(1.-__Attitude,.0,1.),5.));
+		__GIFresnel = add(__Fresnel0,__GIFresnel);
+		// FIXME code duplications all over the place
+
+		// diffuse colour
+		return _diffuseComponent(__Coord,0,__Hit,__GIFresnel,__Metallic);
 	}
 
 	public Color getColor(Vec2 coord)
@@ -311,16 +328,19 @@ public class RayTracer implements Sampler
 		Color p_Colour = hit.material().getComponent(MaterialComponent.COLOUR,hit);
 		Vec3 out = vec3(0,0,0);
 		//for (Vec2 __Hammersley : LUT.map_subset(DIFFUSE_SETS,coord,Config.DIFFUSE_SAMPLES))
-		for (int i=0;i<LUT.lookup().lookup_static_range();i++)
+		//for (int i=0;i<LUT.lookup().lookup_static_range();i++)
+		for (int i=0;i<Config.DIFFUSE_SAMPLES;i++)
 		{
-			Vec2 __Hammersley = LUT.lookup().lookup_static(i);
+			//Vec2 __Hammersley = LUT.lookup().lookup_static(i);
 
 			// hämis hämis hämisphere!
 			/*
 			double u = 2*PI*__Hammersley.x();
 			double v = sqrt(1-pow(__Hammersley.y(),2.));
-			Vec3 __DiffDirection = vec3(v*cos(u),__Hammersley.y(),v*sin(u));
+			Vec3 __DiffDirection = vec3(v*cos(u),v*sin(u),__Hammersley.y());
+			//Vec3 __DiffDirection = vec3(v*cos(u),__Hammersley.y(),v*sin(u));
 			Vec3 __DiffSample = normalize(__DiffDirection);
+			__DiffSample = normalize(add(hit.normal(),__DiffSample));
 			*/
 			Vec3 __DiffSample = normalize(randomDirection());
 			__DiffSample = normalize(add(hit.normal(),__DiffSample));
