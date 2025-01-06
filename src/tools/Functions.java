@@ -1221,6 +1221,22 @@ public class Functions {
 		return vec3(Math.abs(v.x()),Math.abs(v.y()),Math.abs(v.z()));
 	}
 
+	public static Vec3 pow(Vec3 v,double f)
+	{
+		return vec3(Math.pow(v.x(),f),Math.pow(v.y(),f),Math.pow(v.z(),f));
+	}
+
+	public static Vec3 exp(Vec3 v)
+	{
+		return vec3(Math.exp(v.x()),Math.exp(v.y()),Math.exp(v.z()));
+	}
+
+	public static double luma(Color c)
+	{
+		return .2126*c.r()+.7152*c.g()+.0722*c.b();
+	}
+	public static double luma(Vec3 c) { return luma(color(c)); }
+
     /**
      * Helper method for HSV to RGB conversion.
      * Calculates the RGB color for a given hue value.

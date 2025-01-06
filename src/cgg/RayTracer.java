@@ -63,63 +63,50 @@ public class RayTracer implements Sampler
 
 		// diffuse map convolution through bilateral filtering
 		// java language specs guarantee 0 as initial value for each array element
+		// looping for x and y individually, multiplication and addition is faster than modulo and division
 		System.out.print("filtering diffuse buffer... ");
 		this.diffuse = new Vec3[bsize];
+		double sigd = pow(Config.BF_SIGMA_D,2);
+		double sigr = pow(Config.BF_SIGMA_R,2);
 		for (int y=0;y<Config.HEIGHT;y++)
 		{
 			for (int x=0;x<Config.WIDTH;x++)
 			{
 				int rlin = y*Config.WIDTH+x;
 				Vec3 __Center = __Diffuse[rlin];
+
+				// sigma for bilateral pixel processing
 				Vec3 __Result = vec3(0);
 				double __Weight = 0;
-
-				// handle edges
-				if (y<2||y>Config.HEIGHT-3||x<2||x>Config.WIDTH-3)
+				for (int i=-Config.BF_DIAMETER;i<=Config.BF_DIAMETER;i++)
 				{
-					diffuse[rlin] = __Center;
-					continue;
-				}
-				// FIXME write pixel partly when diameter reaches out of bounds
-
-				// bilateral pixel processing
-				diffuse[rlin] = __Center;
-				/*
-				for (int i=-Config.BF_DIAMETER;i<Config.BF_DIAMETER;i++)
-				{
-					for (int j=-Config.BF_DIAMETER;j<Config.BF_DIAMETER;j++)
+					for (int j=-Config.BF_DIAMETER;j<=Config.BF_DIAMETER;j++)
 					{
-						// current sample
 						int __NX = x-i;
 						int __NY = y-j;
-						Vec3 __Sample = __Diffuse[__NY*Config.WIDTH+__NX];
 
-						// gauss procedere
-						Vec3 __CSign = subtract(__Sample,__Center);
-						double __Gauss = exp(-(pow(__NX-x,2)+pow(__NY-y,2))/(2*pow(Config.BF_SIGMA0,2)));
-						__Gauss *= exp(-(pow(__CSign.x(),2)+pow(__CSign.y(),2)+pow(__CSign.z(),2))
-									   /(2*pow(Config.BF_SIGMA1,2)));
-						/*
-						double __Gauss0 = exp(-(pow(__CSign.x(),2)+pow(__CSign.y(),2)+pow(__CSign.z(),2))
-											  /(2*Config.BF_SIGMA0));
-						double __Gauss1 = exp(-(pow(__NX-x,2)+pow(__NY-y,2))/(2*Config.BF_SIGMA1));
-				*//*
-						// FIXME
+						// out of bounds ee
+						if (__NX<0||__NX>=Config.WIDTH||__NY<0||__NY>=Config.HEIGHT) continue;
+
+						// gauss kernel procedere
+						Vec3 __Sample = __Diffuse[__NY*Config.WIDTH+__NX];
+						double __Gauss = exp(
+								-((pow(x-__NX,2)+pow(y-__NY,2))/(2.*sigd))
+								-(pow(luma(__Center)-luma(__Sample),2)/(2*sigr))
+								//-(pow(length(subtract(__Center,__Sample)),2)/(2*sigr))
+							);
 
 						// weight
-						//double __PixelWeight = __Gauss0*__Gauss1;
 						__Result = add(__Result,multiply(__Sample,__Gauss));
 						__Weight += __Gauss;
 					}
 				}
 
-				// weighing pixel result
-				diffuse[rlin] = divide(__Result,__Weight+.0001);
-				  */
+				// normalizing pixel result
+				diffuse[rlin] = divide(__Result,max(__Weight,.0001));
 			}
 		}
 		System.out.println("done.");
-		// FIXME boundscheck for higher diameters
 		// FIXME breakdown into vertical & horizontal substeps for incredible performance benefits
 	}
 

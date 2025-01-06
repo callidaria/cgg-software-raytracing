@@ -27,9 +27,9 @@ public class Config
 	public static final int SPECULAR_SAMPLES = 16;
 
 	// corrections
-	public static final int BF_DIAMETER = 2;
-	public static final double BF_SIGMA0 = .4;
-	public static final double BF_SIGMA1 = .2;
+	public static final int BF_DIAMETER = 16;
+	public static final double BF_SIGMA_D = .45;
+	public static final double BF_SIGMA_R = .25;
 
 	private Config() {  }
 }
