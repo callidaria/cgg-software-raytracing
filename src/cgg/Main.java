@@ -9,10 +9,16 @@ public class Main
 {
 	public static void main(String[] args)
 	{
+		// geometry
 		Scene scene = new TestingScene();
-		Sampler rt = new HaltonSampler(new RayTracer(scene));
+
+		// raytracer
+		RayTracer rt = new RayTracer(scene);
+		rt.bake();
+
+		// image
 		Image image = new Image();
-		image.sample(rt);
+		image.sample(new HaltonSampler(rt));
 		image.writePng("a08-image");
 	}
 }

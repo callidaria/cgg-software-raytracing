@@ -29,7 +29,7 @@ public class Config
 	// corrections
 	public static final int BF_DIAMETER = 16;
 	public static final double BF_SIGMA_D = .45;
-	public static final double BF_SIGMA_R = .25;
+	public static final double BF_SIGMA_R = .0001;
 
 	private Config() {  }
 }

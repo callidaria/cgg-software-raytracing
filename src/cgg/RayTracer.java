@@ -38,76 +38,57 @@ public class RayTracer implements Sampler
 		this.DIFFUSE_SETS = LUT.lookup().subsets_raster(Config.DIFFUSE_SAMPLES);
 		this.SPECULAR_SETS = LUT.lookup().subsets_raster(Config.SPECULAR_SAMPLES);
 		*/
+	}
 
+	public void bake()
+	{
 		// diffuse precalculation
-		System.out.println("pre-processing global diffuse...");
 		int bsize = Config.WIDTH*Config.HEIGHT;
-		Vec3[] __Diffuse = new Vec3[bsize];
+		this.diffuse = _globalIllumination(bsize);
+
+		// diffuse map convolution through bilateral filtering
+		// java language specs guarantee 0 as initial value for each array element
+		// looping for x and y individually, multiplication and addition is faster than modulo and division
+		double sigd = pow(Config.BF_SIGMA_D,2);
+		double sigr = pow(Config.BF_SIGMA_R,2);
+		/*
+		this.diffuse = _bilateralFilter(diffuse,bsize,16,sigd,sigr);
+		this.diffuse = _bilateralFilter(diffuse,bsize,4,sigd,sigr);
+		this.diffuse = _bilateralFilter(diffuse,bsize,2,sigd,sigr);
+		*/
+		this.diffuse = _bilateralFilter(diffuse,bsize,1,sigd,sigr);
+		// FIXME breakdown into vertical & horizontal substeps for incredible performance benefits
+		// TODO find out if this breakdown even does something interesting without dithering
+		// TODO fix, it still looks horrible
+	}
+
+	private Vec3[] _globalIllumination(int bsize)
+	{
+		Vec3[] out = new Vec3[bsize];
+
+		// threading
+		System.out.println("pre-processing global diffuse...");
 		AdvancementData adv_data = new AdvancementData(bsize);
 		Thread __AllFaxNoPrinter = new Thread(new AdvancementPrinter(adv_data));
 		__AllFaxNoPrinter.start();
+
+		// diffuse precalculation
 		StopWatch __Timing = new StopWatch();
 		Stream.iterate(0,i -> i<bsize,i -> i+1)
 			.unordered()
 			.parallel()
 			.forEach(i -> {
-					__Diffuse[i] = _precalculateDiffuse(i);
+					out[i] = _precalculateDiffuse(i);
 					adv_data.adv++;
 				});
 		adv_data.done = true;
 		__Timing.stop();
+
+		// end threading and print stats
 		try { __AllFaxNoPrinter.join(); }
 		catch (InterruptedException e) {  }
 		System.out.printf("\ndone in %.2fs\n",__Timing.time_seconds());
-		// TODO show progress and timing in terminal
-
-		// diffuse map convolution through bilateral filtering
-		// java language specs guarantee 0 as initial value for each array element
-		// looping for x and y individually, multiplication and addition is faster than modulo and division
-		System.out.print("filtering diffuse buffer... ");
-		this.diffuse = new Vec3[bsize];
-		double sigd = pow(Config.BF_SIGMA_D,2);
-		double sigr = pow(Config.BF_SIGMA_R,2);
-		for (int y=0;y<Config.HEIGHT;y++)
-		{
-			for (int x=0;x<Config.WIDTH;x++)
-			{
-				int rlin = y*Config.WIDTH+x;
-				Vec3 __Center = __Diffuse[rlin];
-
-				// sigma for bilateral pixel processing
-				Vec3 __Result = vec3(0);
-				double __Weight = 0;
-				for (int i=-Config.BF_DIAMETER;i<=Config.BF_DIAMETER;i++)
-				{
-					for (int j=-Config.BF_DIAMETER;j<=Config.BF_DIAMETER;j++)
-					{
-						int __NX = x-i;
-						int __NY = y-j;
-
-						// out of bounds ee
-						if (__NX<0||__NX>=Config.WIDTH||__NY<0||__NY>=Config.HEIGHT) continue;
-
-						// gauss kernel procedere
-						Vec3 __Sample = __Diffuse[__NY*Config.WIDTH+__NX];
-						double __Gauss = exp(
-								-((pow(x-__NX,2)+pow(y-__NY,2))/(2.*sigd))
-								-(pow(luma(__Center)-luma(__Sample),2)/(2*sigr))
-								//-(pow(length(subtract(__Center,__Sample)),2)/(2*sigr))
-							);
-
-						// weight
-						__Result = add(__Result,multiply(__Sample,__Gauss));
-						__Weight += __Gauss;
-					}
-				}
-
-				// normalizing pixel result
-				diffuse[rlin] = divide(__Result,max(__Weight,.0001));
-			}
-		}
-		System.out.println("done.");
-		// FIXME breakdown into vertical & horizontal substeps for incredible performance benefits
+		return out;
 	}
 
 	private Vec3 _precalculateDiffuse(int i)
@@ -133,6 +114,70 @@ public class RayTracer implements Sampler
 
 		// diffuse colour
 		return _diffuseComponent(__Coord,0,__Hit,__GIFresnel,__Metallic);
+	}
+
+	private Vec3[] _bilateralFilter(Vec3[] ds,int bsize,int steps,double sigd,double sigr)
+	{
+		Vec3[] out = new Vec3[bsize];
+
+		// threading
+		System.out.println("filtering diffuse buffer "+steps+"x...");
+		AdvancementData adv_data = new AdvancementData(bsize);
+		Thread __AllFaxNoPrinter = new Thread(new AdvancementPrinter(adv_data));
+		__AllFaxNoPrinter.start();
+
+		// filtering
+		StopWatch __Timing = new StopWatch();
+		Stream.iterate(0,y -> y<Config.HEIGHT,y -> y+1)
+			.unordered()
+			.parallel()
+			.forEach(y -> Stream.iterate(0,x -> x<Config.WIDTH,x -> x+1)
+					 .forEach(x -> {
+							 out[y*Config.WIDTH+x] = _sigmaBilateralFilter(ds,x,y,steps,sigd,sigr);
+							 adv_data.adv++;
+						 })
+				);
+		adv_data.done = true;
+		__Timing.stop();
+
+		// end threading and print statistics
+		try { __AllFaxNoPrinter.join(); }
+		catch (InterruptedException e) {  }
+		System.out.printf("\ndone in %.2fs\n",__Timing.time_seconds());
+		return out;
+	}
+
+	private Vec3 _sigmaBilateralFilter(Vec3[] ds,int x,int y,int steps,double sigd,double sigr)
+	{
+		int rlin = y*Config.WIDTH+x;
+		Vec3 __Center = ds[rlin];
+		double __Weight = 0;
+		Vec3 out = vec3(0);
+		for (int i=-Config.BF_DIAMETER;i<=Config.BF_DIAMETER;i++)
+		{
+			for (int j=-Config.BF_DIAMETER;j<=Config.BF_DIAMETER;j++)
+			{
+				int __NX = x-i*steps;
+				int __NY = y-j*steps;
+
+				// out of bounds ee
+				if (__NX<0||__NX>=Config.WIDTH||__NY<0||__NY>=Config.HEIGHT) continue;
+
+				// gauss kernel procedere
+				Vec3 __Sample = ds[__NY*Config.WIDTH+__NX];
+				double __Gauss = exp(
+						-((pow(x-__NX,2)+pow(y-__NY,2))/(2.*sigd))
+						-(pow(luma(__Center)-luma(__Sample),2)/(2*sigr))
+					);
+
+				// weight
+				out = add(out,multiply(__Sample,__Gauss));
+				__Weight += __Gauss;
+			}
+		}
+
+		// normalize pixel result
+		return divide(out,max(__Weight,.0001));
 	}
 
 	public Color getColor(Vec2 coord)
@@ -186,7 +231,7 @@ public class RayTracer implements Sampler
 	private Color _shadePhysical(Hit hit,Ray ray,Vec2 coord,int depth)
 	{
 		// §§test output
-		if (depth==0) return color(diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]);
+		//if (depth==0) return color(diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]);
 
 		// extract colour information
 		// colour preferredly to be a constant because the loader does not translate into sRGB colourspace
