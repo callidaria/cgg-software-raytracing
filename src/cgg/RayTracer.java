@@ -195,14 +195,23 @@ public class RayTracer implements Sampler
 	{
 		if (depth>Config.RECURSION_DEPTH) return color(0,0,0);
 		Hit __Recent = _recentIntersection(ray,depth);
-		if (__Recent==null) return Config.CLEARCOLOUR;
-		return switch (__Recent.material())
+
+		// intersection colour
+		Color gx = Config.CLEARCOLOUR;
+		if (__Recent!=null)
 		{
-		case PhysicalMaterial c -> _shadePhysical(__Recent,ray,coord,depth);
-		case SurfaceMaterial c -> _shadePhong(__Recent);
-		case SurfaceColour c -> _shadeLaemp(__Recent);
-		default -> Config.ERRORCOLOUR;
-		};
+			gx = switch (__Recent.material())
+			{
+			case PhysicalMaterial c -> _shadePhysical(__Recent,ray,coord,depth);
+			case SurfaceMaterial c -> _shadePhong(__Recent);
+			case SurfaceColour c -> _shadeLaemp(__Recent);
+			default -> Config.ERRORCOLOUR;
+			};
+		}
+
+		// combine with volumetric component
+		Color vx = _computeVolumetric(ray,__Recent);
+		return add(gx,vx);
 	}
 
 	private Hit _recentIntersection(Ray ray,int depth)
@@ -450,4 +459,34 @@ public class RayTracer implements Sampler
 	private Color _shadePosition(Hit hit,double intent) { return color(multiply(hit.position(),intent)); }
 	private Color _shadeTexture(Hit hit) { return color(hit.uv().x(),hit.uv().y(),0); }
 	private Color _shadeNormals(Hit hit) { return color(hit.normal()); }
+
+	private Color _computeVolumetric(Ray ray,Hit hit)
+	{
+		Color out = color(0);
+
+		// fallback to maximum range when no geometric intersection
+		if (hit==null) hit = new Hit(10000,ray.calculatePosition(10000),vec2(0,0),vec3(0),null);
+
+		// raymarching until intersection
+		double n = .0;
+		while (n<hit.param())
+		{
+			// iterate lightsources
+			for (Illumination p_Light : scene.lights)
+			{
+				Vec3 __RayPosition = ray.calculatePosition(n);
+				Vec3 __LightDirection = p_Light.direction(__RayPosition);
+
+				// check for obfuscation through geometry
+				Ray __Ray = new Ray(__RayPosition,__LightDirection);
+				Hit __Obfuscation = _recentIntersection(__Ray,1);
+
+				// accumulate volumetric result
+				if (__Obfuscation.param()>1) out = add(out,p_Light.intensity(__RayPosition));
+			}
+			n += .01;
+		}
+
+		return out;
+	}
 }
