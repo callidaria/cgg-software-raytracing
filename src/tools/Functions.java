@@ -646,6 +646,10 @@ public class Functions {
         return color(a.r() / s, a.g() / s, a.b() / s);
     }
 
+	public static Color divide(Color a,Color b) {
+		return color(a.r()/b.r(),a.g()/b.g(),a.b()/b.b());
+	}
+
     /**
      * Clamps the components of a Color to the range [0, 1].
      *

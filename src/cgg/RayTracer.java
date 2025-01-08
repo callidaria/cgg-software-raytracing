@@ -197,10 +197,10 @@ public class RayTracer implements Sampler
 		Hit __Recent = _recentIntersection(ray,depth);
 
 		// intersection colour
-		Color gx = Config.CLEARCOLOUR;
+		Color __GX = Config.CLEARCOLOUR;
 		if (__Recent!=null)
 		{
-			gx = switch (__Recent.material())
+			__GX = switch (__Recent.material())
 			{
 			case PhysicalMaterial c -> _shadePhysical(__Recent,ray,coord,depth);
 			case SurfaceMaterial c -> _shadePhong(__Recent);
@@ -210,8 +210,8 @@ public class RayTracer implements Sampler
 		}
 
 		// combine with volumetric component
-		Color vx = _computeVolumetric(ray,__Recent);
-		return add(gx,vx);
+		if (depth==0) __GX = add(__GX,_computeVolumetric(ray,__Recent));
+		return __GX;
 	}
 
 	private Hit _recentIntersection(Ray ray,int depth)
@@ -465,10 +465,11 @@ public class RayTracer implements Sampler
 		Color out = color(0);
 
 		// fallback to maximum range when no geometric intersection
-		if (hit==null) hit = new Hit(10000,ray.calculatePosition(10000),vec2(0,0),vec3(0),null);
+		if (hit==null) hit = new Hit(1000,ray.calculatePosition(1000),vec2(0,0),vec3(0),null);
 
 		// raymarching until intersection
 		double n = .0;
+		Color __Weight = color(0);
 		while (n<hit.param())
 		{
 			// iterate lightsources
@@ -482,11 +483,13 @@ public class RayTracer implements Sampler
 				Hit __Obfuscation = _recentIntersection(__Ray,1);
 
 				// accumulate volumetric result
-				if (__Obfuscation.param()>1) out = add(out,p_Light.intensity(__RayPosition));
+				Color i = p_Light.intensity(__RayPosition);
+				if (__Obfuscation==null||__Obfuscation.param()>1) out = multiply(.01,add(out,i));
+				__Weight = add(__Weight,i);
 			}
-			n += .01;
+			n += .1;
 		}
 
-		return out;
+		return divide(out,__Weight);
 	}
 }
