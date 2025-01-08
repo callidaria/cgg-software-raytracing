@@ -60,3 +60,4 @@
 - [ ] ray tracer refactor
 - [ ] parallel diffuse preprocessing
 - [ ] hollow geometry, to allow for camera to spawn inside of complex structures
+- [ ] switch hit read from tuple based on directional in relation to normal

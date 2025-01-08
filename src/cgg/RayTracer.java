@@ -210,7 +210,7 @@ public class RayTracer implements Sampler
 		}
 
 		// combine with volumetric component
-		if (depth==0) __GX = add(__GX,_computeVolumetric(ray,__Recent));
+		//if (depth==0) __GX = add(__GX,_computeVolumetric(ray,__Recent));
 		return __GX;
 	}
 
@@ -240,7 +240,7 @@ public class RayTracer implements Sampler
 	private Color _shadePhysical(Hit hit,Ray ray,Vec2 coord,int depth)
 	{
 		// §§test output
-		//if (depth==0) return color(diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]);
+		if (depth==0) return color(diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]);
 
 		// extract colour information
 		// colour preferredly to be a constant because the loader does not translate into sRGB colourspace
@@ -469,7 +469,7 @@ public class RayTracer implements Sampler
 
 		// raymarching until intersection
 		double n = .0;
-		Color __Weight = color(0);
+		//Color __Weight = color(0);
 		while (n<hit.param())
 		{
 			// iterate lightsources
@@ -484,12 +484,13 @@ public class RayTracer implements Sampler
 
 				// accumulate volumetric result
 				Color i = p_Light.intensity(__RayPosition);
-				if (__Obfuscation==null||__Obfuscation.param()>1) out = multiply(.01,add(out,i));
-				__Weight = add(__Weight,i);
+				if (__Obfuscation==null||__Obfuscation.param()>1) out = multiply(.001,add(out,i));
+				//__Weight = add(__Weight,i);
 			}
 			n += .1;
 		}
 
-		return divide(out,__Weight);
+		return out;
+		//return divide(out,__Weight);
 	}
 }
