@@ -56,7 +56,7 @@ public class RayTracer implements Sampler
 		this.diffuse = _bilateralFilter(diffuse,bsize,4,sigd,sigr);
 		this.diffuse = _bilateralFilter(diffuse,bsize,2,sigd,sigr);
 		*/
-		this.diffuse = _bilateralFilter(diffuse,bsize,1,sigd,sigr);
+		//this.diffuse = _bilateralFilter(diffuse,bsize,1,sigd,sigr);
 		// FIXME breakdown into vertical & horizontal substeps for incredible performance benefits
 		// TODO find out if this breakdown even does something interesting without dithering
 		// TODO fix, it still looks horrible
@@ -372,19 +372,19 @@ public class RayTracer implements Sampler
 		//for (int i=0;i<LUT.lookup().lookup_static_range();i++)
 		for (int i=0;i<Config.DIFFUSE_SAMPLES;i++)
 		{
-			//Vec2 __Hammersley = LUT.lookup().lookup_static(i);
+			Vec2 __Hammersley = LUT.lookup().lookup_static(i);
 
 			// hämis hämis hämisphere!
-			/*
 			double u = 2*PI*__Hammersley.x();
 			double v = sqrt(1-pow(__Hammersley.y(),2.));
 			Vec3 __DiffDirection = vec3(v*cos(u),v*sin(u),__Hammersley.y());
 			//Vec3 __DiffDirection = vec3(v*cos(u),__Hammersley.y(),v*sin(u));
 			Vec3 __DiffSample = normalize(__DiffDirection);
 			__DiffSample = normalize(add(hit.normal(),__DiffSample));
-			*/
+			/*
 			Vec3 __DiffSample = normalize(randomDirection());
 			__DiffSample = normalize(add(hit.normal(),__DiffSample));
+			*/
 
 			// trace sample
 			Ray __DIR = new Ray(hit.position(),__DiffSample);
@@ -469,7 +469,6 @@ public class RayTracer implements Sampler
 
 		// raymarching until intersection
 		double n = .0;
-		//Color __Weight = color(0);
 		while (n<hit.param())
 		{
 			// iterate lightsources
@@ -483,14 +482,12 @@ public class RayTracer implements Sampler
 				Hit __Obfuscation = _recentIntersection(__Ray,1);
 
 				// accumulate volumetric result
-				Color i = p_Light.intensity(__RayPosition);
-				if (__Obfuscation==null||__Obfuscation.param()>1) out = multiply(.001,add(out,i));
-				//__Weight = add(__Weight,i);
+				if (__Obfuscation==null||__Obfuscation.param()>1)
+					out = multiply(.001,add(out,p_Light.intensity(__RayPosition)));
 			}
 			n += .1;
 		}
 
 		return out;
-		//return divide(out,__Weight);
 	}
 }
