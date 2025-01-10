@@ -366,8 +366,11 @@ public class RayTracer implements Sampler
 
 	private Vec3 _diffuseComponent(Vec2 coord,int depth,Hit hit,Vec3 fresnel,double metallic)
 	{
-		Color p_Colour = hit.material().getComponent(MaterialComponent.COLOUR,hit);
+		// ee in case of metallic or special reflectance situation
 		Vec3 out = vec3(0,0,0);
+		if (greater(fresnel,Config.E_FRESNEL_DIFFUSE)||metallic>Config.E_METALLIC_DIFFUSE) return out;
+
+		// iterate over diffuse samples
 		//for (Vec2 __Hammersley : LUT.map_subset(DIFFUSE_SETS,coord,Config.DIFFUSE_SAMPLES))
 		//for (int i=0;i<LUT.lookup().lookup_static_range();i++)
 		for (int i=0;i<Config.DIFFUSE_SAMPLES;i++)
@@ -379,18 +382,20 @@ public class RayTracer implements Sampler
 			double v = sqrt(1-pow(__Hammersley.y(),2.));
 			Vec3 __DiffDirection = vec3(v*cos(u),v*sin(u),__Hammersley.y());
 			//Vec3 __DiffDirection = vec3(v*cos(u),__Hammersley.y(),v*sin(u));
-			Vec3 __DiffSample = normalize(__DiffDirection);
-			__DiffSample = normalize(add(hit.normal(),__DiffSample));
+			Vec3 __DiffSample = normalize(add(hit.normal(),__DiffDirection));
 			/*
 			Vec3 __DiffSample = normalize(randomDirection());
 			__DiffSample = normalize(add(hit.normal(),__DiffSample));
 			*/
+			//System.out.println(i+": "+__DiffDirection+" -> "+__DiffSample);
 
 			// trace sample
 			Ray __DIR = new Ray(hit.position(),__DiffSample);
 			out = add(out,vec3(_processScene(__DIR,coord,depth+1)));
 		}
-		out = multiply(divide(out,Config.DIFFUSE_SAMPLES),vec3(p_Colour));
+		//System.out.println();
+		out = multiply(divide(out,Config.DIFFUSE_SAMPLES),
+					   vec3(hit.material().getComponent(MaterialComponent.COLOUR,hit)));
 		out = multiply(out,subtract(vec3(1),fresnel));
 		out = multiply(out,subtract(vec3(1),metallic));
 		return out;

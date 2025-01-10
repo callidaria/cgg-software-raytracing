@@ -31,5 +31,9 @@ public class Config
 	public static final double BF_SIGMA_D = .45;
 	public static final double BF_SIGMA_R = .0001;
 
+	// threshold
+	public static final double E_FRESNEL_DIFFUSE = .99;
+	public static final double E_METALLIC_DIFFUSE = .99;
+
 	private Config() {  }
 }

@@ -1099,6 +1099,11 @@ public class Functions {
         return ret;
     }
 
+	public static boolean greater(Vec3 v,double a)
+	{
+		return v.x()>a&&v.y()>a&&v.z()>a;
+	}
+
     /**
      * Generates a random double between 0 and 1.
      *
