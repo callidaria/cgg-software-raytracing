@@ -1104,6 +1104,11 @@ public class Functions {
 		return v.x()>a&&v.y()>a&&v.z()>a;
 	}
 
+	public static double triangleSize(Vertex v0,Vertex v1,Vec3 v)
+	{
+		return length(cross(subtract(v1.position(),v0.position()),subtract(v,v0.position())))/2.;
+	}
+
     /**
      * Generates a random double between 0 and 1.
      *

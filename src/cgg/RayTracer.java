@@ -56,7 +56,7 @@ public class RayTracer implements Sampler
 		this.diffuse = _bilateralFilter(diffuse,bsize,4,sigd,sigr);
 		this.diffuse = _bilateralFilter(diffuse,bsize,2,sigd,sigr);
 		*/
-		//this.diffuse = _bilateralFilter(diffuse,bsize,1,sigd,sigr);
+		this.diffuse = _bilateralFilter(diffuse,bsize,1,sigd,sigr);
 		// FIXME breakdown into vertical & horizontal substeps for incredible performance benefits
 		// TODO find out if this breakdown even does something interesting without dithering
 		// TODO fix, it still looks horrible
@@ -240,7 +240,7 @@ public class RayTracer implements Sampler
 	private Color _shadePhysical(Hit hit,Ray ray,Vec2 coord,int depth)
 	{
 		// §§test output
-		if (depth==0) return color(diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]);
+		//if (depth==0) return color(diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]);
 
 		// extract colour information
 		// colour preferredly to be a constant because the loader does not translate into sRGB colourspace
@@ -368,7 +368,7 @@ public class RayTracer implements Sampler
 	{
 		// ee in case of metallic or special reflectance situation
 		Vec3 out = vec3(0,0,0);
-		if (greater(fresnel,Config.E_FRESNEL_DIFFUSE)||metallic>Config.E_METALLIC_DIFFUSE) return out;
+		if (/*greater(fresnel,Config.E_FRESNEL_DIFFUSE)||*/metallic>Config.E_METALLIC_DIFFUSE) return out;
 
 		// iterate over diffuse samples
 		//for (Vec2 __Hammersley : LUT.map_subset(DIFFUSE_SETS,coord,Config.DIFFUSE_SAMPLES))
@@ -378,15 +378,16 @@ public class RayTracer implements Sampler
 			Vec2 __Hammersley = LUT.lookup().lookup_static(i);
 
 			// hämis hämis hämisphere!
+			/*
 			double u = 2*PI*__Hammersley.x();
 			double v = sqrt(1-pow(__Hammersley.y(),2.));
 			Vec3 __DiffDirection = vec3(v*cos(u),v*sin(u),__Hammersley.y());
 			//Vec3 __DiffDirection = vec3(v*cos(u),__Hammersley.y(),v*sin(u));
 			Vec3 __DiffSample = normalize(add(hit.normal(),__DiffDirection));
-			/*
+			__DiffSample = hit.normal();
+			*/
 			Vec3 __DiffSample = normalize(randomDirection());
 			__DiffSample = normalize(add(hit.normal(),__DiffSample));
-			*/
 			//System.out.println(i+": "+__DiffDirection+" -> "+__DiffSample);
 
 			// trace sample

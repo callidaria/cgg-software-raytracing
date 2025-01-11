@@ -10,7 +10,7 @@ public class Main
 	public static void main(String[] args)
 	{
 		// geometry
-		Scene scene = new TestingScene();
+		Scene scene = new AnimalFarm();
 
 		// raytracer
 		RayTracer rt = new RayTracer(scene);
