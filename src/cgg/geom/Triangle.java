@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import static tools.Functions.*;
 import tools.*;
+import static cgg.Math.*;
 import cgg.mtrl.*;
 import cgg.a02.Ray;
 import cgg.a02.Hit;
@@ -28,13 +29,12 @@ public class Triangle implements Geometry
 	{
 		// normal
 		Vec3 __ParaCross = cross(subtract(v1.position(),v0.position()),subtract(v2.position(),v0.position()));
-		Vec3 __Normal = normalize(__ParaCross);
+		Vec3 __ParaNormal = normalize(__ParaCross);
 		double __InvSize = 1./(length(__ParaCross)/2.);
 
 		// calculate intersection
-		double t = divide(multiply(subtract(v0.position(),ray.origin()),__Normal),
-						  multiply(ray.direction(),__Normal));
-		if (ray.paramInRange(t)) return new LinkedList<HitTuple>();
+		double t = dot(subtract(v0.position(),ray.origin()),__ParaNormal)/dot(ray.direction(),__ParaNormal);
+		if (!ray.paramInRange(t)) return new LinkedList<HitTuple>();
 		Vec3 __InterPos = ray.calculatePosition(t);
 
 		// barycentric coordinate
@@ -49,11 +49,17 @@ public class Triangle implements Geometry
 							multiply(__BCentric.y(),v1.normal()),
 							multiply(__BCentric.z(),v2.normal())
 			);
-		Vec3 __UV = add(multiply(v0.uv(),__BCentric.x()),
+		Vec2 __UV = add(multiply(v0.uv(),__BCentric.x()),
 						multiply(v1.uv(),__BCentric.y()),
 						multiply(v2.uv(),__BCentric.z())
 			);
-		return new Hit(t,__InterPos,__UV,__Normal,new PhysicalMaterial(color(1,0,0),color(0,1,1)));
+		Color __Colour = add(multiply(v0.color(),__BCentric.x()),
+							 multiply(v1.color(),__BCentric.y()),
+							 multiply(v2.color(),__BCentric.z())
+			);
+		Hit hits = new Hit(t,__InterPos,__UV,__Normal,new PhysicalMaterial(__Colour,color(0,1,1)));
+		System.out.println(hits);
+		return primitive_hit(new HitTuple(hits,hits));
 	}
 
 	public BoundingBox bounding_box() { return bounds; }

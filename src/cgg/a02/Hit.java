@@ -25,7 +25,7 @@ public class Hit
 
 	public String toString()
 	{
-		return "Hit[t="+param+", point="+position+", normal="+normal+"]";
+		return "Hit[t="+param+", point="+position+", normal="+normal+", uv="+uv+"]";
 	}
 
 	public double param() { return param; }
