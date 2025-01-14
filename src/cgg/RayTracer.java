@@ -267,7 +267,7 @@ public class RayTracer implements Sampler
 		{
 			// shadow checking
 			Vec3 __LightDir = p_Light.direction(hit.position());
-			if (_shadowCast(hit,__LightDir,p_Light.distance(hit.position()))) continue;
+			//if (_shadowCast(hit,__LightDir,p_Light.distance(hit.position()))) continue;
 
 			// distribution component
 			Vec3 __Halfway = normalize(add(__CameraDir,__LightDir));

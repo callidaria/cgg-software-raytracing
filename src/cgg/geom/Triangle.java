@@ -58,7 +58,6 @@ public class Triangle implements Geometry
 							 multiply(v2.color(),__BCentric.z())
 			);
 		Hit hits = new Hit(t,__InterPos,__UV,__Normal,new PhysicalMaterial(__Colour,color(0,1,1)));
-		System.out.println(hits);
 		return primitive_hit(new HitTuple(hits,hits));
 	}
 

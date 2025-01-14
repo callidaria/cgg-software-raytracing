@@ -34,14 +34,12 @@ public class AnimalFarm extends Scene
 		// definition
 		GraphNode out = new GraphNode();
 		out.register_geometry(new Box(vec3(0,.5,-hsize),size,1,size,neutral));
-		/*
 		out.register_geometry(new Box(vec3(0,-hsize,-size-.5),size,size,1,neutral));
 		out.register_geometry(new Box(vec3(0,-size-.5,-hsize),size,1,size,neutral));
 		out.register_geometry(new Box(vec3(-hsize-.5,-hsize,-hsize),1,size,size,
 									  new PhysicalMaterial(color(.7,0,0),color(0,1,1))));
 		out.register_geometry(new Box(vec3(hsize+.5,-hsize,-hsize),1,size,size,
 									  new PhysicalMaterial(rwall,color(0,1,1))));
-		*/
 		out.update_bounds();
 		return out;
 	}
