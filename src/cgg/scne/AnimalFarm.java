@@ -14,11 +14,13 @@ public class AnimalFarm extends Scene
 
 		// cornell box
 		groot.register_geometry(_cornellBox(5,false));
+		/*
 		groot.register_geometry(new Triangle(
 										new Vertex(vec3(-2,0,-4),vec3(0,-1,0),vec2(0,0),color(1,0,0)),
 										new Vertex(vec3(2,0,-4),vec3(0,-1,0),vec2(0,0),color(0,1,0)),
 										new Vertex(vec3(0,-4,-4),vec3(0,-1,0),vec2(0,0),color(0,0,1))
 									));
+		*/
 
 		craeveTheVorbiddenLaemp(vec3(0,-4,-2.5),color(.7,.7,.7),.7);
 		groot.update_bounds();
@@ -33,6 +35,7 @@ public class AnimalFarm extends Scene
 
 		// definition
 		GraphNode out = new GraphNode();
+
 		out.register_geometry(new Box(vec3(0,.5,-hsize),size,1,size,neutral));
 		out.register_geometry(new Box(vec3(0,-hsize,-size-.5),size,size,1,neutral));
 		out.register_geometry(new Box(vec3(0,-size-.5,-hsize),size,1,size,neutral));
@@ -40,6 +43,7 @@ public class AnimalFarm extends Scene
 									  new PhysicalMaterial(color(.7,0,0),color(0,1,1))));
 		out.register_geometry(new Box(vec3(hsize+.5,-hsize,-hsize),1,size,size,
 									  new PhysicalMaterial(rwall,color(0,1,1))));
+
 		out.update_bounds();
 		return out;
 	}
