@@ -454,7 +454,10 @@ public class RayTracer implements Sampler
 	private boolean _shadowCast(Hit hit,Vec3 ldir,double ldist)
 	{
 		Ray __ShadowRay = new Ray(hit.position(),ldir);
-		return scene.groot.intersect(__ShadowRay).size()>0;
+		Queue<HitTuple> __Hits = scene.groot.intersect(__ShadowRay);
+		if (__Hits.size()==0) return false;
+		for (HitTuple __Tuple : __Hits) if (__Tuple.front().param()<1||__Tuple.back().param()<1) return true;
+		return false;
 	}
 
 	private Color _shadeLaemp(Hit hit)
