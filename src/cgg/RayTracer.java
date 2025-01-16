@@ -267,7 +267,7 @@ public class RayTracer implements Sampler
 		{
 			// shadow checking
 			Vec3 __LightDir = p_Light.direction(hit.position());
-			if (_shadowCast(hit,__LightDir,p_Light.distance(hit.position()))) continue;
+			if (_shadowCast(hit,__LightDir)) continue;
 
 			// distribution component
 			Vec3 __Halfway = normalize(add(__CameraDir,__LightDir));
@@ -359,9 +359,7 @@ public class RayTracer implements Sampler
 		Vec3 __GI = divide(__GIResult,__SmpWeight);
 		__GI = multiply(__GI,add(multiply(__GIFresnel,__LUT.r()),__LUT.g()));
 		__GI = multiply(add(__GI,__DGI),__Cavity);
-		out = mix(out,color(__GI),.5);
-
-		return out;
+		return mix(out,color(__GI),.5);
 	}
 
 	private Vec3 _diffuseComponent(Vec2 coord,int depth,Hit hit,Vec3 fresnel,double metallic)
@@ -431,7 +429,7 @@ public class RayTracer implements Sampler
 
 			// shadow calculation
 			Vec3 __LightDirection = p_Light.direction(hit.position());
-			if (_shadowCast(hit,__LightDirection,p_Light.distance(hit.position()))) continue;
+			if (_shadowCast(hit,__LightDirection)) continue;
 
 			// diffuse component
 			double __Attitude = dot(hit.normal(),__LightDirection);
@@ -451,7 +449,7 @@ public class RayTracer implements Sampler
 		return clamp(__Result);
 	}
 
-	private boolean _shadowCast(Hit hit,Vec3 ldir,double ldist)
+	private boolean _shadowCast(Hit hit,Vec3 ldir)
 	{
 		Ray __ShadowRay = new Ray(hit.position(),ldir);
 		Queue<HitTuple> __Hits = scene.groot.intersect(__ShadowRay);

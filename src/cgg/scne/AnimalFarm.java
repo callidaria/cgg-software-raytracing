@@ -23,7 +23,8 @@ public class AnimalFarm extends Scene
 									));
 		*/
 
-		craeveTheVorbiddenLaemp(vec3(0,-4,-2.5),color(.7,.7,.7),.7);
+		craeveTheVorbiddenLaemp(vec3(-1.7,-4,-2.5),color(.7,.7,.7),.7);
+		craeveTheVorbiddenLaemp(vec3(1.7,-4,-2.5),color(.7,.7,.7),.7);
 		groot.update_bounds();
 	}
 
