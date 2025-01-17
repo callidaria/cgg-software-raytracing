@@ -30,7 +30,6 @@ public class Triangle implements Geometry
 		// normal
 		Vec3 __ParaCross = cross(subtract(v1.position(),v0.position()),subtract(v2.position(),v0.position()));
 		Vec3 __ParaNormal = normalize(__ParaCross);
-		double __InvSize = 1./(length(__ParaCross)/2.);
 
 		// calculate intersection
 		double t = dot(subtract(v0.position(),ray.origin()),__ParaNormal)/dot(ray.direction(),__ParaNormal);
@@ -38,9 +37,10 @@ public class Triangle implements Geometry
 		Vec3 __InterPos = ray.calculatePosition(t);
 
 		// barycentric coordinate
+		double __InvSize = 1./(length(__ParaCross)/2.);
 		Vec3 __BCentric = vec3(triangleSize(v1,v2,__InterPos)*__InvSize,
 							   triangleSize(v2,v0,__InterPos)*__InvSize,
-							   triangleSize(v0,v2,__InterPos)*__InvSize
+							   triangleSize(v0,v1,__InterPos)*__InvSize
 			);
 		if (!almostEqual(__BCentric.x()+__BCentric.y()+__BCentric.z(),1.)) return new LinkedList<HitTuple>();
 
@@ -57,8 +57,9 @@ public class Triangle implements Geometry
 							 multiply(v1.color(),__BCentric.y()),
 							 multiply(v2.color(),__BCentric.z())
 			);
-		Hit hits = new Hit(t,__InterPos,__UV,__Normal,new PhysicalMaterial(__Colour,color(0,1,1)));
+		Hit hits = new Hit(t,__InterPos,__UV,__Normal,new UnknownMaterial());
 		return primitive_hit(new HitTuple(hits,hits));
+		// TODO change back to hit only registered at front state of tuple
 	}
 
 	public BoundingBox bounding_box() { return bounds; }

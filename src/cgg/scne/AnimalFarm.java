@@ -14,14 +14,12 @@ public class AnimalFarm extends Scene
 
 		// cornell box
 		groot.register_geometry(_cornellBox(5,false));
-		groot.register_geometry(new Sphere(vec3(-1,-.5,-2.5),.5,new PhysicalMaterial(color(0,0,.7),color(0,1,1))));
-		/*
+		//groot.register_geometry(new Sphere(vec3(-1,-.5,-2.5),.5,new PhysicalMaterial(color(0,0,.7),color(1,.1,1))));
 		groot.register_geometry(new Triangle(
-										new Vertex(vec3(-2,0,-4),vec3(0,-1,0),vec2(0,0),color(1,0,0)),
-										new Vertex(vec3(2,0,-4),vec3(0,-1,0),vec2(0,0),color(0,1,0)),
-										new Vertex(vec3(0,-4,-4),vec3(0,-1,0),vec2(0,0),color(0,0,1))
+										new Vertex(vec3(-1.7,-4,-2.5),vec3(0,0,1),vec2(0,0),color(1,0,0)),
+										new Vertex(vec3(1.7,-4,-2.5),vec3(0,0,1),vec2(0,0),color(0,1,0)),
+										new Vertex(vec3(0,0,-2.5),vec3(0,0,1),vec2(0,0),color(0,0,1))
 									));
-		*/
 
 		craeveTheVorbiddenLaemp(vec3(-1.7,-4,-2.5),color(.7,.7,.7),.7);
 		craeveTheVorbiddenLaemp(vec3(1.7,-4,-2.5),color(.7,.7,.7),.7);
