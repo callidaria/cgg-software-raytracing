@@ -22,7 +22,7 @@ public class Complex implements Geometry
 		this.jop = jop;
 		this.bounds = (g1!=null) ? BoundingBox.around(g0.bounding_box(),g1.bounding_box()) : g0.bounding_box();
 		// TODO bounding boxes of intersection and difference should not be same as union!
-		//		this can be sped up when correctly boxed in precalculation
+		//		this can be sped up slightly when correctly boxed in precalculation
 	}
 
 	public Queue<HitTuple> intersect(Ray ray)

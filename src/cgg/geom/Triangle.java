@@ -3,6 +3,7 @@ package cgg.geom;
 import java.util.LinkedList;
 import java.util.Queue;
 import static tools.Functions.*;
+import static tools.Wavefront.*;
 import tools.*;
 import static cgg.Math.*;
 import cgg.mtrl.*;
@@ -18,6 +19,16 @@ public class Triangle implements Geometry
 	private BoundingBox bounds;
 
 	public Triangle(Vertex v0,Vertex v1,Vertex v2)
+	{
+		_init(v0,v1,v2);
+	}
+
+	public Triangle(TriangleData tdat)
+	{
+		_init(tdat.v0(),tdat.v1(),tdat.v2());
+	}
+
+	private void _init(Vertex v0,Vertex v1,Vertex v2)
 	{
 		this.v0 = v0;
 		this.v1 = v1;
@@ -57,9 +68,8 @@ public class Triangle implements Geometry
 							 multiply(v1.color(),__BCentric.y()),
 							 multiply(v2.color(),__BCentric.z())
 			);
-		Hit hits = new Hit(t,__InterPos,__UV,__Normal,new UnknownMaterial());
+		Hit hits = new Hit(t,__InterPos,__UV,__Normal,new PhysicalMaterial(color(__BCentric),color(0,1,1)));
 		return primitive_hit(new HitTuple(hits,hits));
-		// TODO change back to hit only registered at front state of tuple
 	}
 
 	public BoundingBox bounding_box() { return bounds; }
