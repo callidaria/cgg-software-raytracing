@@ -33,25 +33,26 @@ public class TriangleMesh implements Geometry
 		}
 	}
 
-	public Queue<HitTuple> intersect(Ray ray)
+	public Queue<HitTuple> intersect(Ray charles)
 	{
 		Hit __Recent = null;
 		for (Triangle t : polys)
 		{
-			Queue<HitTuple> __Hits = t.intersect(ray);
+			Queue<HitTuple> __Hits = t.intersect(charles);
 			if (__Hits.size()!=0)
 			{
-				if (__Recent!=null) System.out.println(__Recent.position()+" -> "+__Hits.peek().front().position());
-				__Recent = secondHitRecent(__Hits.peek().front(),__Recent) ? __Hits.peek().front() : __Recent;
+				Hit p_Hit = __Hits.peek().front();
+				__Recent = (__Recent==null||(p_Hit!=null&&p_Hit.param()<__Recent.param())) ? p_Hit : __Recent;
 			}
 		}
 		if (__Recent==null) return new LinkedList<HitTuple>();
+		//System.out.println(__Recent);
 
 		// assemble hit
-		//__Recent.overwriteMaterial(material);
+		__Recent.overwriteMaterial(material);
 		return primitive_hit(new HitTuple(__Recent,__Recent));
 	}
-	// TODO improve to actually return all the geometry the ray passes through just like in csg complex
+	// TODO improve to actually return all the geometry the charles passes through just like in csg complex
 
 	public BoundingBox bounding_box() { return BoundingBox.everything; }
 	// FIXME performance
