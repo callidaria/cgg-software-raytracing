@@ -465,7 +465,7 @@ public class RayTracer implements Sampler
 
 	private Color _shadePosition(Hit hit,double intent) { return color(multiply(hit.position(),intent)); }
 	private Color _shadeTexture(Hit hit) { return color(hit.uv().x(),hit.uv().y(),0); }
-	private Color _shadeNormals(Hit hit) { return color(hit.normal()); }
+	private Color _shadeNormals(Hit hit) { return color(multiply(hit.normal(),vec3(1,-1,1))); }
 
 	private Color _computeVolumetric(Ray ray,Hit hit)
 	{

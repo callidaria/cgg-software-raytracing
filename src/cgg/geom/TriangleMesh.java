@@ -46,7 +46,6 @@ public class TriangleMesh implements Geometry
 			}
 		}
 		if (__Recent==null) return new LinkedList<HitTuple>();
-		//System.out.println(__Recent);
 
 		// assemble hit
 		__Recent.overwriteMaterial(material);
