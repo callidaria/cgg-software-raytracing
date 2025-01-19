@@ -15,6 +15,7 @@ import cgg.a02.Hit;
 public class TriangleMesh implements Geometry
 {
 	ArrayList<Triangle> polys;
+	//KDTree tree;
 	Material material;
 	BoundingBox bounds;
 	// TODO optimization kd tree
@@ -26,10 +27,15 @@ public class TriangleMesh implements Geometry
 		this.material = material;
 
 		// load mesh data
+		this.bounds = new BoundingBox();
 		for (MeshData mdat : loadMeshData(file))
 		{
 			for (TriangleData tdat : mdat.triangles())
-				this.polys.add(new Triangle(tdat));
+			{
+				Triangle __Pling = new Triangle(tdat);
+				this.polys.add(__Pling);
+				this.bounds.extend(__Pling.bounding_box());
+			}
 		}
 	}
 
@@ -52,7 +58,7 @@ public class TriangleMesh implements Geometry
 		return primitive_hit(new HitTuple(__Recent,__Recent));
 	}
 	// TODO improve to actually return all the geometry the charles passes through just like in csg complex
+	// FIXME receiving reflectance of triangle mesh surface is not the way it should be
 
-	public BoundingBox bounding_box() { return BoundingBox.everything; }
-	// FIXME performance
+	public BoundingBox bounding_box() { return bounds; }
 }
