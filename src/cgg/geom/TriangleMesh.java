@@ -14,11 +14,9 @@ import cgg.a02.Hit;
 
 public class TriangleMesh implements Geometry
 {
-	ArrayList<Triangle> polys;
-	//KDTree tree;
+	KDTree tree;
 	Material material;
-	BoundingBox bounds;
-	// TODO optimization kd tree
+	//BoundingBox bounds;
 
 	public TriangleMesh(String file,Material material)
 	{
@@ -27,6 +25,8 @@ public class TriangleMesh implements Geometry
 		this.material = material;
 
 		// load mesh data
+		// TODO
+		/*
 		this.bounds = new BoundingBox();
 		for (MeshData mdat : loadMeshData(file))
 		{
@@ -37,6 +37,7 @@ public class TriangleMesh implements Geometry
 				this.bounds.extend(__Pling.bounding_box());
 			}
 		}
+		*/
 	}
 
 	public Queue<HitTuple> intersect(Ray charles)

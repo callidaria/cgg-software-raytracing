@@ -14,10 +14,24 @@ class KDTree implements Geometry
 	KDTree right;
 	BoundingBox bounds;
 
-	public KDTree()
+	public KDTree(List<Triangle> triangles)
 	{
-		// TODO
+		this.bounds = BoundingBox.empty();
+
+		// node state
+		if (triangles.size()>3)
+		{
+			// TODO sort by distance maybe
+		}
+
+		// leaf state
+		else
+		{
+			this.triangles = triangles;
+			for (Triangle t : triangles) this.bounds.extend(t.bounding_box());
+		}
 	}
+	// TODO modify to use both nodes and leafs seperately
 
 	public Queue<HitTuple> intersect(Ray ray)
 	{
