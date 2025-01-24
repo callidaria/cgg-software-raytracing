@@ -231,6 +231,11 @@ public record BoundingBox(Vec3 min, Vec3 max) {
         );
     }
 
+	public boolean contains(Triangle t)
+	{
+		return contains(t.v0())||contains(t.v1())||contains(t.v2());
+	}
+
     /**
      * Checks if this bounding box contains another bounding box.
      *
