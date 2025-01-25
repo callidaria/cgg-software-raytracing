@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import static tools.Functions.*;
 import cgg.Config;
 import cgg.geom.Geometry;
+import cgg.geom.Triangle;
 import cgg.a02.Ray;
 
 /**
@@ -233,7 +234,7 @@ public record BoundingBox(Vec3 min, Vec3 max) {
 
 	public boolean contains(Triangle t)
 	{
-		return contains(t.v0())||contains(t.v1())||contains(t.v2());
+		return contains(t.v0().position())||contains(t.v1().position())||contains(t.v2().position());
 	}
 
     /**

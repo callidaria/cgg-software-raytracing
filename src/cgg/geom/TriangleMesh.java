@@ -14,7 +14,9 @@ import cgg.a02.Hit;
 
 public class TriangleMesh implements Geometry
 {
-	KDTree tree;
+	ArrayList<Triangle> triangles;
+	BoundingBox bounds;
+	//KDTree tree;
 	Material material;
 
 	public TriangleMesh(String file,Material material)
@@ -23,20 +25,24 @@ public class TriangleMesh implements Geometry
 		this.material = material;
 
 		// load mesh data
-		ArrayList<Triangle> triangles = new ArrayList<Triangle>();
+		/*ArrayList<Triangle> */triangles = new ArrayList<Triangle>();
+		bounds = BoundingBox.empty;
 		for (MeshData mdat : loadMeshData(file))
 		{
 			for (TriangleData tdat : mdat.triangles())
-				triangle.add(new Triangle(tdat));
+			{
+				Triangle t = new Triangle(tdat);
+				triangles.add(t);
+				this.bounds.extend(t.bounding_box());
+			}
 		}
-		this.tree = new KDTree(triangles);
+		//this.tree = new KDTree(triangles);
 	}
 
 	public Queue<HitTuple> intersect(Ray charles)
 	{
-		/*
 		Hit __Recent = null;
-		for (Triangle t : polys)
+		for (Triangle t : triangles)
 		{
 			Queue<HitTuple> __Hits = t.intersect(charles);
 			if (__Hits.size()!=0)
@@ -45,16 +51,18 @@ public class TriangleMesh implements Geometry
 				__Recent = (__Recent==null||(p_Hit!=null&&p_Hit.param()<__Recent.param())) ? p_Hit : __Recent;
 			}
 		}
-		*/
-		Hit __Recent = tree.intersect(charles);
+		//Queue<HitTuple> out = tree.intersect(charles);
 		if (__Recent==null) return new LinkedList<HitTuple>();
 
 		// assemble hit
-		__Recent.overwriteMaterial(material);
+		/*
+		if (out.size()>0) out.peek().front().overwriteMaterial(material);
+		return out;
+		*/
 		return primitive_hit(new HitTuple(__Recent,__Recent));
 	}
 	// TODO improve to actually return all the geometry the charles passes through just like in csg complex
 	// FIXME receiving reflectance of triangle mesh surface is not the way it should be
 
-	public BoundingBox bounding_box() { return tree.bounding_box(); }
+	public BoundingBox bounding_box() { return /*tree.bounding_box();*/bounds; }
 }

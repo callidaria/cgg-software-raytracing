@@ -73,4 +73,25 @@ public class Triangle implements Geometry
 	}
 
 	public BoundingBox bounding_box() { return bounds; }
+
+	public double center_1D(int axis)
+	{
+		switch (axis)
+		{
+		case 0: return _det_median(v0.position().x(),v1.position().x(),v2.position().x());
+		case 1: return _det_median(v0.position().y(),v1.position().y(),v2.position().y());
+		case 2: return _det_median(v0.position().z(),v1.position().z(),v2.position().z());
+		}
+		return .0;
+	}
+
+	private double _det_median(double p0,double p1,double p2)
+	{
+		double out = (p1>p0) ? p1 : p0;
+		return (p2>out) ? p2 : out;
+	}
+
+	public Vertex v0() { return v0; }
+	public Vertex v1() { return v1; }
+	public Vertex v2() { return v2; }
 }

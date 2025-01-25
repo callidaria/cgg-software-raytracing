@@ -13,8 +13,8 @@ public class AnimalFarm extends Scene
 		super(vec3(0,-2.5,4.5),vec3(0,0,0));
 
 		// cornell box
-		//groot.register_geometry(_cornellBox(vec3(0),5,false));
-		Structures.floor(groot,vec3(0,1,0),10,4);
+		groot.register_geometry(_cornellBox(vec3(0),5,false));
+		//Structures.floor(groot,vec3(0,1,0),10,4);
 
 		// reference object
 		/*
@@ -30,7 +30,7 @@ public class AnimalFarm extends Scene
 		// animal
 		GraphNode __Well = new GraphNode(vec3(0,-1,-2.5),vec3(1),vec3(0,0,0));
 		__Well.register_geometry(
-				new TriangleMesh("./res/mesh/suzanne.obj",new PhysicalMaterial(color(0,0,.7),color(.2,1,1)))
+				new TriangleMesh("./res/mesh/suzanne.obj",new PhysicalMaterial(color(0,0,.7),color(0,.1,1)))
 			);
 		__Well.update_bounds();
 		groot.register_geometry(__Well);
@@ -51,14 +51,12 @@ public class AnimalFarm extends Scene
 		GraphNode out = new GraphNode(pos,vec3(1),vec3(0));
 
 		out.register_geometry(new Box(vec3(0,.5,-hsize),size,1,size,neutral));
-		/*
 		out.register_geometry(new Box(vec3(0,-hsize,-size-.5),size,size,1,neutral));
 		out.register_geometry(new Box(vec3(0,-size-.5,-hsize),size,1,size,neutral));
 		out.register_geometry(new Box(vec3(-hsize-.5,-hsize,-hsize),1,size,size,
 									  new PhysicalMaterial(color(.7,0,0),color(0,1,1))));
 		out.register_geometry(new Box(vec3(hsize+.5,-hsize,-hsize),1,size,size,
 									  new PhysicalMaterial(rwall,color(0,1,1))));
-		*/
 
 		out.update_bounds();
 		return out;
