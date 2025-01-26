@@ -203,6 +203,7 @@ public class RayTracer implements Sampler
 			__GX = switch (__Recent.material())
 			{
 			case PhysicalMaterial c -> _shadePhysical(__Recent,ray,coord,depth);
+			case TransmittingMaterial c -> _shadeTransmitting(__Recent,ray,coord,depth);
 			case SurfaceMaterial c -> _shadePhong(__Recent);
 			case SurfaceColour c -> _shadeLaemp(__Recent);
 			default -> Config.ERRORCOLOUR;
@@ -360,6 +361,58 @@ public class RayTracer implements Sampler
 		__GI = multiply(__GI,add(multiply(__GIFresnel,__LUT.r()),__LUT.g()));
 		__GI = multiply(add(__GI,__DGI),__Cavity);
 		return mix(out,color(__GI),.5);
+	}
+
+	private Color _shadeTransmitting(Hit hit,Ray ray,Vec2 coord,int depth)
+	{
+		Vec3 p_Normal = hit.normal();
+		double __N0 = 1.;
+		double __N1 = hit.material().getComponent(MaterialComponent.MASS,hit).r();
+
+		// check for exit ray
+		double __CosTheta = dot(p_Normal,ray.direction());
+		if (__CosTheta>0)
+		{
+			// recalculate
+			p_Normal = multiply(p_Normal,-1);
+			__CosTheta = dot(p_Normal,ray.direction());
+			// FIXME is signswap equivalent?
+
+			// swap factors
+			__N0 = __N1;
+			__N1 = 1.;
+		}
+
+		// fresnel approximation
+		double __Schlick = pow((__N0-__N1)/(__N0+__N1),2.);
+		__Schlick = __Schlick+(1-__Schlick)*pow(1+__CosTheta,5.);
+
+		// in case of total reflection
+		double __R = (__N0/__N1);
+		double __DC = 1-pow(__R,2.)*(1-pow(-__CosTheta,2.));
+		if (__DC<0) __Schlick = 1.;
+
+		// calculate refraction
+		Color __Refraction = color(0,0,.5);
+		if (__Schlick<.99)
+		{
+			Vec3 __FacDirection = multiply(ray.direction(),__R);
+			Vec3 __FacDC = multiply(hit.normal(),__R*-__CosTheta-sqrt(__DC));
+			Vec3 __RefDirection = add(__FacDirection,__FacDC);
+			Ray __RefractRay = new Ray(hit.position(),__RefDirection);
+			__Refraction = _processScene(__RefractRay,coord,depth);
+		}
+
+		// calculate reflection
+		Color __Reflection = color(0,0,0);
+		if (__Schlick>.01)
+		{
+			Ray __ReflectRay = new Ray(hit.position(),bounce(ray.direction(),hit.normal()));
+			__Reflection = _processScene(__ReflectRay,coord,depth+1);
+		}
+
+		// combine components
+		return mix(__Refraction,__Reflection,__Schlick);
 	}
 
 	private Vec3 _diffuseComponent(Vec2 coord,int depth,Hit hit,Vec3 fresnel,double metallic)

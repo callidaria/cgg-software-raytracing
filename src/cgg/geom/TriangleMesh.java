@@ -38,6 +38,8 @@ public class TriangleMesh implements Geometry
 		}
 		//this.tree = new KDTree(triangles);
 	}
+	// FIXME kdtree should make rendering faster, not slower:
+	//		a debug log has been established in KDTree implementation in case there is time
 
 	public Queue<HitTuple> intersect(Ray charles)
 	{
@@ -59,6 +61,7 @@ public class TriangleMesh implements Geometry
 		if (out.size()>0) out.peek().front().overwriteMaterial(material);
 		return out;
 		*/
+		__Recent.overwriteMaterial(material);
 		return primitive_hit(new HitTuple(__Recent,__Recent));
 	}
 	// TODO improve to actually return all the geometry the charles passes through just like in csg complex

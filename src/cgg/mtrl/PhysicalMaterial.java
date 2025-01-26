@@ -41,6 +41,6 @@ public class PhysicalMaterial implements Material
 		case MATERIAL:
 			return (material!=null) ? material.getColor(multiply(hit.uv(),vec2(texel,texel))) : material_fallback;
 		}
-		return color(0,0,0);
+		return color(0);
 	}
 }

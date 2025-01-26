@@ -29,6 +29,7 @@ class KDTree implements Geometry
 		// leaf state
 		if (triangles.size()<4)
 		{
+			System.out.println("-> LEAF: "+triangles.size());
 			this.triangles = triangles;
 			return;
 		}
@@ -59,8 +60,10 @@ class KDTree implements Geometry
 
 		// packaging triangles into seperate tree subprogressions
 		int __Until = (int)(__Sorted.size()*.5);
+		System.out.println("+ NODE: "+triangles.size());
 		this.left = new KDTree(__Sorted.subList(0,__Until));
 		this.right = new KDTree(__Sorted.subList(__Until,__Sorted.size()));
+		System.out.println("- EXIT: "+triangles.size());
 	}
 
 	public Queue<HitTuple> intersect(Ray ray)

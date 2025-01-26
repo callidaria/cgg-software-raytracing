@@ -10,7 +10,7 @@ public class Main
 	public static void main(String[] args)
 	{
 		// geometry
-		Scene scene = new AnimalFarm();
+		Scene scene = new BodhisPoolRepair();
 
 		// raytracer
 		RayTracer rt = new RayTracer(scene);
@@ -19,6 +19,6 @@ public class Main
 		// image
 		Image image = new Image();
 		image.sample(new HaltonSampler(rt));
-		image.writePng("a08-image");
+		image.writePng("cgg-competition-ws-24-103717");
 	}
 }
