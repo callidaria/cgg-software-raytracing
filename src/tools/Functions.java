@@ -2,6 +2,7 @@ package tools;
 
 import java.lang.Math;
 
+
 /**
  * Utility class providing various mathematical and vector operations.
  */
@@ -1208,6 +1209,25 @@ public class Functions {
 	public static Vec3 bounce(Vec3 dir,Vec3 normal)
 	{
 		return add(dir,multiply(2*dot(multiply(dir,-1),normal),normal));
+	}
+
+	public static double transmissionSchlick(double cosTheta,double n0,double n1)
+	{
+		double out = Math.pow((n0-n1)/(n0+n1),2.);
+		return out+(1-out)*Math.pow(1+cosTheta,5.);
+	}
+
+	public static Vec3 refract(Vec3 dir,Vec3 normal,double cosTheta,double n0,double n1)
+	{
+		// in case of total reflection
+		double __R = (n0/n1);
+		double __DC = 1-Math.pow(__R,2.)*(1-Math.pow(-cosTheta,2.));
+		if (__DC<0) return null;
+
+		// calculate refraction
+		Vec3 __FacDirection = multiply(dir,__R);
+		Vec3 __FacDC = multiply(normal,__R*-cosTheta-Math.sqrt(__DC));
+		return add(__FacDirection,__FacDC);
 	}
 
 	public static Vec3 mix(Vec3 v0,Vec3 v1,double t)

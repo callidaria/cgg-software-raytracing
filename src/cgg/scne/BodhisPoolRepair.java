@@ -10,7 +10,7 @@ public class BodhisPoolRepair extends Scene
 {
 	public BodhisPoolRepair()
 	{
-		super(vec3(0,-2.5,5),vec3(0,0,0));
+		super(vec3(0,-1,5),vec3(0,0,0));
 
 		// flooring
 		Structures.floor(groot,vec3(0,0,0),10,4);

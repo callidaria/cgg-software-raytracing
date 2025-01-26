@@ -376,43 +376,39 @@ public class RayTracer implements Sampler
 			// recalculate
 			p_Normal = multiply(p_Normal,-1);
 			__CosTheta = dot(p_Normal,ray.direction());
-			// FIXME is signswap equivalent?
 
 			// swap factors
 			__N0 = __N1;
 			__N1 = 1.;
 		}
 
-		// fresnel approximation
-		double __Schlick = pow((__N0-__N1)/(__N0+__N1),2.);
-		__Schlick = __Schlick+(1-__Schlick)*pow(1+__CosTheta,5.);
-
-		// in case of total reflection
-		double __R = (__N0/__N1);
-		double __DC = 1-pow(__R,2.)*(1-pow(-__CosTheta,2.));
-		if (__DC<0) __Schlick = 1.;
-
 		// calculate refraction
-		Color __Refraction = color(0,0,.5);
+		double __Schlick = transmissionSchlick(__CosTheta,__N0,__N1);
+		Color __Refraction = color(0,0,0);
 		if (__Schlick<.99)
 		{
-			Vec3 __FacDirection = multiply(ray.direction(),__R);
-			Vec3 __FacDC = multiply(hit.normal(),__R*-__CosTheta-sqrt(__DC));
-			Vec3 __RefDirection = add(__FacDirection,__FacDC);
-			Ray __RefractRay = new Ray(hit.position(),__RefDirection);
-			__Refraction = _processScene(__RefractRay,coord,depth);
+			Vec3 __RefractDirection = refract(ray.direction(),p_Normal,__CosTheta,__N0,__N1);
+			if (__RefractDirection!=null)
+			{
+				Ray __RefractRay = new Ray(hit.position(),__RefractDirection);
+				__Refraction = _processScene(__RefractRay,coord,depth);
+				__Refraction = multiply(__Refraction,1-__Schlick);
+			}
+			else __Schlick = 1.;
 		}
 
 		// calculate reflection
 		Color __Reflection = color(0,0,0);
 		if (__Schlick>.01)
 		{
-			Ray __ReflectRay = new Ray(hit.position(),bounce(ray.direction(),hit.normal()));
+			Ray __ReflectRay = new Ray(hit.position(),bounce(ray.direction(),p_Normal));
 			__Reflection = _processScene(__ReflectRay,coord,depth+1);
+			__Reflection = multiply(__Reflection,__Schlick);
 		}
 
 		// combine components
-		return mix(__Refraction,__Reflection,__Schlick);
+		return add(__Reflection,__Refraction);
+		// FIXME there is some weird blue tint over refraction component
 	}
 
 	private Vec3 _diffuseComponent(Vec2 coord,int depth,Hit hit,Vec3 fresnel,double metallic)
