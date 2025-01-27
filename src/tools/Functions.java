@@ -1278,7 +1278,7 @@ public class Functions {
      * @param h The hue value (0.0 to 1.0).
      * @return A Color object representing the RGB values for the given hue.
      */
-    private static Color hue(double h) {
+    public static Color hue(double h) {
         double r = Math.abs(h * 6 - 3) - 1;
         double g = 2 - Math.abs(h * 6 - 2);
         double b = 2 - Math.abs(h * 6 - 4);

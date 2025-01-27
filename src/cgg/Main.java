@@ -13,7 +13,7 @@ public class Main
 {
 	public static void main(String[] args)
 	{
-		final double SECONDS = 2;
+		final double SECONDS = 30;
 		final int FRAMERATE = 40;
 		final double FRAMES = SECONDS*FRAMERATE;
 		BodhisPoolRepair scene = new BodhisPoolRepair(FRAMERATE);
@@ -25,7 +25,7 @@ public class Main
 		{
 			// setup
 			System.out.println("FRAME: "+i+"/"+FRAMES+" -> "+(int)((i/FRAMES)*100)+"%");
-			scene.render_setup();
+			scene.render_setup(i);
 			rt.bake();
 
 			// image

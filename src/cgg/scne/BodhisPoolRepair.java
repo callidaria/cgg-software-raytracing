@@ -74,25 +74,42 @@ public class BodhisPoolRepair extends Scene
 		PF_G = .981/framerate;
 
 		// geometry
+		// odd entities
 		pe = new ArrayList<PhysicalEntity>();
-		//pe.add(new PhysicalEntity(vec3(-4,-3,-4),_rd(),.5,1,.8,color(.5,0,0),MaterialState.EMITTER));
+		pe.add(new PhysicalEntity(vec3(-1,-.75,0),vec3(0),.5,1.5,.4,color(0,.5,0),MaterialState.EMITTER));
+		pe.add(new PhysicalEntity(vec3(1,-1.5,0),vec3(0),.5,1.5,.4,color(.5,.5,0),MaterialState.EMITTER));
 		/*
-		pe.add(new PhysicalEntity(vec3(-4,-2,-4),_rd(),.5,1,.8,color(0,.5,0),MaterialState.EMITTER));
-		//pe.add(new PhysicalEntity(vec3(4,-5,-4),_rd(),.5,1,.8,color(0,0,.5),MaterialState.EMITTER));
+		pe.add(new PhysicalEntity(vec3(-2,-4,-2),_rd(),.5,1.5,.8,color(.5,0,0),MaterialState.TRANSMITTER));
+		pe.add(new PhysicalEntity(vec3(-2,-3,2),_rd(),.5,1.5,.8,color(0,.5,0),MaterialState.TRANSMITTER));
+		pe.add(new PhysicalEntity(vec3(2,-2,-2),_rd(),.5,1.5,.8,color(0,0,.5),MaterialState.TRANSMITTER));
+		pe.add(new PhysicalEntity(vec3(2,-5,2),_rd(),.5,1.5,.8,color(.5,.5,0),MaterialState.TRANSMITTER));
+		*/
+		pe.add(new PhysicalEntity(vec3(-2,-4,-2),_rd(),.5,1.5,.7,color(.5,0,0),MaterialState.TRANSMITTER));
+		pe.add(new PhysicalEntity(vec3(-2,-3,-2),_rd(),.5,1.5,.7,color(0,.5,0),MaterialState.TRANSMITTER));
+		pe.add(new PhysicalEntity(vec3(4,-2,-2),_rd(),.5,1.5,.7,color(0,0,.5),MaterialState.TRANSMITTER));
+		pe.add(new PhysicalEntity(vec3(-4,-5,-2),_rd(),.5,1.5,.7,color(.5,.5,0),MaterialState.TRANSMITTER));
+		pe.add(new PhysicalEntity(vec3(-2,-4,2),_rd(),.5,1.5,.7,color(.5,0,0),MaterialState.TRANSMITTER));
+		pe.add(new PhysicalEntity(vec3(-2,-3,2),_rd(),.5,1.5,.7,color(0,.5,0),MaterialState.TRANSMITTER));
+		pe.add(new PhysicalEntity(vec3(4,-2,2),_rd(),.5,1.5,.7,color(0,0,.5),MaterialState.TRANSMITTER));
+		pe.add(new PhysicalEntity(vec3(-4,-5,2),_rd(),.5,1.5,.7,color(.5,.5,0),MaterialState.TRANSMITTER));
+
+		// phyiscal based entities
+		/*
+		pe.add(new PhysicalEntity(vec3(-4,-4,-4),_rd(),.1,4,.1,color(.5,.5,0),MaterialState.METAL));
+		pe.add(new PhysicalEntity(vec3(4,-6,-4),_rd(),.1,4,.4,color(0,0,.5),MaterialState.METAL));
 		*/
 		/*
-		pe.add(new PhysicalEntity(vec3(-1,-.75,0),vec3(0),.7,1.5,.5,color(0,.5,0),MaterialState.EMITTER));
-		pe.add(new PhysicalEntity(vec3(1,-1.5,0),vec3(0),.7,1.5,.5,color(.5,.5,0),MaterialState.EMITTER));
-		pe.add(new PhysicalEntity(vec3(-2,-4,-2),_rd(),.5,1,.4,color(.5,0,0),MaterialState.TRANSMITTER));
-		pe.add(new PhysicalEntity(vec3(-2,-3,2),_rd(),.5,1,.4,color(0,.5,0),MaterialState.TRANSMITTER));
-		pe.add(new PhysicalEntity(vec3(2,-2,-2),_rd(),.5,1,.4,color(0,0,.5),MaterialState.TRANSMITTER));
-		pe.add(new PhysicalEntity(vec3(2,-5,2),_rd(),.5,1,.4,color(.5,.5,0),MaterialState.TRANSMITTER));
+		pe.add(new PhysicalEntity(vec3(-4,-1,4),_rd(),.5,1,.4,color(0,.5,.5),MaterialState.ROUGH));
+		pe.add(new PhysicalEntity(vec3(4,-3,4),_rd(),.5,1,.4,color(.5,0,.5),MaterialState.ROUGH));
 		*/
-		pe.add(new PhysicalEntity(vec3(.2,-2,0),vec3(0),.7,1.5,.8,color(.5,.5,0),MaterialState.EMITTER));
-		pe.add(new PhysicalEntity(vec3(-.2,-4,0),vec3(0),.5,1,.8,color(.5,0,0),MaterialState.TRANSMITTER));
+		/*
+		pe.add(new PhysicalEntity(vec3(-3,-2,1),_rd(),.25,1.2,.4,color(.5,0,0),MaterialState.SMOOTH));
+		pe.add(new PhysicalEntity(vec3(3,-4,-1),_rd(),.25,1.2,.4,color(0,.5,0),MaterialState.SMOOTH));
+		*/
 	}
 
-	private Vec3 _rd() { return vec3(random()-.5,0,random()-.5); }
+	private Vec3 _rd() { return vec3((random()-.5)*.5,0,(random()-.5)*.5); }
+	private Vec3 _r2d() { return vec3(random()-.5,0,0); }
 
 	public void update()
 	{
@@ -134,14 +151,14 @@ public class BodhisPoolRepair extends Scene
 				double p = 2*(e.mass*v0+f.mass*v1)/__TMass;
 				double v0_i = p-v0, v1_i = p-v1;
 				double offc0 = dot(__Twi,f.direction), offc1 = dot(__Twd,e.direction);
-				if (offc1<0) e.direction = vec3(0);
-				else e.direction = add(multiply(e.direction,1-offc1),multiply(__Twi,v0_i*offc0*e.elastic));
-				if (offc0<0) f.direction = vec3(0);
-				else f.direction = add(multiply(f.direction,1-offc0),multiply(__Twd,v1_i*offc1*f.elastic));
+				if (offc1>0)
+					e.direction = add(multiply(e.direction,v1_i*(1-offc1)),multiply(__Twi,v0_i*offc0*e.elastic));
+				if (offc0>0)
+					f.direction = add(multiply(f.direction,v0_i*(1-offc0)),multiply(__Twd,v1_i*offc1*f.elastic));
 
 				// rejecting overintersection
-				e.position = add(e.position,multiply(__Twd,__Dist*(f.mass/__TMass)));
-				f.position = add(f.position,multiply(__Twi,__Dist*(e.mass/__TMass)));
+				e.position = add(e.position,multiply(__Twd,__Dist*(f.mass/__TMass)+.001));
+				f.position = add(f.position,multiply(__Twi,__Dist*(e.mass/__TMass)+.001));
 			}
 
 			// reject jitterbounce
@@ -156,7 +173,7 @@ public class BodhisPoolRepair extends Scene
 		}
 	}
 
-	public void render_setup()
+	public void render_setup(int frame)
 	{
 		groot = new GraphNode();
 		lights = new ArrayList<Illumination>();
@@ -178,8 +195,19 @@ public class BodhisPoolRepair extends Scene
 				em = new TransmittingMaterial(e.colour,1.5);
 				break;
 			case EMITTER:
-				em = new AbsoluteMaterial(e.colour);
+				em = new AbsoluteMaterial(hue(((double)frame/400.+e.colour.r())%1.));
 				break;
+				/*
+			case METAL:
+				em = new PhysicalMaterial(e.colour,color(1,.15,1));
+				break;
+			case ROUGH:
+				em = new PhysicalMaterial(e.colour,color(0,.8,1));
+				break;
+			case SMOOTH:
+				em = new PhysicalMaterial(e.colour,color(0,.2,1));
+				break;
+				*/
 			}
 
 			// write to node

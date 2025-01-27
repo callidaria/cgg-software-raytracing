@@ -193,7 +193,7 @@ public class RayTracer implements Sampler
 		return pow(__Result,1./Config.GAMMA);
 	}
 
-	private Color _processScene(Ray ray,Vec2 coord,int depth)
+	private Color _processScene(Ray ray,Vec2 coord,double depth)
 	{
 		if (depth>Config.RECURSION_DEPTH) return color(0,0,0);
 		Hit __Recent = _recentIntersection(ray,depth);
@@ -218,7 +218,7 @@ public class RayTracer implements Sampler
 		return __GX;
 	}
 
-	private Hit _recentIntersection(Ray ray,int depth)
+	private Hit _recentIntersection(Ray ray,double depth)
 	{
 		Queue<HitTuple> __Hits = new LinkedList<>();
 
@@ -241,7 +241,7 @@ public class RayTracer implements Sampler
 		return __Hits.peek().front();
 	}
 
-	private Color _shadePhysical(Hit hit,Ray ray,Vec2 coord,int depth)
+	private Color _shadePhysical(Hit hit,Ray ray,Vec2 coord,double depth)
 	{
 		// §§test output
 		//if (depth==0) return color(diffuse[(int)coord.y()*Config.WIDTH+(int)coord.x()]);
@@ -366,7 +366,7 @@ public class RayTracer implements Sampler
 		return mix(out,color(__GI),.5);
 	}
 
-	private Color _shadeTransmitting(Hit hit,Ray ray,Vec2 coord,int depth)
+	private Color _shadeTransmitting(Hit hit,Ray ray,Vec2 coord,double depth)
 	{
 		Vec3 p_Normal = hit.normal();
 		double __N0 = 1.;
@@ -394,7 +394,7 @@ public class RayTracer implements Sampler
 			if (__RefractDirection!=null)
 			{
 				Ray __RefractRay = new Ray(hit.position(),__RefractDirection);
-				__Refraction = _processScene(__RefractRay,coord,depth);
+				__Refraction = _processScene(__RefractRay,coord,depth+.25);
 				__Refraction = multiply(__Refraction,1-__Schlick);
 			}
 			else __Schlick = 1.;
@@ -423,7 +423,7 @@ public class RayTracer implements Sampler
 		return hit.material().getComponent(MaterialComponent.COLOUR,hit);
 	}
 
-	private Vec3 _diffuseComponent(Vec2 coord,int depth,Hit hit,Vec3 fresnel,double metallic)
+	private Vec3 _diffuseComponent(Vec2 coord,double depth,Hit hit,Vec3 fresnel,double metallic)
 	{
 		// ee in case of metallic or special reflectance situation
 		Vec3 out = vec3(0,0,0);
@@ -434,7 +434,7 @@ public class RayTracer implements Sampler
 		//for (int i=0;i<LUT.lookup().lookup_static_range();i++)
 		for (int i=0;i<Config.DIFFUSE_SAMPLES;i++)
 		{
-			Vec2 __Hammersley = LUT.lookup().lookup_static(i);
+			// Vec2 __Hammersley = LUT.lookup().lookup_static(i);
 
 			// hämis hämis hämisphere!
 			/*
@@ -453,7 +453,6 @@ public class RayTracer implements Sampler
 			Ray __DIR = new Ray(hit.position(),__DiffSample);
 			out = add(out,vec3(_processScene(__DIR,coord,depth+1)));
 		}
-		//System.out.println();
 		out = multiply(divide(out,Config.DIFFUSE_SAMPLES),
 					   vec3(hit.material().getComponent(MaterialComponent.COLOUR,hit)));
 		out = multiply(out,subtract(vec3(1),fresnel));
