@@ -206,6 +206,7 @@ public class RayTracer implements Sampler
 			{
 			case PhysicalMaterial c -> _shadePhysical(__Recent,ray,coord,depth);
 			case TransmittingMaterial c -> _shadeTransmitting(__Recent,ray,coord,depth);
+			case AbsoluteMaterial c -> _shadeAbsolute(__Recent);
 			case SurfaceMaterial c -> _shadePhong(__Recent);
 			case SurfaceColour c -> _shadeLaemp(__Recent);
 			default -> Config.ERRORCOLOUR;
@@ -408,9 +409,18 @@ public class RayTracer implements Sampler
 			__Reflection = multiply(__Reflection,__Schlick);
 		}
 
+		// glass tint
+		double __FresnelMod = pow(angle(ray.direction(),p_Normal)/(PI*.5),5.);
+		Color __Tint = multiply(hit.material().getComponent(MaterialComponent.COLOUR,hit),__FresnelMod*.001);
+
 		// combine components
-		return add(__Reflection,__Refraction);
+		return add(add(__Reflection,__Refraction),__Tint);
 		// FIXME there is some weird blue tint over refraction component
+	}
+
+	private Color _shadeAbsolute(Hit hit)
+	{
+		return hit.material().getComponent(MaterialComponent.COLOUR,hit);
 	}
 
 	private Vec3 _diffuseComponent(Vec2 coord,int depth,Hit hit,Vec3 fresnel,double metallic)

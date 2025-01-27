@@ -17,7 +17,8 @@ public class Main
 		BodhisPoolRepair scene = new BodhisPoolRepair();
 
 		// render loop
-		double seconds = 1;
+		double seconds = 30;
+		StopWatch __Timing = new StopWatch();
 		for (int i=0;i<seconds*30;i++)
 		{
 			// setup
@@ -35,6 +36,8 @@ public class Main
 			// update
 			scene.update();
 		}
+		__Timing.stop();
+		System.out.printf("video render time: %.2fs\n",__Timing.time_seconds());
 
 		try
 		{

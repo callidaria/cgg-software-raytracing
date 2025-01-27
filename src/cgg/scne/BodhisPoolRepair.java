@@ -38,6 +38,27 @@ class PhysicalEntity
 		this.colour = colour;
 		this.material = material;
 	}
+
+	public boolean grounded() { return (position.y()+radius)>0; }
+
+	public void bounds(double x,double z)
+	{
+		// x axis bounds
+		if (position.x()+radius>x||position.x()-radius<-x)
+		{
+			direction = multiply(direction,vec3(-elastic,1,1));
+			double __Correction = Math.abs(position.x())+radius-x;
+			position = subtract(position,vec3(__Correction*((position.x()<0)?-1:1),0,0));
+		}
+
+		// z axis bounds
+		if (position.z()+radius>z||position.z()-radius<-z)
+		{
+			direction = multiply(direction,vec3(1,1,-elastic));
+			double __Correction = Math.abs(position.z())+radius-z;
+			position = subtract(position,vec3(0,0,__Correction*((position.z()<0?-1:1))));
+		}
+	}
 }
 
 
@@ -52,8 +73,7 @@ public class BodhisPoolRepair extends Scene
 
 		// geometry
 		pe = new ArrayList<PhysicalEntity>();
-		pe.add(new PhysicalEntity(vec3(0,-4,0),vec3(0,0,0),.5,1,.25,color(0,0,.5),MaterialState.TRANSMITTER));
-		groot.register_geometry(new Sphere(vec3(0,-1,0),.5,new TransmittingMaterial(color(0,0,.5),1.5)));
+		pe.add(new PhysicalEntity(vec3(0,-4,0),vec3(.5,0,-.4),.5,1,.8,color(0,0,.5),MaterialState.TRANSMITTER));
 
 		craeveTheVorbiddenLaemp(vec3(-1.7,-2.5,-5.5),color(.7,.7,.7),.7);
 		craeveTheVorbiddenLaemp(vec3(1.7,-2.5,-5.5),color(.7,.7,.7),.7);
@@ -61,10 +81,30 @@ public class BodhisPoolRepair extends Scene
 
 	public void update()
 	{
-		// gravity application
 		for (PhysicalEntity e : pe)
 		{
-			e.direction = add(e.direction,vec3(0,PF_G,0));
+			// gravity application
+			if (e.grounded())
+			{
+				e.direction = multiply(e.direction,vec3(1,-e.elastic,1));
+				e.position = subtract(e.position,vec3(0,e.position.y()+e.radius,0));
+			}
+			else e.direction = add(e.direction,vec3(0,PF_G,0));
+
+			// keep physical entities inbounds
+			e.bounds(5,5);
+
+			// prevent jitterbounce
+			e.direction = multiply(
+					e.direction,
+					vec3(
+							(e.direction.x()<.001&&e.direction.x()>-.001) ? 0 : 1,
+							(e.direction.y()<.001&&e.direction.y()>-.001) ? 0 : 1,
+							(e.direction.z()<.001&&e.direction.z()>-.001) ? 0 : 1
+						)
+				);
+
+			// update position
 			e.position = add(e.position,e.direction);
 		}
 	}
@@ -72,7 +112,7 @@ public class BodhisPoolRepair extends Scene
 	public void render_setup()
 	{
 		groot = new GraphNode();
-		Structures.floor(groot,vec3(0,0,0),10,4);
+		Structures.floor(groot,vec3(0,.5,0),10,4);
 
 		// assemble geometry
 		for (PhysicalEntity e : pe)
