@@ -56,7 +56,12 @@ public class Box implements Geometry
 		Hit __Back = _assembleHit(r,t.far);
 
 		// combine
-		__Front = (__Back!=null&&__Front==null) ? hit_pointblank(r.origin(),material) : __Front;
+		//__Front = (__Back!=null&&__Front==null) ? hit_pointblank(r.origin(),material) : __Front;
+		if (__Front==null&&__Back!=null)
+		{
+			__Front = __Back;
+			__Front.overwriteNormal(multiply(__Front.normal(),-1));
+		}
 		return primitive_hit(new HitTuple(__Front,__Back));
 	}
 

@@ -49,14 +49,16 @@ public class RayTracer implements Sampler
 		// diffuse map convolution through bilateral filtering
 		// java language specs guarantee 0 as initial value for each array element
 		// looping for x and y individually, multiplication and addition is faster than modulo and division
+		/*
 		double sigd = pow(Config.BF_SIGMA_D,2);
 		double sigr = pow(Config.BF_SIGMA_R,2);
+		*/
 		/*
 		this.diffuse = _bilateralFilter(diffuse,bsize,16,sigd,sigr);
 		this.diffuse = _bilateralFilter(diffuse,bsize,4,sigd,sigr);
 		this.diffuse = _bilateralFilter(diffuse,bsize,2,sigd,sigr);
 		*/
-		this.diffuse = _bilateralFilter(diffuse,bsize,1,sigd,sigr);
+		//this.diffuse = _bilateralFilter(diffuse,bsize,1,sigd,sigr);
 		// FIXME breakdown into vertical & horizontal substeps for incredible performance benefits
 		// TODO find out if this breakdown even does something interesting without dithering
 		// TODO fix, it still looks horrible
