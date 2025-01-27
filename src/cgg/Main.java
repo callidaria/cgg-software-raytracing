@@ -13,19 +13,19 @@ public class Main
 {
 	public static void main(String[] args)
 	{
-		// geometry
-		BodhisPoolRepair scene = new BodhisPoolRepair();
+		final double SECONDS = 2;
+		final int FRAMERATE = 40;
+		final double FRAMES = SECONDS*FRAMERATE;
+		BodhisPoolRepair scene = new BodhisPoolRepair(FRAMERATE);
+		RayTracer rt = new RayTracer(scene);
 
 		// render loop
-		double seconds = 30;
 		StopWatch __Timing = new StopWatch();
-		for (int i=0;i<seconds*30;i++)
+		for (int i=0;i<FRAMES;i++)
 		{
 			// setup
+			System.out.println("FRAME: "+i+"/"+FRAMES+" -> "+(int)((i/FRAMES)*100)+"%");
 			scene.render_setup();
-
-			// raytracer
-			RayTracer rt = new RayTracer(scene);
 			rt.bake();
 
 			// image
@@ -45,7 +45,7 @@ public class Main
 					"ffmpeg",
 					"-y",
 					"-loglevel","panic",
-					"-r","30",
+					"-r",String.valueOf(FRAMERATE),
 					"-start_number","0",
 					"-i","video/frame-%04d.png",
 					"-pix_fmt","yuv420p",

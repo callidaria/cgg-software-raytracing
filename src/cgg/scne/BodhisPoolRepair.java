@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import static tools.Functions.*;
 import tools.*;
 import cgg.geom.*;
+import cgg.lght.*;
 import cgg.mtrl.*;
 
 
@@ -65,36 +66,85 @@ class PhysicalEntity
 public class BodhisPoolRepair extends Scene
 {
 	private ArrayList<PhysicalEntity> pe;
-	private final double PF_G = .981/30;
+	private final double PF_G;
 
-	public BodhisPoolRepair()
+	public BodhisPoolRepair(int framerate)
 	{
-		super(vec3(0,-2.5,7),vec3(0,0,0));
+		super(vec3(0,-4,10),vec3(15,0,0));
+		PF_G = .981/framerate;
 
 		// geometry
 		pe = new ArrayList<PhysicalEntity>();
-		pe.add(new PhysicalEntity(vec3(0,-4,0),vec3(.5,0,-.4),.5,1,.8,color(0,0,.5),MaterialState.TRANSMITTER));
-
-		craeveTheVorbiddenLaemp(vec3(-1.7,-2.5,-5.5),color(.7,.7,.7),.7);
-		craeveTheVorbiddenLaemp(vec3(1.7,-2.5,-5.5),color(.7,.7,.7),.7);
+		//pe.add(new PhysicalEntity(vec3(-4,-3,-4),_rd(),.5,1,.8,color(.5,0,0),MaterialState.EMITTER));
+		/*
+		pe.add(new PhysicalEntity(vec3(-4,-2,-4),_rd(),.5,1,.8,color(0,.5,0),MaterialState.EMITTER));
+		//pe.add(new PhysicalEntity(vec3(4,-5,-4),_rd(),.5,1,.8,color(0,0,.5),MaterialState.EMITTER));
+		*/
+		/*
+		pe.add(new PhysicalEntity(vec3(-1,-.75,0),vec3(0),.7,1.5,.5,color(0,.5,0),MaterialState.EMITTER));
+		pe.add(new PhysicalEntity(vec3(1,-1.5,0),vec3(0),.7,1.5,.5,color(.5,.5,0),MaterialState.EMITTER));
+		pe.add(new PhysicalEntity(vec3(-2,-4,-2),_rd(),.5,1,.4,color(.5,0,0),MaterialState.TRANSMITTER));
+		pe.add(new PhysicalEntity(vec3(-2,-3,2),_rd(),.5,1,.4,color(0,.5,0),MaterialState.TRANSMITTER));
+		pe.add(new PhysicalEntity(vec3(2,-2,-2),_rd(),.5,1,.4,color(0,0,.5),MaterialState.TRANSMITTER));
+		pe.add(new PhysicalEntity(vec3(2,-5,2),_rd(),.5,1,.4,color(.5,.5,0),MaterialState.TRANSMITTER));
+		*/
+		pe.add(new PhysicalEntity(vec3(.2,-2,0),vec3(0),.7,1.5,.8,color(.5,.5,0),MaterialState.EMITTER));
+		pe.add(new PhysicalEntity(vec3(-.2,-4,0),vec3(0),.5,1,.8,color(.5,0,0),MaterialState.TRANSMITTER));
 	}
+
+	private Vec3 _rd() { return vec3(random()-.5,0,random()-.5); }
 
 	public void update()
 	{
-		for (PhysicalEntity e : pe)
+		for (int i=0;i<pe.size();i++)
 		{
+			PhysicalEntity e = pe.get(i);
+
+			// update position
+			e.position = add(e.position,e.direction);
+
 			// gravity application
 			if (e.grounded())
 			{
 				e.direction = multiply(e.direction,vec3(1,-e.elastic,1));
 				e.position = subtract(e.position,vec3(0,e.position.y()+e.radius,0));
 			}
-			else e.direction = add(e.direction,vec3(0,PF_G,0));
+			e.direction = add(e.direction,vec3(0,PF_G,0));
 
-			// keep physical entities inbounds
+			// collision
 			e.bounds(5,5);
+			for (int j=i+1;j<pe.size();j++)
+			{
+				PhysicalEntity f = pe.get(j);
 
-			// prevent jitterbounce
+				// spacial entity relationship & collision test
+				Vec3 __Twd = subtract(f.position,e.position);
+				double __TMass = e.mass+f.mass;
+				double __Dist = length(__Twd)-(e.radius+f.radius);
+				if (__Dist>0) continue;
+
+				// geometric properties of elastic collision
+				double v0 = length(e.direction), v1 = length(f.direction);
+				e.direction = normalize(e.direction);
+				f.direction = normalize(f.direction);
+				__Twd = normalize(__Twd);
+				Vec3 __Twi = multiply(__Twd,-1);
+
+				// combine trajectory after collision
+				double p = 2*(e.mass*v0+f.mass*v1)/__TMass;
+				double v0_i = p-v0, v1_i = p-v1;
+				double offc0 = dot(__Twi,f.direction), offc1 = dot(__Twd,e.direction);
+				if (offc1<0) e.direction = vec3(0);
+				else e.direction = add(multiply(e.direction,1-offc1),multiply(__Twi,v0_i*offc0*e.elastic));
+				if (offc0<0) f.direction = vec3(0);
+				else f.direction = add(multiply(f.direction,1-offc0),multiply(__Twd,v1_i*offc1*f.elastic));
+
+				// rejecting overintersection
+				e.position = add(e.position,multiply(__Twd,__Dist*(f.mass/__TMass)));
+				f.position = add(f.position,multiply(__Twi,__Dist*(e.mass/__TMass)));
+			}
+
+			// reject jitterbounce
 			e.direction = multiply(
 					e.direction,
 					vec3(
@@ -103,16 +153,19 @@ public class BodhisPoolRepair extends Scene
 							(e.direction.z()<.001&&e.direction.z()>-.001) ? 0 : 1
 						)
 				);
-
-			// update position
-			e.position = add(e.position,e.direction);
 		}
 	}
 
 	public void render_setup()
 	{
 		groot = new GraphNode();
+		lights = new ArrayList<Illumination>();
+		emitter = new ArrayList<Geometry>();
+
+		// basic setup
 		Structures.floor(groot,vec3(0,.5,0),10,4);
+		craeveTheVorbiddenLaemp(vec3(-1.7,-2.5,-5.5),color(.7,.7,.7),.7);
+		craeveTheVorbiddenLaemp(vec3(1.7,-2.5,-5.5),color(.7,.7,.7),.7);
 
 		// assemble geometry
 		for (PhysicalEntity e : pe)
@@ -123,6 +176,9 @@ public class BodhisPoolRepair extends Scene
 			{
 			case TRANSMITTER:
 				em = new TransmittingMaterial(e.colour,1.5);
+				break;
+			case EMITTER:
+				em = new AbsoluteMaterial(e.colour);
 				break;
 			}
 

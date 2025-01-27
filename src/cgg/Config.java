@@ -7,8 +7,8 @@ import static tools.Functions.*;
 public class Config
 {
 	// view
-	public static final int WIDTH = 1000;
-	public static final int HEIGHT = 1000;
+	public static final int WIDTH = 1280;
+	public static final int HEIGHT = 720;
 	public static final int FOV = 60;
 	public static final double EXPOSURE = 1.;
 	public static final double NEAR = .0001;
