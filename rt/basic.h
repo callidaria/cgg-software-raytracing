@@ -1,0 +1,16 @@
+#ifndef RT_BASIC_HEADER
+#define RT_BASIC_HEADER
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+typedef unsigned char u8;
+typedef unsigned int u32;
+typedef float f32;
+typedef double f64;
+// TODO affirm that this is equal on all system
+
+
+#endif

@@ -1,0 +1,28 @@
+#include "image.h"
+
+
+/**
+ *	TODO
+ */
+void create_image(Image* img,u32 width,u32 height)
+{
+	img->width = width;
+	img->height = height;
+	img->pixels = (colour*)malloc(sizeof(colour)*width*height);
+}
+
+/**
+ *	TODO
+ */
+void write_image(Image* img,char* path)
+{
+	// TODO
+}
+
+/**
+ *	TODO
+ */
+void destroy_image(Image* img)
+{
+	free(img->pixels);
+}
