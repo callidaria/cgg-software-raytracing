@@ -2,7 +2,10 @@
 
 
 /**
- *	TODO
+ *	generate image buffer
+ *	\param width: buffer resolution width
+ *	\param height: buffer resolution height
+ *	\returns pointer to image in memory
  */
 Image* create_image(u32 width,u32 height)
 {
@@ -15,7 +18,9 @@ Image* create_image(u32 width,u32 height)
 }
 
 /**
- *	TODO
+ *	write image buffer to a file
+ *	\param img: pointer to image buffer
+ *	\param path: path to output file
  */
 void write_image(Image* img,char* path)
 {
@@ -30,7 +35,8 @@ void write_image(Image* img,char* path)
 }
 
 /**
- *	TODO
+ *	delete image buffer from memory
+ *	\param img: image buffer to remove from memory
  */
 void destroy_image(Image* img)
 {
@@ -39,7 +45,11 @@ void destroy_image(Image* img)
 }
 
 /**
- *	TODO
+ *	set a pixel in image buffer
+ *	\param img: pointer to image buffer
+ *	\param x: x coordinate of pixel array in image data
+ *	\param y: y coordinate of pixel array in image data
+ *	\param c: rgb colour values to write to pixel
  */
 void write_pixel(Image* img,u32 x,u32 y,crgb c)
 {
