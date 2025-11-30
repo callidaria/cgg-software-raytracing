@@ -5,8 +5,9 @@
  *	raytracer
  *	\param bff: resulting image buffer
  *	\param cam: camera
+ *	\param scn: root node of scene graph
  */
-void rt(Image* bff,Camera* cam)
+void rt(Image* bff,Camera* cam,SGNode* scn)
 {
 	for (u32 y=0;y<BUFFER_RESOLUTION_HEIGHT;++y)
 	{
