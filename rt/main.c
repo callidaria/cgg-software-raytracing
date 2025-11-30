@@ -1,13 +1,12 @@
 #include "image.h"
 
-#define BUFFER_RESOLUTION_WIDTH 1920
-#define BUFFER_RESOLUTION_HEIGHT 1080
-
 
 int main(int argc,char** argv)
 {
 	// create final output buffer
 	Image* output_buffer = create_image(BUFFER_RESOLUTION_WIDTH,BUFFER_RESOLUTION_HEIGHT);
+	Camera* camera = create_camera((vec3){ 0,1,-4 });
+	update_camera(camera);
 
 	// write to image
 	for (u8 i=0;i<50;++i)
@@ -18,6 +17,7 @@ int main(int argc,char** argv)
 
 	// write & finalize
 	write_image(output_buffer,"../images/cout.ppm");
+	destroy_camera(camera);
 	destroy_image(output_buffer);
 	return 0;
 }

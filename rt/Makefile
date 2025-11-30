@@ -3,6 +3,7 @@ CC = gcc
 LDST = lib/
 SDST = .
 TARGET = rt
+LINKER = -lm
 
 SRCS = $(filter-out main.c, $(wildcard *.c))
 OBJS = $(SRCS:%.c=$(LDST)%.o)
@@ -11,11 +12,11 @@ MAIN = main.c
 DEBUG_SUFFIX = -pg -g -O0 -DDEBUG
 RELEASE_SUFFIX = -O3 -fno-gcse
 
-CXXFLAGS = $(RELEASE_SUFFIX) $(VER)
+CXXFLAGS = $(RELEASE_SUFFIX) $(LINKER)
 
 all: $(TARGET)
 
-debug: CXXFLAGS = $(DEBUG_SUFFIX) $(VER)
+debug: CXXFLAGS = $(DEBUG_SUFFIX) $(LINKER)
 debug: $(TARGET)
 
 clean:

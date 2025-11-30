@@ -21,7 +21,11 @@ vec2 divv2(vec2 v0,vec2 v1) { return (vec2){ v0.x/v1.x,v0.y/v1.y }; }
 vec2 addv2s(vec2 v,f32 s) { return (vec2){ v.x+s,v.y+s }; }
 vec2 subv2s(vec2 v,f32 s) { return (vec2){ v.x-s,v.y-s }; }
 vec2 mulv2s(vec2 v,f32 s) { return (vec2){ v.x*s,v.y*s }; }
-vec2 divv2s(vec2 v,f32 s) { return (vec2){ v.x/s,v.y/s }; }
+vec2 divv2s(vec2 v,f32 s)
+{
+	f32 __Inv = 1.f/s;
+	return (vec2){ v.x*__Inv,v.y*__Inv };
+}
 
 /**
  *	operations over two vectors in R3
@@ -43,7 +47,11 @@ vec3 divv3(vec3 v0,vec3 v1) { return (vec3){ v0.x/v1.x,v0.y/v1.y,v0.z/v1.z }; }
 vec3 addv3s(vec3 v,f32 s) { return (vec3){ v.x+s,v.y+s,v.z+s }; }
 vec3 subv3s(vec3 v,f32 s) { return (vec3){ v.x-s,v.y-s,v.z-s }; }
 vec3 mulv3s(vec3 v,f32 s) { return (vec3){ v.x*s,v.y*s,v.z*s }; }
-vec3 divv3s(vec3 v,f32 s) { return (vec3){ v.x/s,v.y/s,v.z/s }; }
+vec3 divv3s(vec3 v,f32 s)
+{
+	f32 __Inv = 1.f/s;
+	return (vec3){ v.x*__Inv,v.y*__Inv,v.z*__Inv };
+}
 
 /**
  *	operations over two vectors in R4
@@ -64,7 +72,66 @@ vec4 divv4(vec4 v0,vec4 v1) { return (vec4){ v0.x/v1.x,v0.y/v1.y,v0.z/v1.z,v0.w/
 vec4 addv4s(vec4 v,f32 s) { return (vec4){ v.x+s,v.y+s,v.z+s,v.w+s }; }
 vec4 subv4s(vec4 v,f32 s) { return (vec4){ v.x-s,v.y-s,v.z-s,v.w-s }; }
 vec4 mulv4s(vec4 v,f32 s) { return (vec4){ v.x*s,v.y*s,v.z*s,v.w*s }; }
-vec4 divv4s(vec4 v,f32 s) { return (vec4){ v.x/s,v.y/s,v.z/s,v.w/s }; }
+vec4 divv4s(vec4 v,f32 s)
+{
+	f32 __Inv = 1.f/s;
+	return (vec4){ v.x*__Inv,v.y*__Inv,v.z*__Inv,v.w*__Inv };
+}
+
+
+/**
+ *	unary operations over a vector in R2
+ *	\param v: vector
+ */
+f32 lengthv2(vec2 v) { return sqrt(v.x*v.x+v.y*v.y); }
+
+/**
+ *	normalize a vector in R2
+ *	\param v: vector to normalize
+ *	\returns normalized version of passed vector
+ */
+vec2 normalizev2(vec2 v)
+{
+	f32 __Len = lengthv2(v);
+	if (__Len==.0f) return v;
+	return divv2s(v,__Len);
+}
+
+/**
+ *	unary operations over a vector in R3
+ *	\param v: vector
+ */
+f32 lengthv3(vec3 v) { return sqrt(v.x*v.x+v.y*v.y+v.z*v.z); }
+
+/**
+ *	normalize a vector in R3
+ *	\param v: vector to normalize
+ *	\returns normalized version of passed vector
+ */
+vec3 normalizev3(vec3 v)
+{
+	f32 __Len = lengthv3(v);
+	if (__Len==.0f) return v;
+	return divv3s(v,__Len);
+}
+
+/**
+ *	unary operations over a vector in R4
+ *	\param v: vector
+ */
+f32 lengthv4(vec4 v) { return sqrt(v.x*v.x+v.y*v.y+v.z*v.z+v.w*v.w); }
+
+/**
+ *	normalize a vector in R4
+ *	\param v: vector to normalize
+ *	\returns normalized version of passed vector
+ */
+vec4 normalizev4(vec4 v)
+{
+	f32 __Len = lengthv4(v);
+	if (__Len==.0f) return v;
+	return divv4s(v,__Len);
+}
 
 /**
  *	add two matrices cell by cell
@@ -185,4 +252,54 @@ void divm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
 	_mm_storeu_ps(&__R[4],_mm_div_ps(__Ar1,__Br1));
 	_mm_storeu_ps(&__R[8],_mm_div_ps(__Ar2,__Br2));
 	_mm_storeu_ps(&__R[12],_mm_div_ps(__Ar3,__Br3));
+}
+
+/**
+ *	create a camera to cast rays from
+ *	\param pos: camera position and origin of all initial rays
+ *	\returns: pointer to camera in memory
+ */
+Camera* create_camera(vec3 pos)
+{
+	Camera* cam = (Camera*)malloc(sizeof(Camera));
+	cam->position = pos;
+	cam->zfac = -BUFFER_RESOLUTION_HWIDTH/tan(PERSPECTIVE_CLIPPING_FOV*RAD_PI*.5f);
+	cam->rays = (Ray*)malloc(sizeof(Ray)*BUFFER_RESOLUTION_PIXELS);
+}
+
+/**
+ *	regenerate all camera rays
+ *	\param cam: camera to update
+ */
+void update_camera(Camera* cam)
+{
+	for (u32 y=0;y<BUFFER_RESOLUTION_HEIGHT;++y)
+	{
+		for (u32 x=0;x<BUFFER_RESOLUTION_WIDTH;++x)
+			cast_ray(cam,x,y);
+	}
+}
+
+/**
+ *	regenerate ray at given coordinate
+ *	\param cam: camera to update
+ *	\param x: x-axis pixel coordinate
+ *	\param y: y-axis pixel coordinate
+ */
+void cast_ray(Camera* cam,u32 x,u32 y)
+{
+	cam->rays[y*BUFFER_RESOLUTION_WIDTH+x] = (Ray){
+		.origin = cam->position,
+		.direction = normalizev3((vec3){ x-BUFFER_RESOLUTION_HWIDTH,y-BUFFER_RESOLUTION_HHEIGHT,cam->zfac })
+	};
+}
+
+/**
+ *	free memory for created camera and all it's rays
+ *	\param cam: camera to be free'd
+ */
+void destroy_camera(Camera* cam)
+{
+	free(cam->rays);
+	free(cam);
 }

@@ -1,7 +1,13 @@
 #ifndef RT_MATH_HEADER
 #define RT_MATH_HEADER
 
-#include "basic.h"
+#include "config.h"
+
+// ----------------------------------------------------------------------------------------------------
+// Constants
+
+static f64 RAD_PI = M_PI/180.;
+static f64 DEG_PI = 180./M_PI;
 
 
 // ----------------------------------------------------------------------------------------------------
@@ -16,8 +22,18 @@ typedef struct { f32 v[16]; } mat4x4;
 typedef struct { u8 r,g,b; } crgb;
 typedef struct { u8 r,g,b,a; } crgba;
 
+typedef struct {
+	vec3 origin;
+	vec3 direction;
+} Ray;
+
 // camera
-// TODO
+typedef struct {
+	vec3 position;
+	// TODO rotation
+	f32 zfac;
+	Ray* rays;
+} Camera;
 
 
 // ----------------------------------------------------------------------------------------------------
@@ -62,12 +78,31 @@ vec4 divv4s(vec4,f32);
 // quat
 // TODO
 
+// unary vector operations
+// vec2
+f32 lengthv2(vec2);
+vec2 normalizev2(vec2);
+
+// vec3
+f32 lengthv3(vec3);
+vec3 normalizev3(vec3);
+
+// vec4
+f32 lengthv4(vec4);
+vec4 normalizev4(vec4);
+
 // matrixmath
 // mat4
 void addm44(mat4x4*,const mat4x4*,const mat4x4*);
 void subm44(mat4x4*,const mat4x4*,const mat4x4*);
 void mulm44(mat4x4*,const mat4x4*,const mat4x4*);
 void divm44(mat4x4*,const mat4x4*,const mat4x4*);
+
+// camera
+Camera* create_camera(vec3);
+void update_camera(Camera*);
+void cast_ray(Camera*,u32,u32);
+void destroy_camera(Camera*);
 
 
 #endif
