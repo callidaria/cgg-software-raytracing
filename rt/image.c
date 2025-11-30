@@ -22,7 +22,7 @@ Image* create_image(u32 width,u32 height)
  *	\param img: pointer to image buffer
  *	\param path: path to output file
  */
-void write_image(Image* img,char* path)
+void write_image(const Image* img,char* path)
 {
 	// open file & format
 	FILE* __File;

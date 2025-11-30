@@ -66,11 +66,123 @@ vec4 subv4s(vec4 v,f32 s) { return (vec4){ v.x-s,v.y-s,v.z-s,v.w-s }; }
 vec4 mulv4s(vec4 v,f32 s) { return (vec4){ v.x*s,v.y*s,v.z*s,v.w*s }; }
 vec4 divv4s(vec4 v,f32 s) { return (vec4){ v.x/s,v.y/s,v.z/s,v.w/s }; }
 
-// matrixmath
-// mat4
-/*
-void addm44(mat4x4* m0,mat4x4* m1);
-void subm44(mat4x4* m0,mat4x4* m1);
-void mulm44(mat4x4* m0,mat4x4* m1);
-void divm44(mat4x4* m0,mat4x4* m1);
-*/
+/**
+ *	add two matrices cell by cell
+ *	\param r: resulting matrix after addition
+ *	\param m0: left hand side matrix
+ *	\param m1: right hand side matrix
+ */
+void addm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
+{
+	f32* __R = (f32*)r;
+	f32* __M0 = (f32*)m0;
+	f32* __M1 = (f32*)m1;
+
+	// extract rows
+	__m128 __Ar0 = _mm_loadu_ps(&__M0[0]);
+	__m128 __Ar1 = _mm_loadu_ps(&__M0[4]);
+	__m128 __Ar2 = _mm_loadu_ps(&__M0[8]);
+	__m128 __Ar3 = _mm_loadu_ps(&__M0[12]);
+	__m128 __Br0 = _mm_loadu_ps(&__M1[0]);
+	__m128 __Br1 = _mm_loadu_ps(&__M1[4]);
+	__m128 __Br2 = _mm_loadu_ps(&__M1[8]);
+	__m128 __Br3 = _mm_loadu_ps(&__M1[12]);
+
+	// sum & store
+	_mm_storeu_ps(&__R[0],_mm_add_ps(__Ar0,__Br0));
+	_mm_storeu_ps(&__R[4],_mm_add_ps(__Ar1,__Br1));
+	_mm_storeu_ps(&__R[8],_mm_add_ps(__Ar2,__Br2));
+	_mm_storeu_ps(&__R[12],_mm_add_ps(__Ar3,__Br3));
+}
+
+/**
+ *	subtract two matrices cell by cell
+ *	\param r: resulting matrix after subtraction
+ *	\param m0: left hand side matrix
+ *	\param m1: right hand side matrix
+ */
+void subm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
+{
+	f32* __R = (f32*)r;
+	f32* __M0 = (f32*)m0;
+	f32* __M1 = (f32*)m1;
+
+	// extract rows
+	__m128 __Ar0 = _mm_loadu_ps(&__M0[0]);
+	__m128 __Ar1 = _mm_loadu_ps(&__M0[4]);
+	__m128 __Ar2 = _mm_loadu_ps(&__M0[8]);
+	__m128 __Ar3 = _mm_loadu_ps(&__M0[12]);
+	__m128 __Br0 = _mm_loadu_ps(&__M1[0]);
+	__m128 __Br1 = _mm_loadu_ps(&__M1[4]);
+	__m128 __Br2 = _mm_loadu_ps(&__M1[8]);
+	__m128 __Br3 = _mm_loadu_ps(&__M1[12]);
+
+	// subtract & store
+	_mm_storeu_ps(&__R[0],_mm_sub_ps(__Ar0,__Br0));
+	_mm_storeu_ps(&__R[4],_mm_sub_ps(__Ar1,__Br1));
+	_mm_storeu_ps(&__R[8],_mm_sub_ps(__Ar2,__Br2));
+	_mm_storeu_ps(&__R[12],_mm_sub_ps(__Ar3,__Br3));
+}
+
+/**
+ *	multiply two matrices cell by cell
+ *	\param r: resulting matrix after multiplication
+ *	\param m0: left hand side matrix
+ *	\param m1: right hand side matrix
+ */
+void mulm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
+{
+	f32* __R = (f32*)r;
+	f32* __M0 = (f32*)m0;
+	f32* __M1 = (f32*)m1;
+
+	// load left hand side matrix
+	__m128 __Rows[4];
+	__Rows[0] = _mm_loadu_ps(&__M1[0]);
+	__Rows[1] = _mm_loadu_ps(&__M1[4]);
+	__Rows[2] = _mm_loadu_ps(&__M1[8]);
+	__Rows[3] = _mm_loadu_ps(&__M1[12]);
+
+	// iterate multiplication
+	for (u8 i=0;i<4;++i)
+	{
+		__m128 __Cols[4];
+		__Cols[0] = _mm_set1_ps(__M0[i*4]);
+		__Cols[1] = _mm_set1_ps(__M0[i*4+1]);
+		__Cols[2] = _mm_set1_ps(__M0[i*4+2]);
+		__Cols[3] = _mm_set1_ps(__M0[i*4+3]);
+		_mm_store_ps(&__R[i*4],_mm_add_ps(
+				_mm_add_ps(_mm_mul_ps(__Rows[0],__Cols[0]),_mm_mul_ps(__Rows[1],__Cols[1])),
+				_mm_add_ps(_mm_mul_ps(__Rows[2],__Cols[2]),_mm_mul_ps(__Rows[3],__Cols[3]))
+			));
+	}
+}
+
+/**
+ *	divide two matrices cell by cell
+ *	\param r: resulting matrix after divide
+ *	\param m0: left hand side matrix
+ *	\param m1: right hand side matrix
+ */
+void divm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
+{
+	f32* __R = (f32*)r;
+	f32* __M0 = (f32*)m0;
+	f32* __M1 = (f32*)m1;
+
+	// extract rows
+	__m128 __Ar0 = _mm_loadu_ps(&__M0[0]);
+	__m128 __Ar1 = _mm_loadu_ps(&__M0[4]);
+	__m128 __Ar2 = _mm_loadu_ps(&__M0[8]);
+	__m128 __Ar3 = _mm_loadu_ps(&__M0[12]);
+	__m128 __Br0 = _mm_loadu_ps(&__M1[0]);
+	__m128 __Br1 = _mm_loadu_ps(&__M1[4]);
+	__m128 __Br2 = _mm_loadu_ps(&__M1[8]);
+	__m128 __Br3 = _mm_loadu_ps(&__M1[12]);
+
+	// subtract & store
+	_mm_storeu_ps(&__R[0],_mm_div_ps(__Ar0,__Br0));
+	_mm_storeu_ps(&__R[4],_mm_div_ps(__Ar1,__Br1));
+	_mm_storeu_ps(&__R[8],_mm_div_ps(__Ar2,__Br2));
+	_mm_storeu_ps(&__R[12],_mm_div_ps(__Ar3,__Br3));
+}

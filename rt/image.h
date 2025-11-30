@@ -18,7 +18,7 @@ typedef struct {
 
 // image memory utility
 Image* create_image(u32,u32);
-void write_image(Image*,char*);
+void write_image(const Image*,char*);
 void destroy_image(Image*);
 
 // image pixel utility
