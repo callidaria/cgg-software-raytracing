@@ -1,6 +1,9 @@
 #include "math.h"
 
 
+// ----------------------------------------------------------------------------------------------------
+// Basic
+
 /**
  *	operations over two vectors in R2
  *	\param v0: left hand side vector
@@ -254,6 +257,10 @@ void divm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
 	_mm_storeu_ps(&__R[12],_mm_div_ps(__Ar3,__Br3));
 }
 
+
+// ----------------------------------------------------------------------------------------------------
+// Camera
+
 /**
  *	create a camera to cast rays from
  *	\param pos: camera position and origin of all initial rays
@@ -265,6 +272,7 @@ Camera* create_camera(vec3 pos)
 	cam->position = pos;
 	cam->zfac = -BUFFER_RESOLUTION_HWIDTH/tan(PERSPECTIVE_CLIPPING_FOV*RAD_PI*.5f);
 	cam->rays = (Ray*)malloc(sizeof(Ray)*BUFFER_RESOLUTION_PIXELS);
+	return cam;
 }
 
 /**

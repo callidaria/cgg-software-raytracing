@@ -8,7 +8,7 @@
 // Utility
 
 // raytracer
-// TODO
+void rt(Image*,Camera*);
 
 
 #endif
