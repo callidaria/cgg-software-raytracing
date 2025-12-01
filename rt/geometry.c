@@ -64,20 +64,41 @@ void destroy_graph(SGNode* node)
 
 /**
  *	definition of intersection functions correlating to NodeType geometry enumerator
+ *	\param geom: pointer to geometry in memory
  *	\param ray: ray that may be intersecting with geometry stored in node
- *	\param hit
+ *	\param hit: structure holding information about intersection
  */
-typedef void (*_intersection_test)(const Ray*,Intersection*);
-void _root_intersection(const Ray* ray,Intersection* hit) {  }
-void _sphere_intersection(const Ray*,Intersection*);
+typedef void (*_intersection_test)(const f32*,const Ray*,Intersection*);
+void _root_intersection(const f32* geom,const Ray* ray,Intersection* hit) {  }
+void _sphere_intersection(const f32*,const Ray*,Intersection*);
 _intersection_test _test_intersection[NODE_TYPE_COUNT] = {
 	_root_intersection,
 	_sphere_intersection
 };
 
-void _sphere_intersection(const Ray* ray,Intersection* hit)
+void _sphere_intersection(const f32* geom,const Ray* ray,Intersection* hit)
 {
-	hit->hit = ray->direction.x>.0f;
+	Sphere* __Sphere = (Sphere*)geom;
+
+	// components
+	vec3 __Center = subv3(ray->origin,__Sphere->center);
+	f32 a = dotv3(ray->direction,ray->direction);  // TODO precompute?
+	f32 b = 2.f*dotv3(__Center,ray->direction);
+	f32 c = dotv3(__Center,__Center)-__Sphere->radius_sq;
+
+	// discriminant & early exit
+	f32 __SqComp = b*b-4.f*a*c;
+	if (__SqComp<0) return;
+
+	// calculate param
+	f32 __AFac = 1.f/(2.f*a);
+	f32 __SqCompSq = sqrtf(__SqComp);
+	f32 t0 = (-b+__SqCompSq)*__AFac;
+	f32 t1 = (-b-__SqCompSq)*__AFac;
+	f32 ts0 = fmin(t0,t1);
+	f32 ts1 = fmax(t0,t1);
+	hit->hit = 1||hit->hit;
+	// FIXME elegance & optimization
 }
 
 /**
@@ -89,5 +110,5 @@ void _sphere_intersection(const Ray* ray,Intersection* hit)
 void test_intersection(const SGNode* node,const Ray* ray,Intersection* hit)
 {
 	for (u8 i=0;i<node->crr_child;i++) test_intersection(&node->subsequent[i],ray,hit);
-	_test_intersection[node->type](ray,hit);
+	_test_intersection[node->type](node->geometry,ray,hit);
 }

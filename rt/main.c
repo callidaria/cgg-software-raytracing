@@ -7,7 +7,7 @@ int main(int argc,char** argv)
 	Image* image_buffer = create_image(BUFFER_RESOLUTION_WIDTH,BUFFER_RESOLUTION_HEIGHT);
 
 	// setup camera
-	Camera* camera = create_camera((vec3){ 0,1,-4 });
+	Camera* camera = create_camera((vec3){ 0,0,-4 });
 	update_camera(camera);
 
 	// setup scene
