@@ -6,8 +6,8 @@
 // ----------------------------------------------------------------------------------------------------
 // Constants
 
-static f64 RAD_PI = M_PI/180.;
-static f64 DEG_PI = 180./M_PI;
+static const f64 RAD_PI = M_PI/180.;
+static const f64 DEG_PI = 180./M_PI;
 
 
 // ----------------------------------------------------------------------------------------------------
@@ -26,6 +26,11 @@ typedef struct {
 	vec3 origin;
 	vec3 direction;
 } Ray;
+
+typedef struct {
+	u8 hit;
+	// TODO
+} Intersection;
 
 // camera
 typedef struct {
@@ -101,7 +106,7 @@ void divm44(mat4x4*,const mat4x4*,const mat4x4*);
 // camera
 Camera* create_camera(vec3);
 void update_camera(Camera*);
-void cast_ray(Camera*,u32,u32);
+void cast_ray(Camera*,s32,s32);
 void destroy_camera(Camera*);
 
 

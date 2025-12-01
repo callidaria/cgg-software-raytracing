@@ -1,6 +1,9 @@
 #include "geometry.h"
 
 
+// ----------------------------------------------------------------------------------------------------
+// Scene Graph
+
 /**
  *	start scene graph root
  *	\returns neutral root node of scene graph
@@ -31,9 +34,9 @@ void reserve_subsequent(SGNode* node,u8 count)
  *	\param radius: radius of the sphere
  *	\returns pointer to overwritten child node
  */
-SGNode* create_sphere(SGNode* node,vec3 center,f32 radius)
+SGNode* define_sphere(SGNode* node,vec3 center,f32 radius)
 {
-	SGNode* out = node->subsequent[node->crr_child++];
+	SGNode* out = &node->subsequent[node->crr_child++];
 	out->type = NODE_TYPE_SPHERE;
 
 	// write sphere
@@ -50,7 +53,41 @@ SGNode* create_sphere(SGNode* node,vec3 center,f32 radius)
  */
 void destroy_graph(SGNode* node)
 {
-	for (u8 i=0;i<crr_child;i++) destroy_graph(node->subsequent);
+	for (u8 i=0;i<node->crr_child;i++) destroy_graph(node->subsequent);
 	free(node->subsequent);
-	free(geometry);
+	free(node->geometry);
+}
+
+
+// ----------------------------------------------------------------------------------------------------
+// Intersection
+
+/**
+ *	definition of intersection functions correlating to NodeType geometry enumerator
+ *	\param ray: ray that may be intersecting with geometry stored in node
+ *	\param hit
+ */
+typedef void (*_intersection_test)(const Ray*,Intersection*);
+void _root_intersection(const Ray* ray,Intersection* hit) {  }
+void _sphere_intersection(const Ray*,Intersection*);
+_intersection_test _test_intersection[NODE_TYPE_COUNT] = {
+	_root_intersection,
+	_sphere_intersection
+};
+
+void _sphere_intersection(const Ray* ray,Intersection* hit)
+{
+	hit->hit = ray->direction.x>.0f;
+}
+
+/**
+ *	recursively check intersection of nodes
+ *	\param node: root node of testing graph subtree
+ *	\param ray: possibly intersecting ray
+ *	\param hit: pointer to intersection status to update based on test result
+ */
+void test_intersection(const SGNode* node,const Ray* ray,Intersection* hit)
+{
+	for (u8 i=0;i<node->crr_child;i++) test_intersection(&node->subsequent[i],ray,hit);
+	_test_intersection[node->type](ray,hit);
 }

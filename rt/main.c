@@ -20,6 +20,7 @@ int main(int argc,char** argv)
 
 	// write & finalize
 	write_image(image_buffer,"../images/cout.ppm");
+	destroy_graph(scene);
 	destroy_camera(camera);
 	destroy_image(image_buffer);
 	return 0;

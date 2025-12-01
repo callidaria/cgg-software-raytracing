@@ -10,6 +10,7 @@
 typedef enum {
 	NODE_TYPE_ROOT,
 	NODE_TYPE_SPHERE,
+	NODE_TYPE_COUNT
 } NodeType;
 
 typedef struct {
@@ -21,7 +22,7 @@ typedef struct {
 typedef struct SGNode {
 	NodeType type;
 	f32* geometry;
-	struct _SGNode* subsequent;
+	struct SGNode* subsequent;
 	u8 crr_child;
 } SGNode;
 
@@ -34,6 +35,7 @@ SGNode* create_graph();
 void reserve_subsequent(SGNode*,u8);
 SGNode* define_sphere(SGNode*,vec3,f32);
 void destroy_graph(SGNode*);
+void test_intersection(const SGNode*,const Ray*,Intersection*);
 
 
 #endif

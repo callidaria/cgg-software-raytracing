@@ -7,11 +7,15 @@
  *	\param cam: camera
  *	\param scn: root node of scene graph
  */
-void rt(Image* bff,Camera* cam,SGNode* scn)
+void rt(Image* bff,const Camera* cam,const SGNode* scn)
 {
 	for (u32 y=0;y<BUFFER_RESOLUTION_HEIGHT;++y)
 	{
 		for (u32 x=0;x<BUFFER_RESOLUTION_WIDTH;++x)
-			write_pixel(bff,x,y,(crgb){ 120,0,0 });
+		{
+			Intersection __Hit = (Intersection){ 0 };
+			test_intersection(scn,&cam->rays[y*BUFFER_RESOLUTION_WIDTH+x],&__Hit);
+			write_pixel(bff,x,y,(crgb){ 120*__Hit.hit,0,0 });
+		}
 	}
 }

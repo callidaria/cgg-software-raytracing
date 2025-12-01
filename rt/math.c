@@ -104,7 +104,7 @@ vec2 normalizev2(vec2 v)
  *	unary operations over a vector in R3
  *	\param v: vector
  */
-f32 lengthv3(vec3 v) { return sqrt(v.x*v.x+v.y*v.y+v.z*v.z); }
+f32 lengthv3(vec3 v) { return sqrtf(v.x*v.x+v.y*v.y+v.z*v.z); }
 
 /**
  *	normalize a vector in R3
@@ -270,7 +270,7 @@ Camera* create_camera(vec3 pos)
 {
 	Camera* cam = (Camera*)malloc(sizeof(Camera));
 	cam->position = pos;
-	cam->zfac = -BUFFER_RESOLUTION_HWIDTH/tan(PERSPECTIVE_CLIPPING_FOV*RAD_PI*.5f);
+	cam->zfac = -(f32)BUFFER_RESOLUTION_HWIDTH/tan(PERSPECTIVE_CLIPPING_FOV*RAD_PI*.5f);
 	cam->rays = (Ray*)malloc(sizeof(Ray)*BUFFER_RESOLUTION_PIXELS);
 	return cam;
 }
@@ -281,9 +281,9 @@ Camera* create_camera(vec3 pos)
  */
 void update_camera(Camera* cam)
 {
-	for (u32 y=0;y<BUFFER_RESOLUTION_HEIGHT;++y)
+	for (s32 y=0;y<BUFFER_RESOLUTION_HEIGHT;++y)
 	{
-		for (u32 x=0;x<BUFFER_RESOLUTION_WIDTH;++x)
+		for (s32 x=0;x<BUFFER_RESOLUTION_WIDTH;++x)
 			cast_ray(cam,x,y);
 	}
 }
@@ -294,11 +294,13 @@ void update_camera(Camera* cam)
  *	\param x: x-axis pixel coordinate
  *	\param y: y-axis pixel coordinate
  */
-void cast_ray(Camera* cam,u32 x,u32 y)
+void cast_ray(Camera* cam,s32 x,s32 y)
 {
 	cam->rays[y*BUFFER_RESOLUTION_WIDTH+x] = (Ray){
 		.origin = cam->position,
-		.direction = normalizev3((vec3){ x-BUFFER_RESOLUTION_HWIDTH,y-BUFFER_RESOLUTION_HHEIGHT,cam->zfac })
+		.direction = normalizev3((vec3){
+				(f32)x-BUFFER_RESOLUTION_HWIDTH,(f32)y-BUFFER_RESOLUTION_HHEIGHT,cam->zfac
+			})
 	};
 }
 
