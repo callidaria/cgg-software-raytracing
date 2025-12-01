@@ -38,6 +38,8 @@ SGNode* define_sphere(SGNode* node,vec3 center,f32 radius)
 {
 	SGNode* out = &node->subsequent[node->crr_child++];
 	out->type = NODE_TYPE_SPHERE;
+	out->subsequent = NULL;
+	out->crr_child = 0;
 
 	// write sphere
 	Sphere* __Sphere = (Sphere*)malloc(sizeof(Sphere));
@@ -47,15 +49,22 @@ SGNode* define_sphere(SGNode* node,vec3 center,f32 radius)
 	out->geometry = (f32*)__Sphere;
 }
 
+// recursive helper function that deletes all subtrees of the rootnode
+void _destroy_graph(SGNode* node)
+{
+	for (u8 i=0;i<node->crr_child;i++) _destroy_graph(node->subsequent);
+	free(node->subsequent);
+	free(node->geometry);
+}
+
 /**
  *	delete scene graph from memory
  *	\param node: root node of graph subtree, that should be deleted
  */
 void destroy_graph(SGNode* node)
 {
-	for (u8 i=0;i<node->crr_child;i++) destroy_graph(node->subsequent);
-	free(node->subsequent);
-	free(node->geometry);
+	_destroy_graph(node);
+	free(node);
 }
 
 
@@ -92,13 +101,15 @@ void _sphere_intersection(const f32* geom,const Ray* ray,Intersection* hit)
 
 	// calculate param
 	f32 __AFac = 1.f/(2.f*a);
-	f32 __SqCompSq = sqrtf(__SqComp);
-	f32 t0 = (-b+__SqCompSq)*__AFac;
-	f32 t1 = (-b-__SqCompSq)*__AFac;
+	f32 __SqCompSq = sqrtf(__SqComp)*__AFac;
+	f32 __BFac = -b*__AFac;
+	f32 t0 = __BFac+__SqCompSq;
+	f32 t1 = __BFac-__SqCompSq;
 	f32 ts0 = fmin(t0,t1);
 	f32 ts1 = fmax(t0,t1);
 	hit->hit = 1||hit->hit;
 	// FIXME elegance & optimization
+	// TODO depthtesting & detailed intersection store
 }
 
 /**

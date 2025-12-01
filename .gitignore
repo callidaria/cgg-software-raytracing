@@ -4,3 +4,4 @@ bin
 images/video/
 *~
 *.o
+rt/lib/
