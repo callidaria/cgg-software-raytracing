@@ -17,6 +17,7 @@ typedef struct {
 	vec3 center;
 	f32 radius;
 	f32 radius_sq;
+	Material material;
 } Sphere;
 
 typedef struct SGNode {
@@ -33,7 +34,7 @@ typedef struct SGNode {
 // graph
 SGNode* create_graph();
 void reserve_subsequent(SGNode*,u8);
-SGNode* define_sphere(SGNode*,vec3,f32);
+SGNode* define_sphere(SGNode*,vec3,f32,Material);
 void destroy_graph(SGNode*);
 void test_intersection(const SGNode*,const Ray*,Intersection*);
 

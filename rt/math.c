@@ -289,6 +289,16 @@ void update_camera(Camera* cam)
 }
 
 /**
+ *	free memory for created camera and all it's rays
+ *	\param cam: camera to be free'd
+ */
+void destroy_camera(Camera* cam)
+{
+	free(cam->rays);
+	free(cam);
+}
+
+/**
  *	regenerate ray at given coordinate
  *	\param cam: camera to update
  *	\param x: x-axis pixel coordinate
@@ -305,11 +315,12 @@ void cast_ray(Camera* cam,s32 x,s32 y)
 }
 
 /**
- *	free memory for created camera and all it's rays
- *	\param cam: camera to be free'd
+ *	calculate position on ray by factor
+ *	\param ray: casted ray
+ *	\param x: factor x for point of intersection
+ *	\returns vector of resulting position
  */
-void destroy_camera(Camera* cam)
+vec3 ray_calculate_position(const Ray* ray,f32 x)
 {
-	free(cam->rays);
-	free(cam);
+	return addv3(ray->origin,(mulv3s(ray->direction,x)));
 }

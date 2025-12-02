@@ -27,9 +27,16 @@ typedef struct {
 	vec3 direction;
 } Ray;
 
+typedef enum {
+	MATERIAL_PHONG,
+	MATERIAL_COUNT
+} Material;
+
 typedef struct {
 	u8 hit;
-	// TODO
+	vec3 position;
+	vec3 normal;
+	Material material;
 } Intersection;
 
 // camera
@@ -106,8 +113,11 @@ void divm44(mat4x4*,const mat4x4*,const mat4x4*);
 // camera
 Camera* create_camera(vec3);
 void update_camera(Camera*);
-void cast_ray(Camera*,s32,s32);
 void destroy_camera(Camera*);
+
+// rays
+void cast_ray(Camera*,s32,s32);
+vec3 ray_calculate_position(const Ray*,f32);
 
 
 #endif

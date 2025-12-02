@@ -55,3 +55,13 @@ void write_pixel(Image* img,u32 x,u32 y,crgb c)
 {
 	img->pixels[y*img->width+x] = c;
 }
+
+/**
+ *	convert vector in R3 to rgb colourspace
+ *	\param v: vector to convert to colourspace (r=x,g=y,b=z)
+ *	\returns vector as colour
+ */
+crgb convertv3rgb(const vec3* v)
+{
+	return (crgb){ v->x*255,v->y*255,v->z*255 };
+}

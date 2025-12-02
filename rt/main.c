@@ -13,7 +13,7 @@ int main(int argc,char** argv)
 	// setup scene
 	SGNode* scene = create_graph();
 	reserve_subsequent(scene,1);
-	define_sphere(scene,(vec3){ 0,0,0 },1.f);
+	define_sphere(scene,(vec3){ 0,0,0 },1.f,MATERIAL_PHONG);
 
 	// raytrace
 	rt(image_buffer,camera,scene);

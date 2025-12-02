@@ -15,7 +15,8 @@ void rt(Image* bff,const Camera* cam,const SGNode* scn)
 		{
 			Intersection __Hit = (Intersection){ 0 };
 			test_intersection(scn,&cam->rays[y*BUFFER_RESOLUTION_WIDTH+x],&__Hit);
-			write_pixel(bff,x,y,(crgb){ 120*__Hit.hit,0,0 });
+			if (__Hit.hit)
+				write_pixel(bff,x,y,convertv3rgb(&__Hit.normal));
 		}
 	}
 }
