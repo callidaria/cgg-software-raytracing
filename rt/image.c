@@ -59,9 +59,21 @@ void write_pixel(Image* img,u32 x,u32 y,crgb c)
 /**
  *	convert vector in R3 to rgb colourspace
  *	\param v: vector to convert to colourspace (r=x,g=y,b=z)
- *	\returns vector as colour
+ *	\returns vector as rgb colour
  */
-crgb convertv3rgb(const vec3* v)
+crgb convertv3rgb(vec3 v)
 {
-	return (crgb){ v->x*255,v->y*255,v->z*255 };
+	return (crgb){ v.x*255,v.y*255,v.z*255 };
 }
+
+/**
+ *	convert vector in R4 to rgb colourspace and force into 3 dimensions by ignoring alpha value
+ *	\param v: vector to convert to colourspace (r=w,g=x,b=y) (z is ignored)
+ *	\returns vector as rgb colour
+ */
+crgb convertv4rgb(vec4 v)
+{
+	return (crgb){ v.w*255,v.x*255,v.y*255 };
+}
+// TODO implement clamping
+// FIXME unintuitive mapping of r=w e.t.c, better r=x e.t.c

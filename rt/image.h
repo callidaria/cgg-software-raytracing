@@ -23,7 +23,8 @@ void destroy_image(Image*);
 
 // image pixel utility
 void write_pixel(Image*,u32,u32,crgb);
-crgb convertv3rgb(const vec3*);
+crgb convertv3rgb(vec3);
+crgb convertv4rgb(vec4);
 
 
 #endif

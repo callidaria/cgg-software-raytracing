@@ -2,7 +2,15 @@
 
 
 // ----------------------------------------------------------------------------------------------------
-// Basic
+// Basic Math
+
+// s32 clampi(s32 v,s32 a,s32 b) { return v; }
+// TODO actually implement those
+// TODO implement vector clamping through simd
+
+
+// ----------------------------------------------------------------------------------------------------
+// Vector Math
 
 /**
  *	operations over two vectors in R2

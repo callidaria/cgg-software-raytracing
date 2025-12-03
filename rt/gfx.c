@@ -2,6 +2,32 @@
 
 
 /**
+ *	definition of shading functions correlating to material type enumerator
+ *	\param hit: intersection information with traced ray
+ *	\returns vectorial representation of colour in R4 between for mapped value v is 0.0 <= v <= 1.0
+ */
+typedef vec4 (*_material_shading)(const Intersection*);
+vec4 _shade_basic(const Intersection*);
+vec4 _shade_phong(const Intersection*);
+_material_shading _shade[MATERIAL_COUNT] = {
+	_shade_basic,
+	_shade_phong,
+};
+
+/**
+ *	process scene around ray
+ *	\param scn: scene intersecting with cast ray
+ *	\param ray: processing ray
+ *	\returns resulting colour as R4 vector
+ */
+vec4 _process_scene(const SGNode* scn,const Ray* ray)
+{
+	Intersection __Hit = (Intersection){ .material = MATERIAL_NONE };
+	test_intersection(scn,ray,&__Hit);
+	return _shade[__Hit.material](&__Hit);
+}
+
+/**
  *	raytracer
  *	\param bff: resulting image buffer
  *	\param cam: camera
@@ -13,10 +39,26 @@ void rt(Image* bff,const Camera* cam,const SGNode* scn)
 	{
 		for (u32 x=0;x<BUFFER_RESOLUTION_WIDTH;++x)
 		{
-			Intersection __Hit = (Intersection){ 0 };
-			test_intersection(scn,&cam->rays[y*BUFFER_RESOLUTION_WIDTH+x],&__Hit);
-			if (__Hit.hit)
-				write_pixel(bff,x,y,convertv3rgb(&__Hit.normal));
+			vec4 __PixelColour = _process_scene(scn,&cam->rays[y*BUFFER_RESOLUTION_WIDTH+x]);
+			write_pixel(bff,x,y,convertv4rgb(__PixelColour));
 		}
 	}
+}
+
+// default background colour
+vec4 _shade_basic(const Intersection* hit)
+{
+	return (vec4){ GFX_BACKGROUND_COLOUR_R,GFX_BACKGROUND_COLOUR_G,GFX_BACKGROUND_COLOUR_B,1.f };
+}
+
+// 
+vec4 _shade_phong(const Intersection* hit)
+{
+	// TODO
+	return (vec4){
+		hit->normal.x*(hit->normal.x>.0f),
+		hit->normal.y*(hit->normal.y>.0f),
+		hit->normal.z*(hit->normal.z>.0f),
+		1.f
+	};
 }

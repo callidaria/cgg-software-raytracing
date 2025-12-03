@@ -109,7 +109,6 @@ void _sphere_intersection(const f32* geom,const Ray* ray,Intersection* hit)
 	f32 t1 = __BFac-__SqCompSq;
 	f32 ts0 = fmin(t0,t1);
 	f32 ts1 = fmax(t0,t1);
-	hit->hit = 1||hit->hit;
 	hit->position = ray_calculate_position(ray,ts0);  // FIXME clipped
 	hit->normal = normalizev3(subv3(hit->position,__Sphere->center));
 	hit->material = __Sphere->material;

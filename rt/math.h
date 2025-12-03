@@ -28,12 +28,12 @@ typedef struct {
 } Ray;
 
 typedef enum {
+	MATERIAL_NONE,
 	MATERIAL_PHONG,
 	MATERIAL_COUNT
 } Material;
 
 typedef struct {
-	u8 hit;
 	vec3 position;
 	vec3 normal;
 	Material material;
@@ -50,6 +50,13 @@ typedef struct {
 
 // ----------------------------------------------------------------------------------------------------
 // Utility
+
+// basic math
+/*
+s32 clampi(s32,s32,s32);
+u32 clampu(u32,u32,u32);
+f32 clampf(f32,f32,f32);
+*/
 
 // vector math
 // vec2
