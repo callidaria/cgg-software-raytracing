@@ -68,12 +68,11 @@ crgb convertv3rgb(vec3 v)
 
 /**
  *	convert vector in R4 to rgb colourspace and force into 3 dimensions by ignoring alpha value
- *	\param v: vector to convert to colourspace (r=w,g=x,b=y) (z is ignored)
+ *	\param v: vector to convert to colourspace (r=x,g=y,b=z) (w is ignored)
  *	\returns vector as rgb colour
  */
 crgb convertv4rgb(vec4 v)
 {
-	return (crgb){ v.w*255,v.x*255,v.y*255 };
+	return (crgb){ v.x*255,v.y*255,v.z*255 };
 }
 // TODO implement clamping
-// FIXME unintuitive mapping of r=w e.t.c, better r=x e.t.c
