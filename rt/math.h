@@ -16,9 +16,9 @@ static const f64 DEG_PI = 180./M_PI;
 // basic types
 typedef struct { f32 x,y; } vec2;
 typedef struct { f32 x,y,z; } vec3;
-typedef struct { f32 x,y,z,w; } vec4;
-typedef struct { f32 w,x,y,z; } quat;
-typedef struct { f32 v[16]; } mat4x4;
+typedef struct { f32 x,y,z,w; } vec4 __attribute((aligned(16)));
+typedef struct { f32 w,x,y,z; } quat __attribute((aligned(16)));
+typedef struct { f32 v[16]; } mat4x4 __attribute((aligned(16)));
 typedef struct { u8 r,g,b; } crgb;
 typedef struct { u8 r,g,b,a; } crgba;
 
@@ -52,11 +52,7 @@ typedef struct {
 // Utility
 
 // basic math
-/*
-s32 clampi(s32,s32,s32);
-u32 clampu(u32,u32,u32);
-f32 clampf(f32,f32,f32);
-*/
+f32 clamp(f32,f32,f32);
 
 // vector math
 // vec2
@@ -109,6 +105,7 @@ vec3 normalizev3(vec3);
 // vec4
 f32 lengthv4(vec4);
 vec4 normalizev4(vec4);
+vec4 clampv4(vec4,f32,f32);
 
 // matrixmath
 // mat4

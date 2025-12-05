@@ -4,9 +4,15 @@
 // ----------------------------------------------------------------------------------------------------
 // Basic Math
 
-// s32 clampi(s32 v,s32 a,s32 b) { return v; }
-// TODO actually implement those
-// TODO implement vector clamping through simd
+f32 clamp(f32 v,f32 a,f32 b)
+{
+	__m128 __V = _mm_set_ss(v);
+	__m128 __A = _mm_set_ss(a);
+	__m128 __B = _mm_set_ss(b);
+	__m128 __Result = _mm_max_ss(_mm_min_ss(__V,__B),__A);
+	return _mm_cvtss_f32(__Result);
+}
+// TODO implement vector clamping through simd for R3 & R2 next
 
 
 // ----------------------------------------------------------------------------------------------------
@@ -145,6 +151,23 @@ vec4 normalizev4(vec4 v)
 }
 
 /**
+ *	clamp a vector in R4 into a certain range
+ *	\param v: vector to clamp
+ *	\param a: minimum of clamping range
+ *	\param b: maximum of clamping range
+ *	\returns clamped vector
+ */
+vec4 clampv4(vec4 v,f32 a,f32 b)
+{
+	__m128 __V = _mm_load_ps(&v.x);
+	__m128 __A = _mm_set1_ps(a);
+	__m128 __B = _mm_set1_ps(b);
+	__m128 __Result = _mm_max_ps(_mm_min_ps(__V,__B),__A);
+	_mm_store_ps(&v.x,__Result);
+	return v;
+}
+
+/**
  *	add two matrices cell by cell
  *	\param r: resulting matrix after addition
  *	\param m0: left hand side matrix
@@ -157,20 +180,20 @@ void addm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
 	f32* __M1 = (f32*)m1;
 
 	// extract rows
-	__m128 __Ar0 = _mm_loadu_ps(&__M0[0]);
-	__m128 __Ar1 = _mm_loadu_ps(&__M0[4]);
-	__m128 __Ar2 = _mm_loadu_ps(&__M0[8]);
-	__m128 __Ar3 = _mm_loadu_ps(&__M0[12]);
-	__m128 __Br0 = _mm_loadu_ps(&__M1[0]);
-	__m128 __Br1 = _mm_loadu_ps(&__M1[4]);
-	__m128 __Br2 = _mm_loadu_ps(&__M1[8]);
-	__m128 __Br3 = _mm_loadu_ps(&__M1[12]);
+	__m128 __Ar0 = _mm_load_ps(&__M0[0]);
+	__m128 __Ar1 = _mm_load_ps(&__M0[4]);
+	__m128 __Ar2 = _mm_load_ps(&__M0[8]);
+	__m128 __Ar3 = _mm_load_ps(&__M0[12]);
+	__m128 __Br0 = _mm_load_ps(&__M1[0]);
+	__m128 __Br1 = _mm_load_ps(&__M1[4]);
+	__m128 __Br2 = _mm_load_ps(&__M1[8]);
+	__m128 __Br3 = _mm_load_ps(&__M1[12]);
 
 	// sum & store
-	_mm_storeu_ps(&__R[0],_mm_add_ps(__Ar0,__Br0));
-	_mm_storeu_ps(&__R[4],_mm_add_ps(__Ar1,__Br1));
-	_mm_storeu_ps(&__R[8],_mm_add_ps(__Ar2,__Br2));
-	_mm_storeu_ps(&__R[12],_mm_add_ps(__Ar3,__Br3));
+	_mm_store_ps(&__R[0],_mm_add_ps(__Ar0,__Br0));
+	_mm_store_ps(&__R[4],_mm_add_ps(__Ar1,__Br1));
+	_mm_store_ps(&__R[8],_mm_add_ps(__Ar2,__Br2));
+	_mm_store_ps(&__R[12],_mm_add_ps(__Ar3,__Br3));
 }
 
 /**
@@ -186,20 +209,20 @@ void subm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
 	f32* __M1 = (f32*)m1;
 
 	// extract rows
-	__m128 __Ar0 = _mm_loadu_ps(&__M0[0]);
-	__m128 __Ar1 = _mm_loadu_ps(&__M0[4]);
-	__m128 __Ar2 = _mm_loadu_ps(&__M0[8]);
-	__m128 __Ar3 = _mm_loadu_ps(&__M0[12]);
-	__m128 __Br0 = _mm_loadu_ps(&__M1[0]);
-	__m128 __Br1 = _mm_loadu_ps(&__M1[4]);
-	__m128 __Br2 = _mm_loadu_ps(&__M1[8]);
-	__m128 __Br3 = _mm_loadu_ps(&__M1[12]);
+	__m128 __Ar0 = _mm_load_ps(&__M0[0]);
+	__m128 __Ar1 = _mm_load_ps(&__M0[4]);
+	__m128 __Ar2 = _mm_load_ps(&__M0[8]);
+	__m128 __Ar3 = _mm_load_ps(&__M0[12]);
+	__m128 __Br0 = _mm_load_ps(&__M1[0]);
+	__m128 __Br1 = _mm_load_ps(&__M1[4]);
+	__m128 __Br2 = _mm_load_ps(&__M1[8]);
+	__m128 __Br3 = _mm_load_ps(&__M1[12]);
 
 	// subtract & store
-	_mm_storeu_ps(&__R[0],_mm_sub_ps(__Ar0,__Br0));
-	_mm_storeu_ps(&__R[4],_mm_sub_ps(__Ar1,__Br1));
-	_mm_storeu_ps(&__R[8],_mm_sub_ps(__Ar2,__Br2));
-	_mm_storeu_ps(&__R[12],_mm_sub_ps(__Ar3,__Br3));
+	_mm_store_ps(&__R[0],_mm_sub_ps(__Ar0,__Br0));
+	_mm_store_ps(&__R[4],_mm_sub_ps(__Ar1,__Br1));
+	_mm_store_ps(&__R[8],_mm_sub_ps(__Ar2,__Br2));
+	_mm_store_ps(&__R[12],_mm_sub_ps(__Ar3,__Br3));
 }
 
 /**
@@ -216,10 +239,10 @@ void mulm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
 
 	// load left hand side matrix
 	__m128 __Rows[4];
-	__Rows[0] = _mm_loadu_ps(&__M1[0]);
-	__Rows[1] = _mm_loadu_ps(&__M1[4]);
-	__Rows[2] = _mm_loadu_ps(&__M1[8]);
-	__Rows[3] = _mm_loadu_ps(&__M1[12]);
+	__Rows[0] = _mm_load_ps(&__M1[0]);
+	__Rows[1] = _mm_load_ps(&__M1[4]);
+	__Rows[2] = _mm_load_ps(&__M1[8]);
+	__Rows[3] = _mm_load_ps(&__M1[12]);
 
 	// iterate multiplication
 	for (u8 i=0;i<4;++i)
@@ -249,20 +272,20 @@ void divm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
 	f32* __M1 = (f32*)m1;
 
 	// extract rows
-	__m128 __Ar0 = _mm_loadu_ps(&__M0[0]);
-	__m128 __Ar1 = _mm_loadu_ps(&__M0[4]);
-	__m128 __Ar2 = _mm_loadu_ps(&__M0[8]);
-	__m128 __Ar3 = _mm_loadu_ps(&__M0[12]);
-	__m128 __Br0 = _mm_loadu_ps(&__M1[0]);
-	__m128 __Br1 = _mm_loadu_ps(&__M1[4]);
-	__m128 __Br2 = _mm_loadu_ps(&__M1[8]);
-	__m128 __Br3 = _mm_loadu_ps(&__M1[12]);
+	__m128 __Ar0 = _mm_load_ps(&__M0[0]);
+	__m128 __Ar1 = _mm_load_ps(&__M0[4]);
+	__m128 __Ar2 = _mm_load_ps(&__M0[8]);
+	__m128 __Ar3 = _mm_load_ps(&__M0[12]);
+	__m128 __Br0 = _mm_load_ps(&__M1[0]);
+	__m128 __Br1 = _mm_load_ps(&__M1[4]);
+	__m128 __Br2 = _mm_load_ps(&__M1[8]);
+	__m128 __Br3 = _mm_load_ps(&__M1[12]);
 
 	// subtract & store
-	_mm_storeu_ps(&__R[0],_mm_div_ps(__Ar0,__Br0));
-	_mm_storeu_ps(&__R[4],_mm_div_ps(__Ar1,__Br1));
-	_mm_storeu_ps(&__R[8],_mm_div_ps(__Ar2,__Br2));
-	_mm_storeu_ps(&__R[12],_mm_div_ps(__Ar3,__Br3));
+	_mm_store_ps(&__R[0],_mm_div_ps(__Ar0,__Br0));
+	_mm_store_ps(&__R[4],_mm_div_ps(__Ar1,__Br1));
+	_mm_store_ps(&__R[8],_mm_div_ps(__Ar2,__Br2));
+	_mm_store_ps(&__R[12],_mm_div_ps(__Ar3,__Br3));
 }
 
 

@@ -10,7 +10,7 @@ OBJS = $(SRCS:%.c=$(LDST)%.o)
 MAIN = main.c
 
 DEBUG_SUFFIX = -pg -g -O0 -DDEBUG
-RELEASE_SUFFIX = -O3 -fno-gcse
+RELEASE_SUFFIX = -O3 -ffast-math -fno-gcse
 
 CXXFLAGS = $(RELEASE_SUFFIX) $(LINKER)
 

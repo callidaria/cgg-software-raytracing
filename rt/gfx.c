@@ -51,14 +51,10 @@ vec4 _shade_basic(const Intersection* hit)
 	return (vec4){ GFX_BACKGROUND_COLOUR_R,GFX_BACKGROUND_COLOUR_G,GFX_BACKGROUND_COLOUR_B,1.f };
 }
 
-// 
+// shade surface as phong material
 vec4 _shade_phong(const Intersection* hit)
 {
-	// TODO
-	return (vec4){
-		hit->normal.x*(hit->normal.x>.0f),
-		hit->normal.y*(hit->normal.y>.0f),
-		hit->normal.z*(hit->normal.z>.0f),
-		1.f
-	};
+	// TODO implement phong material
+	vec4 __Output = (vec4){ hit->normal.x,hit->normal.y,hit->normal.z,1.f };
+	return clampv4(__Output,.0f,1.f);
 }
