@@ -77,7 +77,7 @@ static inline vec3 _shade_phong(SHADER_PARAMETERS)
 		// diffuse component
 		vec3 __Colour = (vec3){ 1.f,1.f,1.f };  // TODO replace with surface colour
 		f32 __Attitude = dotv3(hit->normal,info.direction);
-		vec3 __Diffuse = mulv3(__Colour,mulv3s(info.intensity,fmax(0,__Attitude)));
+		vec3 __Diffuse = mulv3(__Colour,mulv3s(info.intensity,fmaxf(0,__Attitude)));
 		__Result = addv3(__Result,__Diffuse);
 
 		// specular component

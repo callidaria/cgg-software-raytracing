@@ -14,13 +14,28 @@ static const f64 DEG_PI = 180./M_PI;
 // Data
 
 // basic types
-typedef struct { f32 x,y; } vec2;
-typedef struct { f32 x,y,z; } vec3;
-typedef struct { f32 x,y,z,w; } vec4 __attribute__((aligned(16)));
-typedef struct { f32 w,x,y,z; } quat __attribute__((aligned(16)));
+typedef struct { f32 x,y; } vec2 __attribute__((aligned(8)));
+
+typedef union {
+	struct { f32 x,y,z; };
+	__m128 _simd;
+} vec3 __attribute__((aligned(16)));
+
+typedef union {
+	struct { f32 x,y,z,w; };
+	__m128 _simd;
+} vec4 __attribute__((aligned(16)));
+
+typedef union {
+	struct { f32 w,x,y,z; };
+	__m128 _simd;
+} quat __attribute__((aligned(16)));
+
 typedef struct { f32 v[16]; } mat4x4 __attribute__((aligned(16)));
+
 typedef struct { u8 r,g,b; } crgb;
 typedef struct { u8 r,g,b,a; } crgba;
+// TODO simd supporting union for mat4x4 & alter functions accordingly
 
 typedef struct {
 	vec3 origin;
@@ -52,7 +67,7 @@ typedef struct {
 // Utility
 
 // basic math
-f32 clamp(f32,f32,f32);
+static f32 clamp(f32,f32,f32);
 
 // vector math
 // vec2
@@ -97,12 +112,12 @@ vec4 divv4s(vec4,f32);
 // vec2
 f32 lengthv2(vec2);
 vec2 normalizev2(vec2);
-// TODO clampv2
+vec2 clampv2(vec2,f32,f32);
 
 // vec3
 f32 lengthv3(vec3);
 vec3 normalizev3(vec3);
-// TODO clampv3
+vec3 clampv3(vec3,f32,f32);
 
 // vec4
 f32 lengthv4(vec4);

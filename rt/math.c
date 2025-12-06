@@ -4,15 +4,7 @@
 // ----------------------------------------------------------------------------------------------------
 // Basic Math
 
-f32 clamp(f32 v,f32 a,f32 b)
-{
-	__m128 __V = _mm_set_ss(v);
-	__m128 __A = _mm_set_ss(a);
-	__m128 __B = _mm_set_ss(b);
-	__m128 __Result = _mm_max_ss(_mm_min_ss(__V,__B),__A);
-	return _mm_cvtss_f32(__Result);
-}
-// TODO implement vector clamping through simd for R3 & R2 next
+static inline f32 clamp(f32 v,f32 a,f32 b) { return fmaxf(fminf(v,b),a); }
 
 
 // ----------------------------------------------------------------------------------------------------
@@ -115,6 +107,15 @@ vec2 normalizev2(vec2 v)
 }
 
 /**
+ *	clamp a vector in R2 into a certain range
+ *	\param v: vector to clamp
+ *	\param a: minimum of clamping range
+ *	\param b: maximum of clamping range
+ *	\returns clamped vector
+ */
+vec2 clampv2(vec2 v,f32 a,f32 b) { return (vec2){ clamp(v.x,a,b),clamp(v.y,a,b) }; }
+
+/**
  *	unary operations over a vector in R3
  *	\param v: vector
  */
@@ -130,6 +131,22 @@ vec3 normalizev3(vec3 v)
 	f32 __Len = lengthv3(v);
 	if (__Len==.0f) return v;
 	return divv3s(v,__Len);
+}
+
+/**
+ *	clamp a vector in R3 into a certain range
+ *	\param v: vector to clamp
+ *	\param a: minimum of clamping range
+ *	\param b: maximum of clamping range
+ *	\returns clamped vector
+ */
+vec3 clampv3(vec3 v,f32 a,f32 b)
+{
+	__m128 __A = _mm_set1_ps(a);
+	__m128 __B = _mm_set1_ps(b);
+	__m128 __Result = _mm_max_ps(_mm_min_ps(v._simd,__B),__A);
+	_mm_store_ps(&v.x,__Result);
+	return v;
 }
 
 /**
@@ -159,10 +176,9 @@ vec4 normalizev4(vec4 v)
  */
 vec4 clampv4(vec4 v,f32 a,f32 b)
 {
-	__m128 __V = _mm_load_ps(&v.x);
 	__m128 __A = _mm_set1_ps(a);
 	__m128 __B = _mm_set1_ps(b);
-	__m128 __Result = _mm_max_ps(_mm_min_ps(__V,__B),__A);
+	__m128 __Result = _mm_max_ps(_mm_min_ps(v._simd,__B),__A);
 	_mm_store_ps(&v.x,__Result);
 	return v;
 }
