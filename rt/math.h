@@ -16,9 +16,9 @@ static const f64 DEG_PI = 180./M_PI;
 // basic types
 typedef struct { f32 x,y; } vec2;
 typedef struct { f32 x,y,z; } vec3;
-typedef struct { f32 x,y,z,w; } vec4 __attribute((aligned(16)));
-typedef struct { f32 w,x,y,z; } quat __attribute((aligned(16)));
-typedef struct { f32 v[16]; } mat4x4 __attribute((aligned(16)));
+typedef struct { f32 x,y,z,w; } vec4 __attribute__((aligned(16)));
+typedef struct { f32 w,x,y,z; } quat __attribute__((aligned(16)));
+typedef struct { f32 v[16]; } mat4x4 __attribute__((aligned(16)));
 typedef struct { u8 r,g,b; } crgb;
 typedef struct { u8 r,g,b,a; } crgba;
 
@@ -97,10 +97,12 @@ vec4 divv4s(vec4,f32);
 // vec2
 f32 lengthv2(vec2);
 vec2 normalizev2(vec2);
+// TODO clampv2
 
 // vec3
 f32 lengthv3(vec3);
 vec3 normalizev3(vec3);
+// TODO clampv3
 
 // vec4
 f32 lengthv4(vec4);

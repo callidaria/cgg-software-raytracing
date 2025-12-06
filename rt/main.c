@@ -11,16 +11,16 @@ int main(int argc,char** argv)
 	update_camera(camera);
 
 	// setup scene
-	SGNode* scene = create_graph();
-	reserve_subsequent(scene,1);
-	define_sphere(scene,(vec3){ 0,0,0 },1.f,MATERIAL_PHONG);
+	Scene* scene = create_scene();
+	reserve_subsequent(&scene->graph,1);
+	define_sphere(&scene->graph,(vec3){ 0,0,0 },1.f,MATERIAL_PHONG);
 
 	// raytrace
 	rt(image_buffer,camera,scene);
 
 	// write & finalize
 	write_image(image_buffer,"../images/cout.ppm");
-	destroy_graph(scene);
+	destroy_scene(scene);
 	destroy_camera(camera);
 	destroy_image(image_buffer);
 	return 0;

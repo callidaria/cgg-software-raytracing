@@ -52,7 +52,7 @@ SGNode* define_sphere(SGNode* node,vec3 center,f32 radius,Material material)
 }
 
 // recursive helper function that deletes all subtrees of the rootnode
-void _destroy_graph(SGNode* node)
+static inline void _destroy_graph(SGNode* node)
 {
 	for (u8 i=0;i<node->crr_child;i++) _destroy_graph(node->subsequent);
 	free(node->subsequent);
@@ -67,6 +67,41 @@ void destroy_graph(SGNode* node)
 {
 	_destroy_graph(node);
 	free(node);
+}
+
+
+// ----------------------------------------------------------------------------------------------------
+// Scene
+
+/**
+ *	initialize a scene
+ *	\returns pointer to the created scene
+ */
+Scene* create_scene()
+{
+	Scene* out = (Scene*)malloc(sizeof(Scene));
+
+	// setup rootnode of scene graph
+	out->graph.type = NODE_TYPE_ROOT;
+	out->graph.geometry = NULL;
+	out->graph.crr_child = 0;
+
+	// setup lighting defaults
+	out->lighting.crr_sunlight = 0;
+	out->lighting.crr_pointlight = 0;
+	out->lighting.crr_light = 0;
+
+	return out;
+}
+
+/**
+ *	remove scene from memory
+ *	\param scene: pointer to scene, that will be deleted
+ */
+void destroy_scene(Scene* scene)
+{
+	_destroy_graph(&scene->graph);
+	free(scene);
 }
 
 
@@ -126,4 +161,126 @@ void test_intersection(const SGNode* node,const Ray* ray,Intersection* hit)
 {
 	for (u8 i=0;i<node->crr_child;i++) test_intersection(&node->subsequent[i],ray,hit);
 	_test_intersection[node->type](node->geometry,ray,hit);
+}
+
+
+// ----------------------------------------------------------------------------------------------------
+// Lighting
+
+/**
+ *	setup directional sunlight & enqueue for light processing
+ *	\param lighting: lighting definition that will store the sunlight information
+ *	\param direction: direction of the sunlight
+ *	\param colour: colour & intensity of the sunlight as a vector
+ */
+void create_light_sun(Lighting* lighting,vec3 direction,vec3 colour)
+{
+	// setup light
+	SunLight* p_Light = &lighting->sunlights[lighting->crr_sunlight++];
+	p_Light->direction = normalizev3(direction);
+	p_Light->colour = colour;
+
+	// enqueue
+	Illumination* p_Illumination = &lighting->lighting[lighting->crr_light++];
+	p_Illumination->type = LIGHT_TYPE_SUN;
+	p_Illumination->light = &p_Light->direction.x;
+}
+
+/**
+ *	setup pointlight with default gradient & enqueue for light processing
+ *	\param lighting: lighting definition that will store the pointlight information
+ *	\param position: origin of the pointlight
+ *	\param colour: colour & intensity of the pointlight as a vector
+ */
+void create_light_point_default(Lighting* lighting,vec3 position,vec3 colour)
+{
+	// setup light
+	PointLight* p_Light = &lighting->pointlights[lighting->crr_pointlight++];
+	p_Light->position = position;
+	p_Light->colour = colour;
+	p_Light->constant = 1.f;
+	p_Light->linear = .045f;
+	p_Light->quadratic = .0075f;
+
+	// enqueue
+	Illumination* p_Illumination = &lighting->lighting[lighting->crr_light++];
+	p_Illumination->type = LIGHT_TYPE_POINT;
+	p_Illumination->light = &p_Light->position.x;
+}
+
+/**
+ *	setup pointlight with custom gradient & enqueue for light processing
+ *	\param lighting: lighting definition that will store the pointlight information
+ *	\param position: origin of the pointlight
+ *	\param colour: colour & intensity of the pointlight as a vector
+ *	\param constant: constant part of lighting gradient
+ *	\param linear: linear part of lighting gradient
+ *	\param quadratic: quadratic part of lighting gradient
+ */
+void create_light_point(Lighting* lighting,vec3 position,vec3 colour,f32 constant,f32 linear,f32 quadratic)
+{
+	// setup light
+	PointLight* p_Light = &lighting->pointlights[lighting->crr_pointlight++];
+	p_Light->position = position;
+	p_Light->colour = colour;
+	p_Light->constant = constant;
+	p_Light->linear = linear;
+	p_Light->quadratic = quadratic;
+
+	// enqueue
+	Illumination* p_Illumination = &lighting->lighting[lighting->crr_light++];
+	p_Illumination->type = LIGHT_TYPE_POINT;
+	p_Illumination->light = &p_Light->position.x;
+}
+
+/**
+ *	definition of illumination info cases
+ *	\param light: pointer to light in stack memory
+ *	\param info: resulting light information at given position
+ *	\param position: position in question
+ */
+#define ILLUMINATION_INFO_PARAMETERS const f32* light,LightInfo* info,vec3 position
+typedef void (*_illumination_info_procedure)(ILLUMINATION_INFO_PARAMETERS);
+
+// definition sunlight information
+void _compute_sunlight_info(ILLUMINATION_INFO_PARAMETERS)
+{
+	SunLight* p_Light = (SunLight*)light;
+	info->direction = p_Light->direction;
+	info->distance = 10000;
+	info->intensity = p_Light->colour;
+	info->influence = p_Light->colour;
+}
+
+// definition pointlight information
+void _compute_pointlight_info(ILLUMINATION_INFO_PARAMETERS)
+{
+	PointLight* p_Light = (PointLight*)light;
+	vec3 __NPos = subv3(p_Light->position,position);
+
+	// fill info
+	info->direction = normalizev3(__NPos);
+	info->distance = lengthv3(__NPos);
+
+	// physical attenuation
+	f32 __DistSq = info->distance*info->distance;
+	info->intensity = divv3s(p_Light->colour,__DistSq);
+	f32 __Attenuation = 1.f/(p_Light->constant+p_Light->linear*info->distance+p_Light->quadratic*__DistSq);
+	info->influence = mulv3s(p_Light->colour,__Attenuation);
+}
+
+_illumination_info_procedure _compute_illumination_info[LIGHT_TYPE_COUNT] = {
+	_compute_sunlight_info,
+	_compute_pointlight_info
+};
+
+/**
+ *	gather lighting information at given position
+ *	\param illumination: emitting illumination source
+ *	\param info: pointer to the information struct, that will be filled with resulting data
+ *	\param position: current position in question
+ */
+void compute_lighting_info(const Illumination* illumination,LightInfo* info,vec3 position)
+{
+	_compute_illumination_info[illumination->type](illumination->light,info,position);
 }
