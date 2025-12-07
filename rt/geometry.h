@@ -68,6 +68,7 @@ typedef struct {
 } LightInfo;
 
 typedef struct Scene {
+	Camera camera;
 	SGNode graph;
 	Lighting lighting;
 } Scene;

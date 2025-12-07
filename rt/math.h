@@ -132,7 +132,7 @@ void mulm44(mat4x4*,const mat4x4*,const mat4x4*);
 void divm44(mat4x4*,const mat4x4*,const mat4x4*);
 
 // camera
-Camera* create_camera(vec3);
+void create_camera(Camera*,vec3);
 void update_camera(Camera*);
 void destroy_camera(Camera*);
 

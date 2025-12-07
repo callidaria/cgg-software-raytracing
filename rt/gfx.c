@@ -37,13 +37,13 @@ static inline vec3 _process_scene(const Scene* scn,const Ray* ray)
  *	\param cam: camera
  *	\param scn: root node of scene graph
  */
-void rt(Image* bff,const Camera* cam,const Scene* scn)
+void rt(Image* bff,const Scene* scn)
 {
 	for (u32 y=0;y<BUFFER_RESOLUTION_HEIGHT;++y)
 	{
 		for (u32 x=0;x<BUFFER_RESOLUTION_WIDTH;++x)
 		{
-			vec3 __PixelColour = _process_scene(scn,&cam->rays[y*BUFFER_RESOLUTION_WIDTH+x]);
+			vec3 __PixelColour = _process_scene(scn,&scn->camera.rays[y*BUFFER_RESOLUTION_WIDTH+x]);
 			write_pixel(bff,x,y,convertv3rgb(__PixelColour));
 		}
 	}
@@ -81,7 +81,14 @@ static inline vec3 _shade_phong(SHADER_PARAMETERS)
 		__Result = addv3(__Result,__Diffuse);
 
 		// specular component
-		// TODO
+		if (__Attitude>.0f)
+		{
+			vec3 __R = subv3(mulv3s(hit->normal,2.f*dotv3(info.direction,hit->normal)),info.direction);
+			__R = normalizev3(__R);
+			vec3 __V = normalizev3(subv3(scn->camera.position,hit->position));
+			vec3 __Specular = mulv3s(mulv3s(info.intensity,pow(fmaxf(dotv3(__R,__V),.0f),50)),.2f);
+			__Result = addv3(__Result,__Specular);
+		}
 	}
 
 	return clampv3(__Result,.0f,1.f);

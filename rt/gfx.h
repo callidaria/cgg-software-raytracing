@@ -9,7 +9,7 @@
 // Utility
 
 // raytracer
-void rt(Image*,const Camera*,const Scene*);
+void rt(Image*,const Scene*);
 
 
 #endif

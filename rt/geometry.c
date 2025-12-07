@@ -75,11 +75,16 @@ void destroy_graph(SGNode* node)
 
 /**
  *	initialize a scene
+ *	\param cpos: camera position
  *	\returns pointer to the created scene
  */
-Scene* create_scene()
+Scene* create_scene(vec3 cpos)
 {
 	Scene* out = (Scene*)malloc(sizeof(Scene));
+
+	// setup camera
+	create_camera(&out->camera,cpos);
+	update_camera(&out->camera);
 
 	// setup rootnode of scene graph
 	out->graph.type = NODE_TYPE_ROOT;
@@ -101,6 +106,7 @@ Scene* create_scene()
 void destroy_scene(Scene* scene)
 {
 	_destroy_graph(&scene->graph);
+	destroy_camera(&scene->camera);
 	free(scene);
 }
 

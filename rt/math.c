@@ -310,16 +310,14 @@ void divm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
 
 /**
  *	create a camera to cast rays from
+ *	\param camera: pointer to camera in memory
  *	\param pos: camera position and origin of all initial rays
- *	\returns: pointer to camera in memory
  */
-Camera* create_camera(vec3 pos)
+void create_camera(Camera* camera,vec3 pos)
 {
-	Camera* cam = (Camera*)malloc(sizeof(Camera));
-	cam->position = pos;
-	cam->zfac = -(f32)BUFFER_RESOLUTION_HWIDTH/tan(PERSPECTIVE_CLIPPING_FOV*RAD_PI*.5f);
-	cam->rays = (Ray*)malloc(sizeof(Ray)*BUFFER_RESOLUTION_PIXELS);
-	return cam;
+	camera->position = pos;
+	camera->zfac = -(f32)BUFFER_RESOLUTION_HWIDTH/tan(PERSPECTIVE_CLIPPING_FOV*RAD_PI*.5f);
+	camera->rays = (Ray*)malloc(sizeof(Ray)*BUFFER_RESOLUTION_PIXELS);
 }
 
 /**
@@ -342,7 +340,6 @@ void update_camera(Camera* cam)
 void destroy_camera(Camera* cam)
 {
 	free(cam->rays);
-	free(cam);
 }
 
 /**
