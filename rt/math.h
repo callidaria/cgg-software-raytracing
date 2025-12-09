@@ -31,11 +31,13 @@ typedef union {
 	__m128 _simd;
 } quat __attribute__((aligned(16)));
 
-typedef struct { f32 v[16]; } mat4x4 __attribute__((aligned(16)));
+typedef union {
+	f32 v[16];
+	__m128 _simd[4];
+} mat4x4 __attribute__((aligned(16)));
 
 typedef struct { u8 r,g,b; } crgb;
 typedef struct { u8 r,g,b,a; } crgba;
-// TODO simd supporting union for mat4x4 & alter functions accordingly
 
 typedef struct {
 	vec3 origin;

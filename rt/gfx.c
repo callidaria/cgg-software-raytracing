@@ -86,7 +86,7 @@ static inline vec3 _shade_phong(SHADER_PARAMETERS)
 			vec3 __R = subv3(mulv3s(hit->normal,2.f*dotv3(info.direction,hit->normal)),info.direction);
 			__R = normalizev3(__R);
 			vec3 __V = normalizev3(subv3(scn->camera.position,hit->position));
-			vec3 __Specular = mulv3s(mulv3s(info.intensity,pow(fmaxf(dotv3(__R,__V),.0f),50)),.2f);
+			vec3 __Specular = mulv3s(mulv3s(info.intensity,pow(fmaxf(dotv3(__R,__V),.0f),5)),.9f);
 			__Result = addv3(__Result,__Specular);
 		}
 	}

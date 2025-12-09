@@ -144,8 +144,7 @@ vec3 clampv3(vec3 v,f32 a,f32 b)
 {
 	__m128 __A = _mm_set1_ps(a);
 	__m128 __B = _mm_set1_ps(b);
-	__m128 __Result = _mm_max_ps(_mm_min_ps(v._simd,__B),__A);
-	_mm_store_ps(&v.x,__Result);
+	v._simd = _mm_max_ps(_mm_min_ps(v._simd,__B),__A);
 	return v;
 }
 
@@ -178,8 +177,7 @@ vec4 clampv4(vec4 v,f32 a,f32 b)
 {
 	__m128 __A = _mm_set1_ps(a);
 	__m128 __B = _mm_set1_ps(b);
-	__m128 __Result = _mm_max_ps(_mm_min_ps(v._simd,__B),__A);
-	_mm_store_ps(&v.x,__Result);
+	v._simd = _mm_max_ps(_mm_min_ps(v._simd,__B),__A);
 	return v;
 }
 
@@ -191,25 +189,10 @@ vec4 clampv4(vec4 v,f32 a,f32 b)
  */
 void addm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
 {
-	f32* __R = (f32*)r;
-	f32* __M0 = (f32*)m0;
-	f32* __M1 = (f32*)m1;
-
-	// extract rows
-	__m128 __Ar0 = _mm_load_ps(&__M0[0]);
-	__m128 __Ar1 = _mm_load_ps(&__M0[4]);
-	__m128 __Ar2 = _mm_load_ps(&__M0[8]);
-	__m128 __Ar3 = _mm_load_ps(&__M0[12]);
-	__m128 __Br0 = _mm_load_ps(&__M1[0]);
-	__m128 __Br1 = _mm_load_ps(&__M1[4]);
-	__m128 __Br2 = _mm_load_ps(&__M1[8]);
-	__m128 __Br3 = _mm_load_ps(&__M1[12]);
-
-	// sum & store
-	_mm_store_ps(&__R[0],_mm_add_ps(__Ar0,__Br0));
-	_mm_store_ps(&__R[4],_mm_add_ps(__Ar1,__Br1));
-	_mm_store_ps(&__R[8],_mm_add_ps(__Ar2,__Br2));
-	_mm_store_ps(&__R[12],_mm_add_ps(__Ar3,__Br3));
+	r->_simd[0] = _mm_add_ps(m0->_simd[0],m1->_simd[0]);
+	r->_simd[1] = _mm_add_ps(m0->_simd[1],m1->_simd[1]);
+	r->_simd[2] = _mm_add_ps(m0->_simd[2],m1->_simd[2]);
+	r->_simd[3] = _mm_add_ps(m0->_simd[3],m1->_simd[3]);
 }
 
 /**
@@ -220,25 +203,10 @@ void addm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
  */
 void subm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
 {
-	f32* __R = (f32*)r;
-	f32* __M0 = (f32*)m0;
-	f32* __M1 = (f32*)m1;
-
-	// extract rows
-	__m128 __Ar0 = _mm_load_ps(&__M0[0]);
-	__m128 __Ar1 = _mm_load_ps(&__M0[4]);
-	__m128 __Ar2 = _mm_load_ps(&__M0[8]);
-	__m128 __Ar3 = _mm_load_ps(&__M0[12]);
-	__m128 __Br0 = _mm_load_ps(&__M1[0]);
-	__m128 __Br1 = _mm_load_ps(&__M1[4]);
-	__m128 __Br2 = _mm_load_ps(&__M1[8]);
-	__m128 __Br3 = _mm_load_ps(&__M1[12]);
-
-	// subtract & store
-	_mm_store_ps(&__R[0],_mm_sub_ps(__Ar0,__Br0));
-	_mm_store_ps(&__R[4],_mm_sub_ps(__Ar1,__Br1));
-	_mm_store_ps(&__R[8],_mm_sub_ps(__Ar2,__Br2));
-	_mm_store_ps(&__R[12],_mm_sub_ps(__Ar3,__Br3));
+	r->_simd[0] = _mm_sub_ps(m0->_simd[0],m1->_simd[0]);
+	r->_simd[1] = _mm_sub_ps(m0->_simd[1],m1->_simd[1]);
+	r->_simd[2] = _mm_sub_ps(m0->_simd[2],m1->_simd[2]);
+	r->_simd[3] = _mm_sub_ps(m0->_simd[3],m1->_simd[3]);
 }
 
 /**
@@ -249,29 +217,17 @@ void subm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
  */
 void mulm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
 {
-	f32* __R = (f32*)r;
-	f32* __M0 = (f32*)m0;
-	f32* __M1 = (f32*)m1;
-
-	// load left hand side matrix
-	__m128 __Rows[4];
-	__Rows[0] = _mm_load_ps(&__M1[0]);
-	__Rows[1] = _mm_load_ps(&__M1[4]);
-	__Rows[2] = _mm_load_ps(&__M1[8]);
-	__Rows[3] = _mm_load_ps(&__M1[12]);
-
-	// iterate multiplication
 	for (u8 i=0;i<4;++i)
 	{
 		__m128 __Cols[4];
-		__Cols[0] = _mm_set1_ps(__M0[i*4]);
-		__Cols[1] = _mm_set1_ps(__M0[i*4+1]);
-		__Cols[2] = _mm_set1_ps(__M0[i*4+2]);
-		__Cols[3] = _mm_set1_ps(__M0[i*4+3]);
-		_mm_store_ps(&__R[i*4],_mm_add_ps(
-				_mm_add_ps(_mm_mul_ps(__Rows[0],__Cols[0]),_mm_mul_ps(__Rows[1],__Cols[1])),
-				_mm_add_ps(_mm_mul_ps(__Rows[2],__Cols[2]),_mm_mul_ps(__Rows[3],__Cols[3]))
-			));
+		__Cols[0] = _mm_set1_ps(m0->v[i*4]);
+		__Cols[1] = _mm_set1_ps(m0->v[i*4+1]);
+		__Cols[2] = _mm_set1_ps(m0->v[i*4+2]);
+		__Cols[3] = _mm_set1_ps(m0->v[i*4+3]);
+		r->_simd[i] = _mm_add_ps(
+				_mm_add_ps(_mm_mul_ps(r->_simd[0],__Cols[0]),_mm_mul_ps(r->_simd[1],__Cols[1])),
+				_mm_add_ps(_mm_mul_ps(r->_simd[2],__Cols[2]),_mm_mul_ps(r->_simd[3],__Cols[3]))
+			);
 	}
 }
 
@@ -283,26 +239,12 @@ void mulm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
  */
 void divm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
 {
-	f32* __R = (f32*)r;
-	f32* __M0 = (f32*)m0;
-	f32* __M1 = (f32*)m1;
-
-	// extract rows
-	__m128 __Ar0 = _mm_load_ps(&__M0[0]);
-	__m128 __Ar1 = _mm_load_ps(&__M0[4]);
-	__m128 __Ar2 = _mm_load_ps(&__M0[8]);
-	__m128 __Ar3 = _mm_load_ps(&__M0[12]);
-	__m128 __Br0 = _mm_load_ps(&__M1[0]);
-	__m128 __Br1 = _mm_load_ps(&__M1[4]);
-	__m128 __Br2 = _mm_load_ps(&__M1[8]);
-	__m128 __Br3 = _mm_load_ps(&__M1[12]);
-
-	// subtract & store
-	_mm_store_ps(&__R[0],_mm_div_ps(__Ar0,__Br0));
-	_mm_store_ps(&__R[4],_mm_div_ps(__Ar1,__Br1));
-	_mm_store_ps(&__R[8],_mm_div_ps(__Ar2,__Br2));
-	_mm_store_ps(&__R[12],_mm_div_ps(__Ar3,__Br3));
+	r->_simd[0] = _mm_div_ps(m0->_simd[0],m1->_simd[0]);
+	r->_simd[1] = _mm_div_ps(m0->_simd[1],m1->_simd[1]);
+	r->_simd[2] = _mm_div_ps(m0->_simd[2],m1->_simd[2]);
+	r->_simd[3] = _mm_div_ps(m0->_simd[3],m1->_simd[3]);
 }
+// TODO no there was a trick to do this faster somehow. i remember dont lie to me
 
 
 // ----------------------------------------------------------------------------------------------------
