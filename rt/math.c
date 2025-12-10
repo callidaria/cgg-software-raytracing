@@ -16,10 +16,15 @@ static inline f32 clamp(f32 v,f32 a,f32 b) { return fmaxf(fminf(v,b),a); }
  *	\param v1: right hand side vector
  */
 vec2 addv2(vec2 v0,vec2 v1) { return (vec2){ v0.x+v1.x,v0.y+v1.y }; }
+
 vec2 subv2(vec2 v0,vec2 v1) { return (vec2){ v0.x-v1.x,v0.y-v1.y }; }
+
 vec2 mulv2(vec2 v0,vec2 v1) { return (vec2){ v0.x*v1.x,v0.y*v1.y }; }
+
 f32 dotv2(vec2 v0,vec2 v1) { return v0.x*v1.x+v0.y*v1.y; }
+
 f32 crossv2(vec2 v0,vec2 v1) { return v0.x*v1.y-v0.y*v1.x; }
+
 vec2 divv2(vec2 v0,vec2 v1) { return (vec2){ v0.x/v1.x,v0.y/v1.y }; }
 
 /**
@@ -28,8 +33,11 @@ vec2 divv2(vec2 v0,vec2 v1) { return (vec2){ v0.x/v1.x,v0.y/v1.y }; }
  *	\param s: variable side scalar
  */
 vec2 addv2s(vec2 v,f32 s) { return (vec2){ v.x+s,v.y+s }; }
+
 vec2 subv2s(vec2 v,f32 s) { return (vec2){ v.x-s,v.y-s }; }
+
 vec2 mulv2s(vec2 v,f32 s) { return (vec2){ v.x*s,v.y*s }; }
+
 vec2 divv2s(vec2 v,f32 s)
 {
 	f32 __Inv = 1.f/s;
@@ -37,68 +45,11 @@ vec2 divv2s(vec2 v,f32 s)
 }
 
 /**
- *	operations over two vectors in R3
- *	\param v0: left hand side vector
- *	\param v1: right hand side vector
- */
-vec3 addv3(vec3 v0,vec3 v1) { return (vec3){ v0.x+v1.x,v0.y+v1.y,v0.z+v1.z }; }
-vec3 subv3(vec3 v0,vec3 v1) { return (vec3){ v0.x-v1.x,v0.y-v1.y,v0.z-v1.z }; }
-vec3 mulv3(vec3 v0,vec3 v1) { return (vec3){ v0.x*v1.x,v0.y*v1.y,v0.z*v1.z }; }
-f32 dotv3(vec3 v0,vec3 v1) { return v0.x*v1.x+v0.y*v1.y+v0.z*v1.z; }
-vec3 crossv3(vec3 v0,vec3 v1) { return (vec3){ v0.x*v1.y,v0.y+v1.x }; }
-vec3 divv3(vec3 v0,vec3 v1) { return (vec3){ v0.x/v1.x,v0.y/v1.y,v0.z/v1.z }; }
-
-/**
- *	operations over a vector in R3 and a scalar
- *	\param v: variable side vector
- *	\param s: variable side scalar
- */
-vec3 addv3s(vec3 v,f32 s) { return (vec3){ v.x+s,v.y+s,v.z+s }; }
-vec3 subv3s(vec3 v,f32 s) { return (vec3){ v.x-s,v.y-s,v.z-s }; }
-vec3 mulv3s(vec3 v,f32 s) { return (vec3){ v.x*s,v.y*s,v.z*s }; }
-vec3 divv3s(vec3 v,f32 s)
-{
-	f32 __Inv = 1.f/s;
-	return (vec3){ v.x*__Inv,v.y*__Inv,v.z*__Inv };
-}
-
-/**
- *	operations over two vectors in R4
- *	\param v0: left hand side vector
- *	\param v1: right hand side vector
- */
-vec4 addv4(vec4 v0,vec4 v1) { return (vec4){ v0.x+v1.x,v0.y+v1.y,v0.z+v1.z,v0.w+v1.w }; }
-vec4 subv4(vec4 v0,vec4 v1) { return (vec4){ v0.x-v1.x,v0.y-v1.y,v0.z-v1.z,v0.w-v1.w }; }
-vec4 mulv4(vec4 v0,vec4 v1) { return (vec4){ v0.x*v1.x,v0.y*v1.y,v0.z*v1.z,v0.w*v1.w }; }
-f32 dotv4(vec4 v0,vec4 v1) { return v0.x*v1.x+v0.y*v1.y+v0.z*v1.z+v0.w*v1.w; }
-vec4 divv4(vec4 v0,vec4 v1) { return (vec4){ v0.x/v1.x,v0.y/v1.y,v0.z/v1.z,v0.w/v1.w }; }
-
-/**
- *	operations over a vector in R4 and a scalar
- *	\param v: variable side vector
- *	\param s: variable side scalar
- */
-vec4 addv4s(vec4 v,f32 s) { return (vec4){ v.x+s,v.y+s,v.z+s,v.w+s }; }
-vec4 subv4s(vec4 v,f32 s) { return (vec4){ v.x-s,v.y-s,v.z-s,v.w-s }; }
-vec4 mulv4s(vec4 v,f32 s) { return (vec4){ v.x*s,v.y*s,v.z*s,v.w*s }; }
-vec4 divv4s(vec4 v,f32 s)
-{
-	f32 __Inv = 1.f/s;
-	return (vec4){ v.x*__Inv,v.y*__Inv,v.z*__Inv,v.w*__Inv };
-}
-
-
-/**
  *	unary operations over a vector in R2
  *	\param v: vector
  */
 f32 lengthv2(vec2 v) { return sqrt(v.x*v.x+v.y*v.y); }
 
-/**
- *	normalize a vector in R2
- *	\param v: vector to normalize
- *	\returns normalized version of passed vector
- */
 vec2 normalizev2(vec2 v)
 {
 	f32 __Len = lengthv2(v);
@@ -107,7 +58,159 @@ vec2 normalizev2(vec2 v)
 }
 
 /**
- *	clamp a vector in R2 into a certain range
+ *	operations over two vectors in R3
+ *	\param v0: left hand side vector
+ *	\param v1: right hand side vector
+ */
+vec3 addv3(vec3 v0,vec3 v1) { return (vec3)_mm_add_ps(v0._simd,v1._simd); }
+
+vec3 subv3(vec3 v0,vec3 v1) { return (vec3)_mm_sub_ps(v0._simd,v1._simd); }
+
+vec3 mulv3(vec3 v0,vec3 v1) { return (vec3)_mm_mul_ps(v0._simd,v1._simd); }
+
+f32 dotv3(vec3 v0,vec3 v1)
+{
+	v0._simd = _mm_mul_ps(v0._simd,v1._simd);
+	__m128 __Addr = _mm_movehl_ps(v0._simd,v0._simd);
+	v0._simd = _mm_add_ps(v0._simd,__Addr);
+	__Addr = _mm_shuffle_ps(v0._simd,v0._simd,0x55);
+	v0._simd = _mm_add_ps(v0._simd,__Addr);
+	return _mm_cvtss_f32(v0._simd);
+}
+
+vec3 crossv3(vec3 v0,vec3 v1)
+{
+	return (vec3){ v0.y*v1.z-v0.z*v1.y,v0.z*v1.x-v0.x*v1.z,v0.x*v1.y-v0.y*v1.x };
+	// TODO simd optimization. (i think i know a trick!)
+}
+
+vec3 divv3(vec3 v0,vec3 v1) { return (vec3)_mm_div_ps(v0._simd,v1._simd); }
+
+/**
+ *	operations over a vector in R3 and a scalar
+ *	\param v: variable side vector
+ *	\param s: variable side scalar
+ */
+vec3 addv3s(vec3 v,f32 s)
+{
+	__m128 __S = _mm_set1_ps(s);
+	return (vec3)_mm_add_ps(v._simd,__S);
+}
+
+vec3 subv3s(vec3 v,f32 s)
+{
+	__m128 __S = _mm_set1_ps(s);
+	return (vec3)_mm_sub_ps(v._simd,__S);
+}
+
+vec3 mulv3s(vec3 v,f32 s)
+{
+	__m128 __S = _mm_set1_ps(s);
+	return (vec3)_mm_mul_ps(v._simd,__S);
+}
+
+vec3 divv3s(vec3 v,f32 s)
+{
+	__m128 __S = _mm_set1_ps(1.f/s);
+	return (vec3)_mm_mul_ps(v._simd,__S);
+}
+
+/**
+ *	unary operations over a vector in R3
+ *	\param v: vector
+ */
+f32 lengthv3(vec3 v)
+{
+	v._simd = _mm_mul_ps(v._simd,v._simd);
+	__m128 __Addr = _mm_movehl_ps(v._simd,v._simd);
+	v._simd = _mm_add_ps(v._simd,__Addr);
+	__Addr = _mm_shuffle_ps(v._simd,v._simd,0x55);
+	v._simd = _mm_add_ps(v._simd,__Addr);
+	return _mm_cvtss_f32(_mm_sqrt_ps(v._simd));
+}
+
+vec3 normalizev3(vec3 v)
+{
+	f32 __Len = lengthv3(v);
+	if (!__Len) return v;
+	return divv3s(v,__Len);
+}
+
+/**
+ *	operations over two vectors in R4
+ *	\param v0: left hand side vector
+ *	\param v1: right hand side vector
+ */
+vec4 addv4(vec4 v0,vec4 v1) { return (vec4)_mm_add_ps(v0._simd,v1._simd); }
+
+vec4 subv4(vec4 v0,vec4 v1) { return (vec4)_mm_sub_ps(v0._simd,v1._simd); }
+
+vec4 mulv4(vec4 v0,vec4 v1) { return (vec4)_mm_mul_ps(v0._simd,v1._simd); }
+
+f32 dotv4(vec4 v0,vec4 v1)
+{
+	v0._simd = _mm_mul_ps(v0._simd,v1._simd);
+	__m128 __Addr = _mm_movehl_ps(v0._simd,v0._simd);
+	v0._simd = _mm_add_ps(v0._simd,__Addr);
+	__Addr = _mm_shuffle_ps(v0._simd,v0._simd,0x55);
+	v0._simd = _mm_add_ps(v0._simd,__Addr);
+	return _mm_cvtss_f32(v0._simd);
+}
+
+vec4 divv4(vec4 v0,vec4 v1) { return (vec4)_mm_div_ps(v0._simd,v1._simd); }
+
+/**
+ *	operations over a vector in R4 and a scalar
+ *	\param v: variable side vector
+ *	\param s: variable side scalar
+ */
+vec4 addv4s(vec4 v,f32 s)
+{
+	__m128 __S = _mm_set1_ps(s);
+	return (vec4)_mm_add_ps(v._simd,__S);
+}
+
+vec4 subv4s(vec4 v,f32 s)
+{
+	__m128 __S = _mm_set1_ps(s);
+	return (vec4)_mm_sub_ps(v._simd,__S);
+}
+
+vec4 mulv4s(vec4 v,f32 s)
+{
+	__m128 __S = _mm_set1_ps(s);
+	return (vec4)_mm_mul_ps(v._simd,__S);
+}
+
+vec4 divv4s(vec4 v,f32 s)
+{
+	__m128 __S = _mm_set1_ps(1.f/s);
+	return (vec4)_mm_mul_ps(v._simd,__S);
+}
+
+/**
+ *	unary operations over a vector in R4
+ *	\param v: vector
+ */
+f32 lengthv4(vec4 v)
+{
+	v._simd = _mm_mul_ps(v._simd,v._simd);
+	__m128 __Addr = _mm_movehl_ps(v._simd,v._simd);
+	v._simd = _mm_add_ps(v._simd,__Addr);
+	__Addr = _mm_shuffle_ps(v._simd,v._simd,0x55);
+	v._simd = _mm_add_ps(v._simd,__Addr);
+	return _mm_cvtss_f32(_mm_sqrt_ps(v._simd));
+}
+
+vec4 normalizev4(vec4 v)
+{
+	f32 __Len = lengthv4(v);
+	if (!__Len) return v;
+	return divv4s(v,__Len);
+}
+
+/**
+ *	clamp a vector into a certain range
  *	\param v: vector to clamp
  *	\param a: minimum of clamping range
  *	\param b: maximum of clamping range
@@ -115,31 +218,6 @@ vec2 normalizev2(vec2 v)
  */
 vec2 clampv2(vec2 v,f32 a,f32 b) { return (vec2){ clamp(v.x,a,b),clamp(v.y,a,b) }; }
 
-/**
- *	unary operations over a vector in R3
- *	\param v: vector
- */
-f32 lengthv3(vec3 v) { return sqrtf(v.x*v.x+v.y*v.y+v.z*v.z); }
-
-/**
- *	normalize a vector in R3
- *	\param v: vector to normalize
- *	\returns normalized version of passed vector
- */
-vec3 normalizev3(vec3 v)
-{
-	f32 __Len = lengthv3(v);
-	if (__Len==.0f) return v;
-	return divv3s(v,__Len);
-}
-
-/**
- *	clamp a vector in R3 into a certain range
- *	\param v: vector to clamp
- *	\param a: minimum of clamping range
- *	\param b: maximum of clamping range
- *	\returns clamped vector
- */
 vec3 clampv3(vec3 v,f32 a,f32 b)
 {
 	__m128 __A = _mm_set1_ps(a);
@@ -148,31 +226,6 @@ vec3 clampv3(vec3 v,f32 a,f32 b)
 	return v;
 }
 
-/**
- *	unary operations over a vector in R4
- *	\param v: vector
- */
-f32 lengthv4(vec4 v) { return sqrt(v.x*v.x+v.y*v.y+v.z*v.z+v.w*v.w); }
-
-/**
- *	normalize a vector in R4
- *	\param v: vector to normalize
- *	\returns normalized version of passed vector
- */
-vec4 normalizev4(vec4 v)
-{
-	f32 __Len = lengthv4(v);
-	if (__Len==.0f) return v;
-	return divv4s(v,__Len);
-}
-
-/**
- *	clamp a vector in R4 into a certain range
- *	\param v: vector to clamp
- *	\param a: minimum of clamping range
- *	\param b: maximum of clamping range
- *	\returns clamped vector
- */
 vec4 clampv4(vec4 v,f32 a,f32 b)
 {
 	__m128 __A = _mm_set1_ps(a);
@@ -244,7 +297,6 @@ void divm44(mat4x4* r,const mat4x4* m0,const mat4x4* m1)
 	r->_simd[2] = _mm_div_ps(m0->_simd[2],m1->_simd[2]);
 	r->_simd[3] = _mm_div_ps(m0->_simd[3],m1->_simd[3]);
 }
-// TODO no there was a trick to do this faster somehow. i remember dont lie to me
 
 
 // ----------------------------------------------------------------------------------------------------

@@ -83,6 +83,8 @@ vec2 addv2s(vec2,f32);
 vec2 subv2s(vec2,f32);
 vec2 mulv2s(vec2,f32);
 vec2 divv2s(vec2,f32);
+f32 lengthv2(vec2);
+vec2 normalizev2(vec2);
 
 // vec3
 vec3 addv3(vec3,vec3);
@@ -95,6 +97,8 @@ vec3 addv3s(vec3,f32);
 vec3 subv3s(vec3,f32);
 vec3 mulv3s(vec3,f32);
 vec3 divv3s(vec3,f32);
+f32 lengthv3(vec3);
+vec3 normalizev3(vec3);
 
 // vec4
 vec4 addv4(vec4,vec4);
@@ -106,24 +110,15 @@ vec4 addv4s(vec4,f32);
 vec4 subv4s(vec4,f32);
 vec4 mulv4s(vec4,f32);
 vec4 divv4s(vec4,f32);
+f32 lengthv4(vec4);
+vec4 normalizev4(vec4);
 
 // quat
 // TODO
 
-// unary vector operations
-// vec2
-f32 lengthv2(vec2);
-vec2 normalizev2(vec2);
+// clamping
 vec2 clampv2(vec2,f32,f32);
-
-// vec3
-f32 lengthv3(vec3);
-vec3 normalizev3(vec3);
 vec3 clampv3(vec3,f32,f32);
-
-// vec4
-f32 lengthv4(vec4);
-vec4 normalizev4(vec4);
 vec4 clampv4(vec4,f32,f32);
 
 // matrixmath
