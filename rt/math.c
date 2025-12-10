@@ -80,8 +80,11 @@ f32 dotv3(vec3 v0,vec3 v1)
 
 vec3 crossv3(vec3 v0,vec3 v1)
 {
-	return (vec3){ v0.y*v1.z-v0.z*v1.y,v0.z*v1.x-v0.x*v1.z,v0.x*v1.y-v0.y*v1.x };
-	// TODO simd optimization. (i think i know a trick!)
+	__m128 __Addr0 = _mm_shuffle_ps(v0._simd,v0._simd,0x09);
+	__m128 __Addr1 = _mm_shuffle_ps(v1._simd,v1._simd,0x12);
+	__m128 __Subr0 = _mm_shuffle_ps(v0._simd,v0._simd,0x12);
+	__m128 __Subr1 = _mm_shuffle_ps(v1._simd,v1._simd,0x09);
+	return (vec3)_mm_sub_ps(_mm_mul_ps(__Addr0,__Addr1),_mm_mul_ps(__Subr0,__Subr1));
 }
 
 vec3 divv3(vec3 v0,vec3 v1) { return (vec3)_mm_div_ps(v0._simd,v1._simd); }
