@@ -75,7 +75,7 @@ static inline vec3 _shade_phong(SHADER_PARAMETERS)
 		// TODO
 
 		// diffuse component
-		vec3 __Colour = (vec3){ 1.f,1.f,1.f };  // TODO replace with surface colour
+		vec3 __Colour = (vec3){ hit->colour.r,hit->colour.g,hit->colour.b };
 		f32 __Attitude = dotv3(hit->normal,info.direction);
 		vec3 __Diffuse = mulv3(__Colour,mulv3s(info.intensity,fmaxf(0,__Attitude)));
 		__Result = addv3(__Result,__Diffuse);
@@ -91,7 +91,8 @@ static inline vec3 _shade_phong(SHADER_PARAMETERS)
 		}
 	}
 
-	return clampv3(__Result,.0f,1.f);
+	return clampv3(hit->normal,.0f,1.f);
+	//return clampv3(__Result,.0f,1.f);
 }
 // TODO surface colour read
 // TODO implement ambient component

@@ -1,7 +1,7 @@
 #ifndef RT_GEOMETRY_HEADER
 #define RT_GEOMETRY_HEADER
 
-#include "math.h"
+#include "image.h"
 
 
 // ----------------------------------------------------------------------------------------------------
@@ -19,11 +19,17 @@ typedef enum {
 	LIGHT_TYPE_COUNT
 } LightType;
 
+typedef union {
+	vec4 colour;
+} MaterialInfo;
+
 typedef struct {
 	vec3 center;
 	f32 radius;
 	f32 radius_sq;
+	f32 radius_inv;
 	Material material;
+	MaterialInfo material_info;
 } Sphere;
 
 typedef struct SGNode {
@@ -79,7 +85,7 @@ typedef struct Scene {
 
 // graph
 void reserve_subsequent(SGNode*,u8);
-SGNode* define_sphere(SGNode*,vec3,f32,Material);
+SGNode* define_sphere(SGNode*,vec3,f32,Material,vec4);
 void destroy_graph(SGNode*);
 
 // scene

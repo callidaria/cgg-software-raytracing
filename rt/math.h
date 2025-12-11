@@ -18,11 +18,13 @@ typedef struct { f32 x,y; } vec2 __attribute__((aligned(8)));
 
 typedef union {
 	struct { f32 x,y,z; };
+	struct { f32 r,g,b; };
 	__m128 _simd;
 } vec3 __attribute__((aligned(16)));
 
 typedef union {
 	struct { f32 x,y,z,w; };
+	struct { f32 r,g,b,a; };
 	__m128 _simd;
 } vec4 __attribute__((aligned(16)));
 
@@ -53,6 +55,7 @@ typedef enum {
 typedef struct {
 	vec3 position;
 	vec3 normal;
+	vec4 colour;
 	Material material;
 } Intersection;
 

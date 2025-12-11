@@ -9,8 +9,8 @@ int main(int argc,char** argv)
 
 	// setup scene
 	reserve_subsequent(&scene->graph,1);
-	define_sphere(&scene->graph,(vec3){ 0,0,0 },1.f,MATERIAL_PHONG);
-	create_light_sun(&scene->lighting,(vec3){ -1,1,1 },(vec3){ 1,1,1 });
+	define_sphere(&scene->graph,(vec3){ 0,0,0 },1.f,MATERIAL_PHONG,(vec4){ 0,0,.5f,1 });
+	create_light_sun(&scene->lighting,(vec3){ 1,1,1 },(vec3){ 1,1,1 });
 
 	// raytrace
 	rt(image_buffer,scene);

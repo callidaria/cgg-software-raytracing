@@ -32,10 +32,11 @@ void reserve_subsequent(SGNode* node,u8 count)
  *	\param node: selected node to define geometry in relation to
  *	\param center: vector to center of the sphere
  *	\param radius: radius of the sphere
- *	\param material: surface material of the wphere
+ *	\param material: surface material of the sphere
+ *	\param colour: surface colour
  *	\returns pointer to overwritten child node
  */
-SGNode* define_sphere(SGNode* node,vec3 center,f32 radius,Material material)
+SGNode* define_sphere(SGNode* node,vec3 center,f32 radius,Material material,vec4 colour)
 {
 	SGNode* out = &node->subsequent[node->crr_child++];
 	out->type = NODE_TYPE_SPHERE;
@@ -47,7 +48,9 @@ SGNode* define_sphere(SGNode* node,vec3 center,f32 radius,Material material)
 	__Sphere->center = center;
 	__Sphere->radius = radius;
 	__Sphere->radius_sq = radius*radius;
+	__Sphere->radius_inv = 1.f/radius;
 	__Sphere->material = material;
+	__Sphere->material_info.colour = colour;
 	out->geometry = (f32*)__Sphere;
 }
 
@@ -151,8 +154,10 @@ void _sphere_intersection(const f32* geom,const Ray* ray,Intersection* hit)
 	f32 ts0 = fmin(t0,t1);
 	f32 ts1 = fmax(t0,t1);
 	hit->position = ray_calculate_position(ray,ts0);  // FIXME clipped
-	hit->normal = normalizev3(subv3(hit->position,__Sphere->center));
+	hit->normal = mulv3s(subv3(hit->position,__Sphere->center),__Sphere->radius_inv);
 	hit->material = __Sphere->material;
+	hit->colour = __Sphere->material_info.colour;
+	printf("%f %f %f\n",hit->position.x,hit->position.y,hit->position.z);
 	// FIXME elegance & optimization
 	// TODO depthtesting & detailed intersection store
 }
