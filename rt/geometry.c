@@ -51,7 +51,42 @@ SGNode* define_sphere(SGNode* node,vec3 center,f32 radius,Material material,vec4
 	__Sphere->radius_inv = 1.f/radius;
 	__Sphere->material = material;
 	__Sphere->material_info.colour = colour;
+
+	// write & return
 	out->geometry = (f32*)__Sphere;
+	return out;
+}
+
+/**
+ *	define box as child of given node
+ *	\param node: selected node to define geometry in relation to
+ *	\param center: vector to the center of the box
+ *	\param width: width of the box (x-axis)
+ *	\param height: height of the box (z-axis)
+ *	\param depth: depth of the box (y-axis)
+ *	\param material: surface material of the sphere
+ *	\param colour: surface colour
+ *	\returns pointer to overwritten child node
+ */
+SGNode* define_box(SGNode* node,vec3 center,f32 width,f32 height,f32 depth,Material material,vec4 colour)
+{
+	SGNode* out = &node->subsequent[node->crr_child++];
+	out->type = NODE_TYPE_BOX;
+	out->subsequent = NULL;
+	out->crr_child = 0;
+
+	// write box
+	Box* __Box = (Box*)malloc(sizeof(Box));
+	__Box->center = center;
+	__Box->halfdim = mulv3s((vec3){ width,height,depth },.5f);
+	__Box->bounds_min = subv3(center,__Box->halfdim);
+	__Box->bounds_max = addv3(center,__Box->halfdim);
+	__Box->material = material;
+	__Box->material_info.colour = colour;
+
+	// write & return
+	out->geometry = (f32*)__Box;
+	return out;
 }
 
 // recursive helper function that deletes all subtrees of the rootnode
@@ -118,20 +153,40 @@ void destroy_scene(Scene* scene)
 // Intersection
 
 /**
+ *	bounding box axis clipping function
+ *	\param vol: pointer to clipped ray-volume intersection area (x = near, y = far)
+ *	\param bmin: boundaries minimum on given axis
+ *	\param bmax: boundaries maximum on given axis
+ *	\param origin: axis component of ray origin
+ *	\param direction: axis component of ray direction
+ */
+void _clip_axis(vec2* vol,f32 bmin,f32 bmax,f32 origin,f32 direction)
+{
+	f32 __DirectionInv = 1.f/direction;
+	f32 __T0 = (bmin-origin)*__DirectionInv;
+	f32 __T1 = (bmax-origin)*__DirectionInv;
+	vol->x = fmaxf(vol->x,fminf(__T0,__T1));
+	vol->y = fminf(vol->y,fmaxf(__T0,__T1));
+}
+
+/**
  *	definition of intersection functions correlating to NodeType geometry enumerator
  *	\param geom: pointer to geometry in memory
  *	\param ray: ray that may be intersecting with geometry stored in node
  *	\param hit: structure holding information about intersection
  */
-typedef void (*_intersection_test)(const f32*,const Ray*,Intersection*);
-void _root_intersection(const f32* geom,const Ray* ray,Intersection* hit) {  }
-void _sphere_intersection(const f32*,const Ray*,Intersection*);
+#define INTERSECTION_TEST_PARAMETERS const f32* geom,const Ray* ray,Intersection* hit
+typedef void (*_intersection_test)(INTERSECTION_TEST_PARAMETERS);
+void _root_intersection(INTERSECTION_TEST_PARAMETERS) {  }
+void _sphere_intersection(INTERSECTION_TEST_PARAMETERS);
+void _box_intersection(INTERSECTION_TEST_PARAMETERS);
 _intersection_test _test_intersection[NODE_TYPE_COUNT] = {
 	_root_intersection,
-	_sphere_intersection
+	_sphere_intersection,
+	_box_intersection,
 };
 
-void _sphere_intersection(const f32* geom,const Ray* ray,Intersection* hit)
+void _sphere_intersection(INTERSECTION_TEST_PARAMETERS)
 {
 	Sphere* __Sphere = (Sphere*)geom;
 
@@ -157,10 +212,36 @@ void _sphere_intersection(const f32* geom,const Ray* ray,Intersection* hit)
 	hit->normal = mulv3s(subv3(hit->position,__Sphere->center),__Sphere->radius_inv);
 	hit->material = __Sphere->material;
 	hit->colour = __Sphere->material_info.colour;
-	printf("%f %f %f\n",hit->position.x,hit->position.y,hit->position.z);
 	// FIXME elegance & optimization
 	// TODO depthtesting & detailed intersection store
 }
+
+void _box_intersection(INTERSECTION_TEST_PARAMETERS)
+{
+	Box* __Box = (Box*)geom;
+
+	// components
+	vec2 __IntersectionVolume = (vec2){ 0,FLOAT_MAX_VALUE };
+	_clip_axis(&__IntersectionVolume,__Box->bounds_min.x,__Box->bounds_max.x,ray->origin.x,ray->direction.x);
+	_clip_axis(&__IntersectionVolume,__Box->bounds_min.y,__Box->bounds_max.y,ray->origin.y,ray->direction.y);
+	_clip_axis(&__IntersectionVolume,__Box->bounds_min.z,__Box->bounds_max.z,ray->origin.z,ray->direction.z);
+
+	// ee in case of no intersection & calculate position
+	if (__IntersectionVolume.x>__IntersectionVolume.y) return;
+	hit->position = ray_calculate_position(ray,__IntersectionVolume.x);
+
+	// calculate surface normals
+	vec3 __LP = divv3(subv3(hit->position,__Box->center),__Box->halfdim);
+	unsigned __HX = (fabsf(__LP.x)>fabsf(__LP.y))&&(fabsf(__LP.x)>fabsf(__LP.z));
+	unsigned __HY = !__HX&&(fabsf(__LP.y)>fabsf(__LP.z));
+	hit->normal = normalizev3((vec3){ __HX?__LP.x:0,__HY?__LP.y:0,!(__HX||__HY)?__LP.z:0 });
+
+	// material & colours
+	hit->material = __Box->material;
+	hit->colour = __Box->material_info.colour;
+}
+// TODO check parameter in camera near/far range
+// TODO hit tuple registration for csg system
 
 /**
  *	recursively check intersection of nodes

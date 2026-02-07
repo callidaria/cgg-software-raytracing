@@ -63,6 +63,7 @@ static inline vec3 _shade_basic(SHADER_PARAMETERS)
 static inline vec3 _shade_phong(SHADER_PARAMETERS)
 {
 	vec3 __Result = (vec3){ .0f,.0f,.0f };
+	// TODO ambient component
 
 	// iterate light sources
 	for (u32 i=0;i<scn->lighting.crr_light;i++)
@@ -91,8 +92,8 @@ static inline vec3 _shade_phong(SHADER_PARAMETERS)
 		}
 	}
 
-	return clampv3(hit->normal,.0f,1.f);
-	//return clampv3(__Result,.0f,1.f);
+	//return clampv3(hit->normal,.0f,1.f);
+	return clampv3(__Result,.0f,1.f);
 }
 // TODO surface colour read
 // TODO implement ambient component

@@ -10,6 +10,7 @@
 typedef enum {
 	NODE_TYPE_ROOT,
 	NODE_TYPE_SPHERE,
+	NODE_TYPE_BOX,
 	NODE_TYPE_COUNT
 } NodeType;
 
@@ -31,6 +32,15 @@ typedef struct {
 	Material material;
 	MaterialInfo material_info;
 } Sphere;
+
+typedef struct {
+	vec3 center;
+	vec3 bounds_min;
+	vec3 bounds_max;
+	vec3 halfdim;
+	Material material;
+	MaterialInfo material_info;
+} Box;
 
 typedef struct SGNode {
 	NodeType type;
@@ -86,6 +96,7 @@ typedef struct Scene {
 // graph
 void reserve_subsequent(SGNode*,u8);
 SGNode* define_sphere(SGNode*,vec3,f32,Material,vec4);
+SGNode* define_box(SGNode*,vec3,f32,f32,f32,Material,vec4);
 void destroy_graph(SGNode*);
 
 // scene

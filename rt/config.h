@@ -4,6 +4,10 @@
 #include "basic.h"
 
 
+// value
+static const u32 UINT32_MAX_VALUE = 0xFFFFFFFF;
+static const f32 FLOAT_MAX_VALUE = 0xFFFFFFFF;
+
 // buffer
 static const u32 BUFFER_RESOLUTION_WIDTH = 1920;
 static const u32 BUFFER_RESOLUTION_HEIGHT = 1080;

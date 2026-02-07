@@ -1,8 +1,11 @@
-.DS_Store
-bin
-.vscode
+# image exclusion
 images/video/
-*~
+images/cout.ppm
+
+# compile
+gmon.out
 *.o
-rt/lib/
+
+# setup
+*~
 callgrind.*
