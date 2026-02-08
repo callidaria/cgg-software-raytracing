@@ -92,8 +92,9 @@ static inline vec3 _shade_phong(SHADER_PARAMETERS)
 		}
 	}
 
+	return (vec3){ 1,1,1 };
 	//return clampv3(hit->normal,.0f,1.f);
-	return clampv3(__Result,.0f,1.f);
+	//return clampv3(__Result,.0f,1.f);
 }
 // TODO surface colour read
 // TODO implement ambient component

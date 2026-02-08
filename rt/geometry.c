@@ -38,10 +38,10 @@ void reserve_subsequent(SGNode* node,u8 count)
  */
 SGNode* define_sphere(SGNode* node,vec3 center,f32 radius,Material material,vec4 colour)
 {
-	SGNode* out = &node->subsequent[node->crr_child++];
-	out->type = NODE_TYPE_SPHERE;
-	out->subsequent = NULL;
-	out->crr_child = 0;
+	SGNode* __Out = &node->subsequent[node->crr_child++];
+	__Out->type = NODE_TYPE_SPHERE;
+	__Out->subsequent = NULL;
+	__Out->crr_child = 0;
 
 	// write sphere
 	Sphere* __Sphere = (Sphere*)malloc(sizeof(Sphere));
@@ -53,8 +53,8 @@ SGNode* define_sphere(SGNode* node,vec3 center,f32 radius,Material material,vec4
 	__Sphere->material_info.colour = colour;
 
 	// write & return
-	out->geometry = (f32*)__Sphere;
-	return out;
+	__Out->geometry = (f32*)__Sphere;
+	return __Out;
 }
 
 /**
@@ -70,10 +70,10 @@ SGNode* define_sphere(SGNode* node,vec3 center,f32 radius,Material material,vec4
  */
 SGNode* define_box(SGNode* node,vec3 center,f32 width,f32 height,f32 depth,Material material,vec4 colour)
 {
-	SGNode* out = &node->subsequent[node->crr_child++];
-	out->type = NODE_TYPE_BOX;
-	out->subsequent = NULL;
-	out->crr_child = 0;
+	SGNode* __Out = &node->subsequent[node->crr_child++];
+	__Out->type = NODE_TYPE_BOX;
+	__Out->subsequent = NULL;
+	__Out->crr_child = 0;
 
 	// write box
 	Box* __Box = (Box*)malloc(sizeof(Box));
@@ -85,8 +85,8 @@ SGNode* define_box(SGNode* node,vec3 center,f32 width,f32 height,f32 depth,Mater
 	__Box->material_info.colour = colour;
 
 	// write & return
-	out->geometry = (f32*)__Box;
-	return out;
+	__Out->geometry = (f32*)__Box;
+	return __Out;
 }
 
 // recursive helper function that deletes all subtrees of the rootnode
@@ -94,7 +94,7 @@ static inline void _destroy_graph(SGNode* node)
 {
 	for (u8 i=0;i<node->crr_child;i++) _destroy_graph(node->subsequent);
 	free(node->subsequent);
-	free(node->geometry);
+	//free(node->geometry);
 }
 
 /**
@@ -118,23 +118,23 @@ void destroy_graph(SGNode* node)
  */
 Scene* create_scene(vec3 cpos)
 {
-	Scene* out = (Scene*)malloc(sizeof(Scene));
+	Scene* __Out = (Scene*)malloc(sizeof(Scene));
 
 	// setup camera
-	create_camera(&out->camera,cpos);
-	update_camera(&out->camera);
+	create_camera(&__Out->camera,cpos);
+	update_camera(&__Out->camera);
 
 	// setup rootnode of scene graph
-	out->graph.type = NODE_TYPE_ROOT;
-	out->graph.geometry = NULL;
-	out->graph.crr_child = 0;
+	__Out->graph.type = NODE_TYPE_ROOT;
+	__Out->graph.geometry = NULL;
+	__Out->graph.crr_child = 0;
 
 	// setup lighting defaults
-	out->lighting.crr_sunlight = 0;
-	out->lighting.crr_pointlight = 0;
-	out->lighting.crr_light = 0;
+	__Out->lighting.crr_sunlight = 0;
+	__Out->lighting.crr_pointlight = 0;
+	__Out->lighting.crr_light = 0;
 
-	return out;
+	return __Out;
 }
 
 /**
