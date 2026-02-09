@@ -5,6 +5,17 @@
 // Scene Graph
 
 /**
+ *
+ */
+static inline SGNode* _produce_node(SGNode* parent)
+{
+	SGNode* __Out = &parent->subsequent[parent->crr_child++];
+	__Out->subsequent = NULL;
+	__Out->crr_child = 0;
+	return __Out;
+}
+
+/**
  *	start scene graph root
  *	\returns neutral root node of scene graph
  */
@@ -38,10 +49,8 @@ void reserve_subsequent(SGNode* node,u8 count)
  */
 SGNode* define_sphere(SGNode* node,vec3 center,f32 radius,Material material,vec4 colour)
 {
-	SGNode* __Out = &node->subsequent[node->crr_child++];
+	SGNode* __Out = _produce_node(node);
 	__Out->type = NODE_TYPE_SPHERE;
-	__Out->subsequent = NULL;
-	__Out->crr_child = 0;
 
 	// write sphere
 	Sphere* __Sphere = (Sphere*)malloc(sizeof(Sphere));
@@ -70,10 +79,8 @@ SGNode* define_sphere(SGNode* node,vec3 center,f32 radius,Material material,vec4
  */
 SGNode* define_box(SGNode* node,vec3 center,f32 width,f32 height,f32 depth,Material material,vec4 colour)
 {
-	SGNode* __Out = &node->subsequent[node->crr_child++];
+	SGNode* __Out = _produce_node(node);
 	__Out->type = NODE_TYPE_BOX;
-	__Out->subsequent = NULL;
-	__Out->crr_child = 0;
 
 	// write box
 	Box* __Box = (Box*)malloc(sizeof(Box));
@@ -160,7 +167,7 @@ void destroy_scene(Scene* scene)
  *	\param origin: axis component of ray origin
  *	\param direction: axis component of ray direction
  */
-void _clip_axis(vec2* vol,f32 bmin,f32 bmax,f32 origin,f32 direction)
+static inline void _clip_axis(vec2* vol,f32 bmin,f32 bmax,f32 origin,f32 direction)
 {
 	f32 __DirectionInv = 1.f/direction;
 	f32 __T0 = (bmin-origin)*__DirectionInv;

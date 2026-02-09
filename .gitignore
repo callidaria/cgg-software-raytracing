@@ -1,6 +1,6 @@
 # image exclusion
 images/video/
-images/cout.ppm
+cout.ppm
 
 # compile
 gmon.out
