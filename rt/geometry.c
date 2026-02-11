@@ -99,9 +99,9 @@ SGNode* define_box(SGNode* node,vec3 center,f32 width,f32 height,f32 depth,Mater
 // recursive helper function that deletes all subtrees of the rootnode
 static inline void _destroy_graph(SGNode* node)
 {
-	for (u8 i=0;i<node->crr_child;i++) _destroy_graph(node->subsequent);
+	for (u8 i=0;i<node->crr_child;i++) _destroy_graph(node->subsequent+i);
 	free(node->subsequent);
-	//free(node->geometry);
+	free(node->geometry);
 }
 
 /**

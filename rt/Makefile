@@ -9,7 +9,7 @@ SRCS = $(filter-out main.c, $(wildcard *.c))
 OBJS = $(SRCS:%.c=$(LDST)%.o)
 MAIN = main.c
 
-DEBUG_SUFFIX = -pg -g -O0 -DDEBUG
+DEBUG_SUFFIX = -O0 -DDEBUG  # -pg -g
 RELEASE_SUFFIX = -O3 -ffast-math -fno-gcse
 
 CXXFLAGS = $(RELEASE_SUFFIX) $(LINKER)
