@@ -1,4 +1,4 @@
-#include "gfx.h"
+#include "dialectics.h"
 
 
 int main(int argc,char** argv)
