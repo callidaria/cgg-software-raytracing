@@ -2,20 +2,42 @@
 
 
 /**
+ *	definition of all interpreter modi
+ *	\param root: rootnode of processing subtree
+ *	\param file: dialectics file
+ *	\param status: interpreter read status, this will be changed by command while interpreting
+ *	\param cmd: direct command
+ */
+#define DIALECTICS_INTERPRETER_PARAMETERS SGNode* root,FILE* file,InterpreterStatus* status,const char* cmd
+typedef void (*_dialectics_interpreter_procedure)(DIALECTICS_INTERPRETER_PARAMETERS);
+
+// starting command info, expecting node depth indent
+// TODO
+
+/**
  *	interpreter for dialectics logic
  *	dialectics works, utilizing the following syntacitc rules:
  *		<n> COMMAND <command_params>
  *		<n>: n is an integer value to indicate tree depth at node
  *	COMMANDS:
- *		sphere <
+ *		sphere <position vec3>
  *		tree <subtree_name>: inserts subtree
+ *	type specifications:
+ *		int/float:	n
+ *		vec2:		(x,y)
+ *		vec3:		(x,y,z)
+ *		vec4:		(w,x,y,z)
+ *		quat:		(x,y,z,w)
+ *		string:		<text>
  *	subtree definition:
  *		to define a subtree the developer may use "st <subtree_name>:" or "sti <subtree_name>:"
  *		"ste" is used to mark end of subtree definitione
  *		to insert subtree in another tree definition use (+)n tree <subtree_name>
+ *	"<" and ">" are not to be interpreted as literal syntax, they specify beginning and end of placeholders
+ *	\param graph: pointer to rootnode of scene graph (this can also be the root of a subtree)
  *	\param path: path to scene definition file
  */
-void interpret_dialectics(const char* path)
+void interpret_dialectics(SGNode* graph,const char* path)
 {
 	// open scene definition file
 	FILE* __File = fopen(path);
