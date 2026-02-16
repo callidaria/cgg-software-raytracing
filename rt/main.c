@@ -1,4 +1,4 @@
-#include "dialectics.h"
+#include "linguistics.h"
 
 
 int main(int argc,char** argv)

@@ -1,4 +1,4 @@
-#include "dialectics.h"
+#include "linguistics.h"
 
 
 /**
@@ -8,15 +8,22 @@
  *	\param status: interpreter read status, this will be changed by command while interpreting
  *	\param cmd: direct command
  */
-#define DIALECTICS_INTERPRETER_PARAMETERS SGNode* root,FILE* file,InterpreterStatus* status,const char* cmd
-typedef void (*_dialectics_interpreter_procedure)(DIALECTICS_INTERPRETER_PARAMETERS);
+#define LINGUISTICS_INTERPRETER_PARAMETERS SGNode* root,FILE* file,InterpreterStatus* status,const char* cmd
+typedef void (*_linguistics_interpreter_procedure)(LINGUISTICS_INTERPRETER_PARAMETERS);
 
 // starting command info, expecting node depth indent
-// TODO
+void _interpreter_wait_for_command(LINGUISTICS_INTERPRETER_PARAMETERS)
+{
+	// TODO
+}
+
+_linguistics_interpreter_procedure _interpret_liguistics[INTERPRETER_STATUS_COMMANDCOUNT] = {
+	_interpreter_wait_for_command,
+};
 
 /**
- *	interpreter for dialectics logic
- *	dialectics works, utilizing the following syntacitc rules:
+ *	interpreter for linguistics logic
+ *	this dialects linguistics work, utilizing the following syntacitc rules:
  *		<n> COMMAND <command_params>
  *		<n>: n is an integer value to indicate tree depth at node
  *	COMMANDS:
@@ -37,7 +44,7 @@ typedef void (*_dialectics_interpreter_procedure)(DIALECTICS_INTERPRETER_PARAMET
  *	\param graph: pointer to rootnode of scene graph (this can also be the root of a subtree)
  *	\param path: path to scene definition file
  */
-void interpret_dialectics(SGNode* graph,const char* path)
+void interpret_linguistics(SGNode* graph,const char* path)
 {
 	// open scene definition file
 	FILE* __File = fopen(path);
@@ -48,7 +55,7 @@ void interpret_dialectics(SGNode* graph,const char* path)
 	}
 
 	// iterate definitions
-	char __CMD[DIALECTICS_COMMAND_CHARLEN];
+	char __CMD[LINGUISTICS_COMMAND_CHARLEN];
 	while (fscanf(__File,"%s",__CMD)!=EOF)
 	{
 		// TODO
