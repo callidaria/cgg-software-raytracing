@@ -23,9 +23,12 @@ _linguistics_interpreter_procedure _interpret_liguistics[INTERPRETER_STATUS_COMM
 
 /**
  *	interpreter for linguistics logic
+ *	target functionality of this feature is to read a scenegraph tree & cram it into linear memory space,
+ *	utilizing only a singular memory allocation for the entire tree structure. later the tree nodes can be
+ *	iterated like expected.
  *	this dialects linguistics work, utilizing the following syntacitc rules:
- *		<n> COMMAND <command_params>
- *		<n>: n is an integer value to indicate tree depth at node
+ *		(<+>+<->+e) COMMAND <command_params>
+ *		<+> + <->: is an optional char value to indicate tree depth based on previous depth
  *	COMMANDS:
  *		sphere <position vec3>
  *		tree <subtree_name>: inserts subtree
@@ -54,7 +57,14 @@ void interpret_linguistics(SGNode* graph,const char* path)
 		return;
 	}
 
+	// preprocess to assemble tree structure
+	while (fscanf(__File,"%s",__CMD)!=EOF)
+	{
+		// TODO
+	}
+
 	// iterate definitions
+	fseek(__File,0,0);  // TODO how does this work again?
 	char __CMD[LINGUISTICS_COMMAND_CHARLEN];
 	while (fscanf(__File,"%s",__CMD)!=EOF)
 	{

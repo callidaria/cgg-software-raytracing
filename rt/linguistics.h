@@ -3,7 +3,7 @@
 
 #include "gfx.h"
 
-#define LINGUISTICS_COMMAND_CHARLEN 32;
+#define LINGUISTICS_COMMAND_CHARLEN 32
 
 
 enum InterpreterStatus
@@ -12,7 +12,7 @@ enum InterpreterStatus
 	INTERPRETER_STATUS_COMMANDCOUNT
 };
 
-void interpret_linguistics(const char* path);
+void interpret_linguistics(SGNode*,const char*);
 
 
 #endif
